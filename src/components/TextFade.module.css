@@ -1,0 +1,147 @@
+
+.textFadeContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+.textFadeHorizontal::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  background: linear-gradient(to right, 
+    transparent 0%, 
+    rgba(42, 42, 70, 0.7) 40%,
+    rgba(42, 42, 70, 0.95) 80%,
+    #2a2a46 100%
+  );
+  pointer-events: none;
+}
+
+.textFadeHorizontalTransparent::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  background: linear-gradient(to right, 
+    transparent 0%, 
+    rgba(30, 29, 54, 0.7) 40%,
+    rgba(30, 29, 54, 0.95) 80%,
+    #1e1d36 100%
+  );
+  pointer-events: none;
+}
+
+.textFadeVertical::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(42, 42, 70, 0.7) 40%,
+    rgba(42, 42, 70, 0.95) 80%,
+    #2a2a46 100%
+  );
+  pointer-events: none;
+}
+
+.textFadeVerticalTransparent::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(30, 29, 54, 0.7) 40%,
+    rgba(30, 29, 54, 0.95) 80%,
+    #1e1d36 100%
+  );
+  pointer-events: none;
+}
+
+.singleLineFade {
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+}
+
+.singleLineFade::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, 
+    transparent 0%, 
+    rgba(42, 42, 70, 0.8) 50%,
+    #2a2a46 100%
+  );
+  pointer-events: none;
+}
+
+.multiLineFade {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; 
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+}
+
+.multiLineFade::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(42, 42, 70, 0.7) 30%,
+    rgba(42, 42, 70, 0.95) 70%,
+    #2a2a46 100%
+  );
+  pointer-events: none;
+}
+
+.textFadeGlass::after {
+  background: linear-gradient(to right, 
+    transparent 0%, 
+    rgba(42, 42, 70, 0.4) 30%,
+    rgba(42, 42, 70, 0.8) 70%,
+    rgba(42, 42, 70, 0.95) 100%
+  );
+}
+
+.fadeShort::after {
+  width: 30px;
+}
+
+.fadeMedium::after {
+  width: 60px;
+}
+
+.fadeLong::after {
+  width: 90px;
+}
+
+.textFadeHover {
+  transition: all 0.3s ease;
+}
+
+.textFadeHover:hover::after {
+  opacity: 0;
+}
+
+.textFadeHover:hover {
+  overflow: visible;
+}

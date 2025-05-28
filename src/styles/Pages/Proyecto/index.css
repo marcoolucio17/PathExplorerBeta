@@ -1,0 +1,7 @@
+
+/* Main page styles */
+@import './EmpleadoProyectoPage.module.css';
+
+/* Section-specific styles */
+@import './PeopleSection.module.css';
+@import './SkillsSection.module.css';

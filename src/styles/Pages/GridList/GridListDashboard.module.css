@@ -1,0 +1,119 @@
+:root {
+--container-height: 70vh;
+--container-padding: 2rem;
+--min-content-width: 320px;
+}
+
+/* Main container */
+.dashboardContainer {
+background: transparent;
+height: 100vh;
+min-height: 600px;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: var(--container-padding);
+overflow-x: hidden;
+overflow-y: auto; 
+}
+
+/* Content container */
+.dashboardContent {
+display: flex;
+flex-direction: column;
+max-width: 1200px;
+width: 100%;
+height: var(--container-height);
+min-height: 500px;
+overflow: visible; 
+position: relative;
+}
+
+/* Page header with back button */
+.pageHeader {
+display: flex;
+align-items: center;
+margin-bottom: 20px;
+flex-shrink: 0; 
+overflow: visible; 
+}
+
+.pageTitle {
+font-size: 1.8rem;
+font-weight: 600;
+margin: 0;
+color: var(--text-light);
+font-family: 'Graphik Medium', sans-serif;
+}
+
+/* Search and Filters Row */
+.searchAndFiltersRow {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 1.5rem;
+gap: 1rem;
+flex-shrink: 0; 
+overflow: visible;
+}
+
+/* Applicants container */
+.cardsContainer {
+flex: 1;
+overflow: visible; /* Allow shadows & hgover effects */
+position: relative;
+min-height: 0; 
+}
+
+/* Only hide scrollbars on the actual scrollable content, not the whole container */
+.dashboardContainer {
+scrollbar-width: thin; 
+}
+
+/* Hide only unwanted scrollbars on the main dashboard container */
+.dashboardContainer::-webkit-scrollbar {
+width: 6px; 
+}
+
+.dashboardContainer::-webkit-scrollbar-track {
+background: transparent;
+}
+
+.dashboardContainer::-webkit-scrollbar-thumb {
+background: rgba(255, 255, 255, 0.1);
+border-radius: 3px;
+}
+
+.dashboardContainer::-webkit-scrollbar-thumb:hover {
+background: rgba(255, 255, 255, 0.2);
+}
+
+/* Simple tab action for My Projects - just button at top right */
+.tabActionSimple {
+display: flex;
+justify-content: flex-end;
+margin-bottom: 1rem;
+padding: 0 8px 0 0; 
+overflow: visible; 
+}
+
+.createProjectButton {
+flex-shrink: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+.pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.backButton {
+    margin-right: 0;
+}
+
+.createProjectButton {
+    width: 100%;
+}
+}
