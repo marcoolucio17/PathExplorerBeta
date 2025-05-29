@@ -263,8 +263,9 @@ export const useProfilePage = () => {
   );
 
   // Handle skills update
-  const handleUpdateSkills = useCallback((newSkills) => {
-    //setUserSkills(newSkills);
+  const handleUpdateSkills = useCallback(async (newSkills) => {
+    console.log(newSkills);
+    console.log("hi there.");
   }, []);
 
   // Handle add certificate
@@ -311,7 +312,6 @@ export const useProfilePage = () => {
   return {
     // Data
     userProfile,
-    userSkills,
     userCertificates,
     userExperience,
     objectives,
