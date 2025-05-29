@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import styles from './Tabs.module.css';
 
 /**
- * 
+ * Tabs component with smooth animations, notification badges and customizable border style
  * 
  * @param {Array} tabs - Array of tab names or tab objects with format { name: 'TabName', notificationCount: 5 }
  * @param {string} activeTab - Currently active tab name
@@ -15,18 +15,18 @@ const Tabs = ({
   activeTab, 
   onTabClick, 
   actionButtons,
-  borderStyle = 'full' 
+  borderStyle = 'full' // Default to full-width border
 }) => {
-  //if tabs is an array of strings or objects
+  // Check if tabs is an array of strings or objects
   const isObjectTabs = tabs.length > 0 && typeof tabs[0] === 'object';
   
-  //refs for the tabs to calculate indicator position
+  // Refs for the tabs to calculate indicator position
   const tabRefs = useRef([]);
   
-  //state for indicator style
+  // State for indicator style
   const [indicatorStyle, setIndicatorStyle] = useState({});
   
-  //update indicator position when the active tab changes
+  // Update indicator position when the active tab changes
   useEffect(() => {
     if (tabRefs.current.length === 0) return;
     
@@ -38,7 +38,7 @@ const Tabs = ({
     
     const activeTabElement = tabRefs.current[activeTabIndex];
     
-    //calculate position based on active tab
+    // Calculate position based on active tab
     const { offsetLeft, offsetWidth } = activeTabElement;
     
     setIndicatorStyle({
@@ -47,7 +47,7 @@ const Tabs = ({
     });
   }, [activeTab, tabs, isObjectTabs]);
   
-  //initialize refs array when tabs change
+  // Initialize refs array when tabs change
   useEffect(() => {
     tabRefs.current = tabRefs.current.slice(0, tabs.length);
   }, [tabs]);

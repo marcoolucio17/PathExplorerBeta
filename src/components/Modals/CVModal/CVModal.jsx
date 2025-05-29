@@ -21,7 +21,7 @@ export const CVModal = ({ isOpen, onClose }) => {
       onClose();
       setIsVisible(false);
       setIsClosing(false);
-    }, 300); 
+    }, 300); // Match animation duration
   };
 
   const handleBackdropClick = (e) => {
@@ -47,6 +47,7 @@ export const CVModal = ({ isOpen, onClose }) => {
       const file = e.target.files[0];
       if (file) {
         console.log('File selected:', file.name);
+        // Handle file upload logic here
       }
     };
     input.click();

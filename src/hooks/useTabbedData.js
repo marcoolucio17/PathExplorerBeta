@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 
 /**
- * 
+ * Custom hook for managing tabbed data with counts
  * @param {Array} data - The complete data array
  * @param {Object} options - Configuration options for tabs
  * @returns {Object} - Tab state and filtered data
@@ -11,22 +11,23 @@ const useTabbedData = (data = [], options = {}) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [tabCounts, setTabCounts] = useState({});
   
-  //get unique tab names from data
+  // Get unique tab names from data
   const tabNames = useMemo(() => {
     if (!data || data.length === 0) {
-      return ['Pending', 'In Review', 'Accepted', 'Denied']; 
+      return ['Pending', 'In Review', 'Accepted', 'Denied']; // Default tabs
     }
     
     const uniqueTabs = [...new Set(data.map(item => item[tabNameField]))];
     return uniqueTabs.length > 0 ? uniqueTabs : ['Pending', 'In Review', 'Accepted', 'Denied'];
   }, [data, tabNameField]);
   
+  // Apply filters based on active tab
   const filteredData = useMemo(() => {
     if (!data || data.length === 0) return [];
     return data.filter(item => item[tabNameField] === activeTab);
   }, [data, activeTab, tabNameField]);
   
-  //calculate counts
+  // Calculate counts for each tab
   useEffect(() => {
     if (!data || data.length === 0) {
       setTabCounts({});
@@ -35,11 +36,12 @@ const useTabbedData = (data = [], options = {}) => {
     
     const counts = {};
     
+    // Initialize all tabs with zero count
     tabNames.forEach(tab => {
       counts[tab] = 0;
     });
     
-
+    // Count items for each tab
     data.forEach(item => {
       const tabValue = item[tabNameField];
       if (tabValue) {

@@ -27,7 +27,7 @@
   position: relative;
 }
 
-/*page header with back button */
+/* Page header with back button */
 .pageHeader {
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@
   font-family: 'Graphik Medium', sans-serif;
 }
 
-/*search and Filters Row */
+/* Search and Filters Row */
 .searchAndFiltersRow {
   display: flex;
   align-items: center;

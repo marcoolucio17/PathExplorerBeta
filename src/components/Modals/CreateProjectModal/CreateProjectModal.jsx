@@ -81,7 +81,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    //spansih format
+    // Format dates to Spanish format
     const formatDate = (dateString) => {
       if (!dateString) return '';
       const date = new Date(dateString);
@@ -90,9 +90,9 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
       return `${date.getDate()} de ${months[date.getMonth()]}, ${date.getFullYear()}`;
     };
     
-    //rpoject object
+    // Create Project object
     const newProject = {
-      id: Date.now(), //unique id
+      id: Date.now(), // Generate unique ID
       img: formData.imagePreview || '/imagesUser/default-cert.png',
       alt: formData.skill || formData.title,
       title: formData.title,

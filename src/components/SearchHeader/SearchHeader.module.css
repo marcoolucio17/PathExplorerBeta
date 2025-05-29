@@ -1,4 +1,4 @@
-
+/* SearchHeader wrapper for containing both header and filters */
 .searchHeaderWrapper {
   width: 100%;
   display: flex;
@@ -6,6 +6,7 @@
   margin-bottom: 15px;
 }
 
+/* Search header with search and sort options */
 .searchHeader {
   width: 100%;
   display: flex;
@@ -17,14 +18,15 @@
 .searchContainer {
   position: relative;
   width: 250px;
-  min-height: 42px; 
+  min-height: 42px; /* Fixed height to prevent layout shift */
   display: flex;
   align-items: center;
-  overflow: visible; 
+  overflow: visible; /* Allow input to expand beyond container */
   transition: width 0.25s ease;
 }
 
 .searchContainerFocused {
+  /* This will be controlled by inline styles */
   border-color: var(--text-light);
   box-shadow: var(--shadow-card-hover);
 }
@@ -93,7 +95,7 @@
   position: relative;
 }
 
-/* Active filters container*/
+/* Active filters container - Updated to match screenshot */
 .activeFiltersContainer {
   display: flex;
   align-items: center;
@@ -244,7 +246,7 @@
   font-weight: 500;
 }
 
-/*Container classes for animation targets*/
+/* Container classes for animation targets - improved transitions */
 .gridContainer, .listContainer {
   transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
               transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -259,7 +261,7 @@
   transform-origin: center top;
 }
 
-/*inSearchBar specific styles */
+/* inSearchBar specific styles */
 .inSearchBar {
   margin-bottom: 0;
 }
@@ -291,7 +293,7 @@
   padding-left: 35px;
 }
 
-/*search Results Dropdown */
+/* Search Results Dropdown */
 .searchResultsDropdown {
   position: absolute;
   top: 100%;
@@ -342,7 +344,7 @@
   left: 16px !important;
 }
 
-/*icon wrapper and search result item styling */
+/* Icon wrapper and search result item styling */
 .iconWrapper {
   display: inline-block;
   width: 24px;
