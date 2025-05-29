@@ -15,6 +15,8 @@ export const useDashboardHeaderConfig = (props) => {
     getActiveFilters,
     handleClearFilters,
     toggleSkillsFilterModal,
+    toggleClientsFilterModal,
+    toggleRolesFilterModal,
     setSortOption,
     toggleCompatibility,
     showCompatibility,
@@ -40,11 +42,26 @@ export const useDashboardHeaderConfig = (props) => {
           label: 'Skills', 
           action: 'skills', 
           icon: 'bi-tools'
+        },
+        { 
+          label: 'Clients', 
+          action: 'clients', 
+          icon: 'bi bi-person-circle' 
+        },
+        { 
+          label: 'Roles', 
+          action: 'roles', 
+          icon: 'bi bi-person-workspace' 
         }
       ],
       onDropdownItemClick: (item) => {
         if (item.action === 'skills') {
           toggleSkillsFilterModal();
+        }
+        else if (item.action === 'clients') {
+          toggleClientsFilterModal();
+        } else if (item.action === 'roles') {
+          toggleRolesFilterModal();
         }
       }
     },
