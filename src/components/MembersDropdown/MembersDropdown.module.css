@@ -150,6 +150,7 @@
   margin: 0;
 }
 
+/* Open state animations */
 .membersDropdown.open .stackedAvatars.hidden {
   opacity: 0;
   visibility: hidden;

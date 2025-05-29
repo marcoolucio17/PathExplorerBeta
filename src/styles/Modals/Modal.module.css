@@ -85,7 +85,7 @@
   }
 }
 
-/* Close button */
+/* Close button - FIXED: Ensure it's always visible */
 .closeButton {
   position: absolute;
   top: 1rem;
@@ -101,7 +101,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 1001 !important; 
+  z-index: 1001 !important; /* Ensure it's above everything */
   padding: 0;
   flex-shrink: 0;
   font-size: 1rem;
@@ -218,7 +218,6 @@
 .buttonGroup {
   display: flex;
   gap: 1rem;
-  margin: 0 2rem 2rem;
 }
 
 .cancelButton,

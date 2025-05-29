@@ -4,18 +4,18 @@ import styles from './GlassFade.module.css';
 export const GlassFade = ({ 
   children, 
   className = '',
-  fadeType = 'glass',
-  fadeBackground = 'default', 
+  fadeType = 'glass', // 'glass' or 'feather'
+  fadeBackground = 'default', // 'default' or 'transparent' or 'glass'
   showNoise = false,
   style = {},
-  fadeHeight = 'auto' 
+  fadeHeight = 'auto' // 'auto' for dynamic, or specific pixel value
 }) => {
   const [fadeState, setFadeState] = useState({
     showTop: false,
     showBottom: false,
     topOpacity: 0,
     bottomOpacity: 0,
-    dynamicFadeHeight: 80 
+    dynamicFadeHeight: 80 // default fade height
   });
   const containerRef = useRef(null);
 
@@ -27,8 +27,10 @@ export const GlassFade = ({
       const scrollBottom = scrollHeight - scrollTop - clientHeight;
       const totalScrollable = scrollHeight - clientHeight;
       
-      let calculatedFadeHeight = 80;
+      // Calculate dynamic fade height based on container height
+      let calculatedFadeHeight = 80; // default
       if (fadeHeight === 'auto') {
+        // Make fade height proportional to container height (20% of container height, min 40px, max 120px)
         calculatedFadeHeight = Math.min(120, Math.max(40, clientHeight * 0.2));
       } else if (typeof fadeHeight === 'number') {
         calculatedFadeHeight = fadeHeight;
@@ -45,13 +47,13 @@ export const GlassFade = ({
         return;
       }
       
-      //opacity based on scroll position
+      // Calculate dynamic opacity based on scroll position
       const scrollProgress = scrollTop / totalScrollable;
       const bottomProgress = 1 - scrollProgress;
       
-      //smooth fade
-      const topFadeThreshold = 0.05; //fading at 5% scroll
-      const bottomFadeThreshold = 0.95; // fading at 95% scroll
+      // Smooth fade calculations
+      const topFadeThreshold = 0.05; // Start fading at 5% scroll
+      const bottomFadeThreshold = 0.95; // Start fading at 95% scroll
       
       let topOpacity = 0;
       let bottomOpacity = 0;
@@ -77,10 +79,10 @@ export const GlassFade = ({
     if (container) {
       container.addEventListener('scroll', handleScroll);
       
-      //initial check
+      // Initial check
       setTimeout(handleScroll, 0);
       
-      //when monitor size changes
+      // Monitor size changes
       const resizeObserver = new ResizeObserver(handleScroll);
       resizeObserver.observe(container);
       
@@ -119,7 +121,7 @@ export const GlassFade = ({
           className={`${getFadeClass(true)} ${styles.dynamicFade}`}
           style={{ 
             opacity: fadeState.topOpacity,
-            height: `${fadeState.dynamicFadeHeight * 0.8}px`
+            height: `${fadeState.dynamicFadeHeight * 0.8}px` // Top fade slightly smaller
           }}
         />
       )}

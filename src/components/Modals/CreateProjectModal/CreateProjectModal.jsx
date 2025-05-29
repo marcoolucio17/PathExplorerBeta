@@ -82,7 +82,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const formatDate = (dateString) => {
       if (!dateString) return '';
 

@@ -6,18 +6,18 @@ import useModalControl from '../useModalControl';
 import useToggleState from '../useToggleState';
 
 /**
- * 
- * 
+ * Manager-specific Dashboard hook
+ * Tabs: "All", "Applied To", "My Projects"
  * 
  * @returns {Object} Complete state and functions for the Manager Dashboard page
  */
 export const useManagerDashboardPage = () => {
   const navigate = useNavigate();
   
-  //get dashboard data
+  // Get dashboard data
   const dashboardData = useDashboardData();
   
-  //manager-specific tab names
+  // Manager-specific tab names
   const tabNames = ['All', 'Applied To', 'My Projects'];
   
   // Modal controls
@@ -27,16 +27,17 @@ export const useManagerDashboardPage = () => {
     closeModal, 
     toggleModal 
   } = useModalControl({
-    skillsFilter: false
+    skillsFilter: false,
+    createProject: false
   });
   
-  //toggle for compatibility view
+  // Toggle for compatibility view
   const { 
     state: showCompatibility,
     toggle: toggleCompatibility 
   } = useToggleState(false);
   
-  //setup list page logic
+  // Setup list page logic
   const listPage = useListPage({
     data: dashboardData.projects,
     defaultSortOption: 'date_desc',
@@ -50,14 +51,19 @@ export const useManagerDashboardPage = () => {
     baseUrl: '/manager/dashboard'
   });
   
+  // Override toggleViewMode to ensure animation works consistently
   const toggleViewMode = useCallback(() => {
+    // Toggle view mode using the original function
     listPage.toggleViewMode();
     
+    // Force animation refresh for the newly displayed items
     setTimeout(() => {
+      // Reset any placeholders immediately
       if (listPage.resetAnimation) {
         listPage.resetAnimation();
       }
       
+      // Trigger a full animation sequence after a short delay
       setTimeout(() => {
         if (listPage.triggerAnimationSequence) {
           listPage.triggerAnimationSequence();
@@ -66,15 +72,22 @@ export const useManagerDashboardPage = () => {
     }, 50);
   }, [listPage]);
   
+  // Helper to toggle skills filter modal
   const toggleSkillsFilterModal = () => {
     toggleModal('skillsFilter');
   };
-  
 
+  // Helper to toggle create project modal
+  const toggleCreateProjectModal = () => {
+    toggleModal('createProject');
+  };
+  
+  // Navigate to applicants page
   const handleViewApplicants = () => {
     navigate('/manager/applicants');
   };
   
+  // Get filtered projects for the current tab
   const getTabProjects = () => {
     let filteredProjects;
     
@@ -83,11 +96,13 @@ export const useManagerDashboardPage = () => {
         filteredProjects = dashboardData.projects;
         break;
       case 'Applied To':
+        // Projects where the user has applied to a role
         filteredProjects = dashboardData.projects.filter(project => 
           project.userHasApplied === true
         );
         break;
       case 'My Projects':
+        // Projects managed/owned by the current user
         filteredProjects = dashboardData.projects.filter(project => 
           project.managerId === dashboardData.currentUserId || project.ownerId === dashboardData.currentUserId
         );
@@ -98,7 +113,8 @@ export const useManagerDashboardPage = () => {
     
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
   };
-
+  
+  // Generate active filters for header
   const getActiveFilters = () => {
     const filters = {};
     
@@ -113,41 +129,52 @@ export const useManagerDashboardPage = () => {
     
     return filters;
   };
-
+  
+  // Handle removing a specific filter
   const handleRemoveFilter = (filterType, value) => {
     if (filterType === 'skills') {
       dashboardData.removeSkillFilter(value);
     }
   };
   
+  // Handle clear filters action
   const handleClearFilters = () => {
     dashboardData.clearAllSkillFilters();
     listPage.handleClearFilters();
   };
+
+  // Handle Project creation
+  const handleCreateProject =() => {
+    // Agregar lógica de agregar proyecto
+  }
   
+  // Compute flattened projects for display
   const displayProjects = dashboardData.flattenProjectsForList(getTabProjects());
   
+  // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
       return { 'All': 0, 'Applied To': 0, 'My Projects': 0 };
     }
     
-    //initial counts
+    // Initial counts
     const counts = {
       'All': 0,
       'Applied To': 0,
       'My Projects': 0
     };
     
+    // Calculate flattened projects (roles) for each tab
+    // All projects - set to 0 to hide notification badge as requested
     counts['All'] = 0;
     
-    //applied To projects
+    // Applied To projects
     const appliedToProjects = dashboardData.projects.filter(project => 
       project.userHasApplied === true
     );
     counts['Applied To'] = dashboardData.flattenProjectsForList(appliedToProjects).length;
     
-    //my Projects
+    // My Projects
     const myProjects = dashboardData.projects.filter(project => 
       project.managerId === dashboardData.currentUserId || project.ownerId === dashboardData.currentUserId
     );
@@ -167,11 +194,14 @@ export const useManagerDashboardPage = () => {
     openModal,
     closeModal,
     toggleSkillsFilterModal,
+    toggleCreateProjectModal,
     handleViewApplicants,
     getActiveFilters,
     handleRemoveFilter,
     handleClearFilters,
+    // Override toggleViewMode with our custom implementation
     toggleViewMode,
+    // Override tab counts with our corrected counts
     tabCounts: correctedTabCounts
   };
 };
