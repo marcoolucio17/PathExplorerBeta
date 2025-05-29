@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import modalStyles from 'src/styles/Modals/Modal.module.css';
-import styles from './ClientsModal.module.css';
+import styles from './RolesModal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
 
+export const RolesModal = ({ isOpen, onClose, selectedRole, onRoleSelected, roles = [] }) => {
 
-
-export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelected, clients = [] }) => {
 
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedClient, setselectedClient] = useState('');
+    const [selecteRole, setselecteRole] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -40,13 +39,13 @@ export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelecte
         }
     };
 
-    const toggleClient = (client) => {
-        setselectedClient(client)
+    const toggleRole = (client) => {
+        setselecteRole(client)
     };
 
     const handleSave = () => {
         if (selectedClient) {
-            onClientSelected(selectedClient);
+            onRoleSelected(selectedClient);
         }
         handleClose();
     }
@@ -65,8 +64,8 @@ export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelecte
                 </button>
 
                 <div className={modalStyles.modalHeader}>
-                    <h2 className={modalStyles.title}>Clients register</h2>
-                    <p className={modalStyles.subtitle}>Select a client to see the projects they belong to them.</p>
+                    <h2 className={modalStyles.title}>Roles available</h2>
+                    <p className={modalStyles.subtitle}>Select a role to see the projects who have it.</p>
 
                     <div className={styles.searchBox}>
                         <i className={`bi bi-search ${styles.searchIcon}`}></i>
@@ -83,12 +82,12 @@ export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelecte
                 </div>
 
                 <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
-                    {clients && clients.map((client) => (
+                    {roles && roles.map((role) => (
 
-                        <div key={client.idcliente} >
-                            <button onClick={() => toggleClient(client.idcliente)}>
+                        <div key={role.idrol} >
+                            <button onClick={() => toggleClient(role.idrol)}>
                                 <span>
-                                    {client.clnombre}
+                                    {role.nombrerol}
                                 </span>
                             </button>
 
@@ -109,4 +108,5 @@ export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelecte
             </div>
         </div>
     );
+
 };
