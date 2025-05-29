@@ -86,7 +86,7 @@ export const LoginForm = () => {
         Sign in
       </p>
 
-      <Form className="w-50">
+      <Form className="w-50" onSubmit={handleLogin}>
         <Form.Group className="mt-5 mb-3" controlId="formBasicEmail">
           <input
             className="transparent-input"
@@ -132,7 +132,7 @@ export const LoginForm = () => {
           }}
         >
           <button
-            type="button"
+            type="submit"
             onClick={handleLogin}
             className="customSubmitButton"
             disabled={isLoading}
