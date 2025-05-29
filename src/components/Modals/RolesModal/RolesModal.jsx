@@ -4,13 +4,14 @@ import styles from './RolesModal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
 
-export const RolesModal = ({ isOpen, onClose, selectedRole, onRoleSelected, roles = [] }) => {
+export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
 
 
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selecteRole, setselecteRole] = useState('');
+    const [selectRole, setselectRole] = useState('');
+    const [selectRoleId, setSelectRoleId] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -39,13 +40,14 @@ export const RolesModal = ({ isOpen, onClose, selectedRole, onRoleSelected, role
         }
     };
 
-    const toggleRole = (client) => {
-        setselecteRole(client)
+    const toggleRole = (role, roleId) => {
+        setselectRole(role);
+        setSelectRoleId(roleId);
     };
 
     const handleSave = () => {
-        if (selectedClient) {
-            onRoleSelected(selectedClient);
+        if (selectRole && selectRoleId) {
+            onRoleSelected(selectRole, selectRoleId);
         }
         handleClose();
     }
@@ -71,7 +73,7 @@ export const RolesModal = ({ isOpen, onClose, selectedRole, onRoleSelected, role
                         <i className={`bi bi-search ${styles.searchIcon}`}></i>
                         <input
                             type="text"
-                            placeholder="Search client..."
+                            placeholder="Search role..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className={styles.searchInput}
@@ -85,7 +87,7 @@ export const RolesModal = ({ isOpen, onClose, selectedRole, onRoleSelected, role
                     {roles && roles.map((role) => (
 
                         <div key={role.idrol} >
-                            <button onClick={() => toggleClient(role.idrol)}>
+                            <button onClick={() => toggleRole(role.nombrerol, role.idrol)}>
                                 <span>
                                     {role.nombrerol}
                                 </span>

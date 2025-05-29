@@ -19,10 +19,16 @@ export const useDashboardData = () => {
 
   //searchand filter state
   const [searchTerm, setSearchTerm] = useState(searchFromURL);
-
+  const [skillSelected, setSkillSelected] = useState("Skills");
   const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
-  const [selectedClientFilters, setSelectedClientFilters] = useState("");
-  const [selectedRoleFilters, setSelectedRoleFilters] = useState("");
+  //Selected the name of the client
+  const [clientNameSelected, setClientNameSelected] = useState("Clients");
+  //Selected the id client
+  const [clientId, setClientId] = useState(null);
+  //Name of the selected role
+  const [roleNameSelected, setRoleNameSelected] = useState("Roles");
+  //Selected the id role
+  const [roleId, setRoleId] = useState(null);
 
   const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
 
@@ -74,26 +80,26 @@ export const useDashboardData = () => {
   };
 
   //Apply client filters
-  const handleApplyClientFilters = (selectedClientFilters) => {
-    setSelectedClientFilters(selectedClientFilters);
-
+  const handleApplyClientFilters = (clientName, clientId) => {
     //update the Client button text based on selected clients
-    if (selectedClientFilters) {
-      setClientSelected(selectedClientFilters);
+    if (clientName && clientId) {
+      setClientNameSelected(clientName);
+      setClientId(clientId);
     } else {
-      setClientSelected("Clients");
+      setClientNameSelected("Clients");
+      setClientId(null);
     }
   };
 
   //Apply role filters
-  const handleApplyRoleFilters = (selectedRoleFilters) => {
-    setSelectedRoleFilters(selectedRoleFilters);
-
+  const handleApplyRoleFilters = (roleName, roleId) => {
     //update the Role button text based on selected roles
-    if (selectedRoleFilters) {
-      setRoleSelected(selectedRoleFilters);
+    if (roleName && roleId) {
+      setRoleNameSelected(roleName);
+      setRoleId(roleId);
     } else {
-      setRoleSelected("Roles");
+      setRoleNameSelected("Roles");
+      setRoleId(null);
     }
   };
 
@@ -173,12 +179,14 @@ export const useDashboardData = () => {
     searchTerm,
     setSearchTerm,
     selectedSkillFilters,
-    selectedClientFilters,
-    selectedRoleFilters,
     userSkills,
     currentUserId,
     handleApplySkillFilters,
+    clientNameSelected,
+    clientId,
     handleApplyClientFilters,
+    roleNameSelected,
+    roleId,
     handleApplyRoleFilters,
     removeSkillFilter,
     clearAllSkillFilters,

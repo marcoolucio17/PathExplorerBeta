@@ -6,12 +6,13 @@ import useGetFetch from 'src/hooks/useGetFetch';
 
 
 
-export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelected, clients = [] }) => {
+export const ClientsModal = ({ isOpen, onClose, onClientSelected, clients = [] }) => {
 
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClient, setselectedClient] = useState('');
+    const [selectedClientId, setSelectedClientId] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -40,13 +41,14 @@ export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelecte
         }
     };
 
-    const toggleClient = (client) => {
-        setselectedClient(client)
+    const toggleClient = (client, clientId) => {
+        setselectedClient(client);
+        setSelectedClientId(clientId);
     };
 
     const handleSave = () => {
-        if (selectedClient) {
-            onClientSelected(selectedClient);
+        if (selectedClient && selectedClientId) {
+            onClientSelected(selectedClient, selectedClientId);
         }
         handleClose();
     }
@@ -86,7 +88,7 @@ export const ClientsModal = ({ isOpen, onClose, selectedClients, onClientSelecte
                     {clients && clients.map((client) => (
 
                         <div key={client.idcliente} >
-                            <button onClick={() => toggleClient(client.idcliente)}>
+                            <button onClick={() => toggleClient(client.clnombre, client.idcliente)}>
                                 <span>
                                     {client.clnombre}
                                 </span>
