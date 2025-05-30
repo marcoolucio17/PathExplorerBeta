@@ -53,6 +53,9 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
         handleClose();
     }
 
+    const filteredRoles = searchTerm !== "" ? roles.filter(role =>
+        role.tnombre.toLowerCase().includes(searchTerm.toLowerCase())) : roles;
+
     return (
 
         <div
@@ -88,7 +91,7 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
                     <div className={styles.rolesList} >
 
 
-                        {roles && roles.map((role) => (
+                        {filteredRoles && filteredRoles.map((role) => (
                             <ChipModalSelect
                                 key={role.idtitulo}
                                 text={role.tnombre}
