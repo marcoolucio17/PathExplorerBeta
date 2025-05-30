@@ -4,7 +4,7 @@ import styles from './SkillsModal.module.css';
 import { SkillChip } from "src/components/SkillChip";
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 
-//complete skills
+// Complete skills data structure from the Excel file
 const SKILLS_DATA = {
   ".NET Development": ["ASP.NET Core", "Blazor WebAssembly", "C# 12 language features", "Entity Framework Core", "LINQ mastery", "SignalR", "WPF / WinUI 3 desktop apps", ".NET MAUI (cross-platform UI)", ".NET microservices with Dapr", "Azure DevOps pipelines", "Dapper micro-ORM", "Dependency Injection (built-in container)", "gRPC for .NET", "NuGet package management", "Performance profiling (dotTrace)", "Roslyn analyzers & source generators", "Task-based async programming", "Unity / Prism MVVM frameworks", "xUnit / NUnit testing"],
   "AI / Machine Learning Engineering": ["MLOps", "fine-tuning", "model lifecycle", "responsible AI", "vector DBs"],
@@ -39,7 +39,7 @@ const SKILLS_DATA = {
   "Web Front-End Engineering": ["PWA patterns", "React/Next.js", "Svelte", "Vue", "WebAssembly"]
 };
 
-//soft skills?
+// List of all soft skills for filtering
 const SOFT_SKILLS_LIST = SKILLS_DATA["Soft Skills"].concat([
   "Git mastery", "agile practices", "architectural writing", "code reviews", "communication"
 ]);
@@ -106,25 +106,25 @@ export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }
     const filtered = {};
     
     Object.entries(SKILLS_DATA).forEach(([category, skills]) => {
-      //category filter first
+      // Apply category filter first
       let shouldInclude = false;
       
       if (selectedCategory === 'all') {
         shouldInclude = true;
       } else if (selectedCategory === 'hard') {
-        //hard skills, exclude soft skill categories
+        // For hard skills, exclude soft skill categories
         shouldInclude = category !== 'Soft Skills' && 
                        category !== 'Collaboration & Product Skills' &&
                        category !== 'Project Management & Agile';
       } else if (selectedCategory === 'soft') {
-        //soft skills, only include the relevant categories
+        // For soft skills, only include the relevant categories
         shouldInclude = category === 'Soft Skills' || 
                        category === 'Collaboration & Product Skills' ||
                        category === 'Project Management & Agile';
       }
       
       if (shouldInclude) {
-        //filter skills by search term
+        // Then filter skills by search term if there is one
         if (searchTerm) {
           const filteredSkills = skills.filter(skill =>
             skill.toLowerCase().includes(searchTerm.toLowerCase())
@@ -133,7 +133,7 @@ export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }
             filtered[category] = filteredSkills;
           }
         } else {
-          //no search term, include all skills in the category
+          // If no search term, include all skills in the category
           filtered[category] = skills;
         }
       }

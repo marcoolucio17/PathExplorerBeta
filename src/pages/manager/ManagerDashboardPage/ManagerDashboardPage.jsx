@@ -17,19 +17,22 @@ import Button from "../../../components/shared/Button";
 // CSS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
+// Modals
+import { CreateProjectModal } from "src/components/Modals/CreateProjectModal";
 
+/**
+ * Dashboard component for Manager role
+ */
 export const ManagerDashboardPage = () => {
-  //use the manager-specific dashboard hook
+  // Use the manager-specific dashboard hook
   const dashboardPage = useManagerDashboardPage();
-
-  //get header configuration
+  
+  // Get header configuration
   const headerProps = useDashboardHeaderConfig(dashboardPage);
 
-
-  //handle creating a new project
+  // Handle creating a new project
   const handleCreateProject = () => {
-    // wait TODO:Add logic to open create project modal or navigate to create project page
-    console.log('Creating new project...');
+    dashboardPage.toggleCreateProjectModal()
   };
 
   console.log("Client name", dashboardPage.clientNameSelected);
@@ -100,19 +103,14 @@ export const ManagerDashboardPage = () => {
         userSkills={dashboardPage.selectedSkillFilters}
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
       />
-      <ClientsModal
-        isOpen={dashboardPage.modals.clientsFilter}
-        onClose={() => dashboardPage.closeModal('clientsFilter')}
-        selectedClients={dashboardPage.selectedClientFilters}
-        onClientSelected={dashboardPage.handleApplyClientFilters}
-        clients={dashboardPage.clients}
+
+      <CreateProjectModal
+        isOpen={dashboardPage.modals.createProject}
+        onClose={() => dashboardPage.closeModal('createProject')}
+        onCreateProject={dashboardPage.handleCreateProject}
       />
-      <RolesModal
-        isOpen={dashboardPage.modals.rolesFilter}
-        onClose={() => dashboardPage.closeModal('rolesFilter')}
-        onRoleSelected={dashboardPage.handleApplyRoleFilters}
-        roles={dashboardPage.roles}
-      />
+
+
     </div>
   );
 };
