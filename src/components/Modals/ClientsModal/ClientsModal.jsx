@@ -3,6 +3,7 @@ import modalStyles from 'src/styles/Modals/Modal.module.css';
 import styles from './ClientsModal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
+import { ChipModalSelect } from '../ChipModalSelect';
 
 
 
@@ -85,18 +86,21 @@ export const ClientsModal = ({ isOpen, onClose, onClientSelected, clients = [] }
                 </div>
 
                 <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
-                    {clients && clients.map((client) => (
+                    <div className={styles.clientsList}>
 
-                        <div key={client.idcliente} >
-                            <button onClick={() => toggleClient(client.clnombre, client.idcliente)}>
-                                <span>
-                                    {client.clnombre}
-                                </span>
-                            </button>
 
-                        </div>
-                    ))
-                    }
+                        {clients && clients.map((client) => (
+                            <ChipModalSelect
+                                key={client.idcliente}
+                                text={client.clnombre}
+                                iconClass={selectedClient === client.clnombre ? "bi bi-check-circle-fill" : null}
+                                isSelectText={selectedClient === client.clnombre}
+                                onClick={() => toggleClient(client.clnombre, client.idcliente)}
+                            />
+
+                        ))
+                        }
+                    </div>
                 </div>
 
                 <div className={modalStyles.buttonGroup}>

@@ -1,0 +1,1 @@
+export { ChipModalSelect } from "./ChipModalSelect";

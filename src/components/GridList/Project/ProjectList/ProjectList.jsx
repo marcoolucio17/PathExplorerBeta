@@ -15,10 +15,10 @@ import styles from 'src/styles/GridList/GridListContainer.module.css';
  * @param {Function} props.onClearFilters - Function called when Clear Filters button is clicked
  * @param {boolean} props.isLoading - Whether items are currently loading
  */
-const ProjectList = ({ 
-  projects = [], 
-  viewMode, 
-  showCompatibility, 
+const ProjectList = ({
+  projects = [],
+  viewMode,
+  showCompatibility,
   selectedSkillFilters = [],
   userSkills = [],
   onClearFilters,
@@ -26,7 +26,7 @@ const ProjectList = ({
 }) => {
   // Safety check for undefined/null projects array
   const safeProjects = Array.isArray(projects) ? projects : [];
-  
+
   // If loading, show loader
   if (isLoading) {
     return (
@@ -43,7 +43,7 @@ const ProjectList = ({
         <div className={styles.noItemsMessage}>
           <i className="bi bi-briefcase" style={{ fontSize: '2rem', marginBottom: '1rem' }}></i>
           <p>No projects match your selected filters</p>
-          <button 
+          <button
             className={styles.clearFiltersButton}
             onClick={onClearFilters}
           >
@@ -56,12 +56,12 @@ const ProjectList = ({
 
   // Container class based on viewMode
   const containerClass = viewMode === 'grid' ? styles.gridContainer : styles.listContainer;
-  
+
   // Create a unique key for the container to force re-render and animation restart
   const containerKey = `container-projects-${viewMode}`;
   const idEmployee = localStorage.getItem('idEmployee') || 1;
   return (
-    <div 
+    <div
       key={containerKey}
       className={containerClass}
     >
@@ -71,16 +71,16 @@ const ProjectList = ({
           console.warn('Invalid project item structure:', item);
           return null; // Skip rendering this item
         }
-        
+
         // Calculate match percentage if function is provided
-        const matchPercentage = calculateMatchPercentage ? 
-          calculateMatchPercentage(item.project, item.proyecto_rol) : 0;
-        
+        /*const matchPercentage = calculateMatchPercentage ? 
+          calculateMatchPercentage(item.project, item.proyecto_rol) : 0;*/
+
         // Force cards to always re-render when filter changes with a unique key
         const renderKey = `${item.project.idproyecto || 'unknown'}-${item.proyecto_rol.idrol || 'unknown'}-${index}`;
-        
+
         return (
-          <div 
+          <div
             key={renderKey}
             className={styles.item}
           >

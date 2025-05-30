@@ -26,7 +26,7 @@ import { CreateProjectModal } from "src/components/Modals/CreateProjectModal";
 export const ManagerDashboardPage = () => {
   // Use the manager-specific dashboard hook
   const dashboardPage = useManagerDashboardPage();
-  
+
   // Get header configuration
   const headerProps = useDashboardHeaderConfig(dashboardPage);
 
@@ -110,6 +110,20 @@ export const ManagerDashboardPage = () => {
         onCreateProject={dashboardPage.handleCreateProject}
       />
 
+      <ClientsModal
+        isOpen={dashboardPage.modals.clientsFilter}
+        onClose={() => dashboardPage.closeModal('clientsFilter')}
+        selectedClients={dashboardPage.selectedClientFilters}
+        onClientSelected={dashboardPage.handleApplyClientFilters}
+        clients={dashboardPage.clients}
+      />
+
+      <RolesModal
+        isOpen={dashboardPage.modals.rolesFilter}
+        onClose={() => dashboardPage.closeModal('rolesFilter')}
+        onRoleSelected={dashboardPage.handleApplyRoleFilters}
+        roles={dashboardPage.roles}
+      />
 
     </div>
   );
