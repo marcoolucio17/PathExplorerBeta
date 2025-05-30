@@ -4,6 +4,7 @@ import { ProgressCircle } from 'src/components/ProgressCircle';
 import SkillChip from 'src/components/SkillChip/SkillChip';
 import styles from 'src/styles/GridList/GridListCard.module.css';
 import customStyles from 'src/styles/GridList/ProjectCard.module.css'; // Import our custom override styles
+import useGetFetch from 'src/hooks/useGetFetch';
 
 /**
  * ProjectCard component for displaying project information in grid or list view
@@ -21,8 +22,9 @@ const ProjectCard = ({
   project,
   proyecto_rol,
   viewMode,
+  idEmployee,
+  idrol,
   showCompatibility,
-  matchPercentage,
   selectedSkillFilters = [],
   userSkills = []
 }) => {
@@ -59,11 +61,16 @@ const ProjectCard = ({
     return proyecto_rol.roles.requerimientos_roles.map(req_rol => ({
       id: req_rol.requerimientos.habilidades.idhabilidad,
       name: req_rol.requerimientos.habilidades.nombre,
-      isUser: userSkills.includes(req_rol.requerimientos.habilidades.nombre) || 
-              selectedSkillFilters.includes(req_rol.requerimientos.habilidades.nombre)
+      isUser: userSkills.includes(req_rol.requerimientos.habilidades.nombre) ||
+        selectedSkillFilters.includes(req_rol.requerimientos.habilidades.nombre)
     }));
   };
   
+  const { data: matchPercentage } = useGetFetch({
+    rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`
+  })
+
+  const matchPercentageValue = matchPercentage? matchPercentage : 0;
   // Get role data
   const roleData = ensureRoleData();
   
@@ -105,7 +112,7 @@ const ProjectCard = ({
       {showCompatibility && (
         <div className={styles.statusCircle}>
           <ProgressCircle 
-            value={matchPercentage}
+            value={matchPercentageValue}
             size={60}
             fontSize="1.1rem" 
             strokeWidth={6}

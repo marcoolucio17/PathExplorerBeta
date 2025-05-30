@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useDashboardData from './useDashboardData';
-import useListPage from '../useListPage';
-import useModalControl from '../useModalControl';
-import useToggleState from '../useToggleState';
+import { useState, useEffect, useMemo, useCallback, use } from "react";
+import { useNavigate } from "react-router-dom";
+import useDashboardData from "./useDashboardData";
+import useListPage from "../useListPage";
+import useModalControl from "../useModalControl";
+import useToggleState from "../useToggleState";
 
 /**
  * Manager-specific Dashboard hook
@@ -40,15 +40,15 @@ export const useManagerDashboardPage = () => {
   // Setup list page logic
   const listPage = useListPage({
     data: dashboardData.projects,
-    defaultSortOption: 'date_desc',
-    defaultViewMode: 'grid',
-    tabConfig: { 
-      defaultTab: 'All', 
-      tabNameField: 'status' 
+    defaultSortOption: "date_desc",
+    defaultViewMode: "grid",
+    tabConfig: {
+      defaultTab: "All",
+      tabNameField: "status",
     },
     filterConfig: {},
     sortFunction: dashboardData.sortProjects,
-    baseUrl: '/manager/dashboard'
+    baseUrl: "/manager/dashboard",
   });
   
   // Override toggleViewMode to ensure animation works consistently
@@ -68,13 +68,17 @@ export const useManagerDashboardPage = () => {
         if (listPage.triggerAnimationSequence) {
           listPage.triggerAnimationSequence();
         }
-      }, 50);
-    }, 50);
+      });
+    });
   }, [listPage]);
   
   // Helper to toggle skills filter modal
   const toggleSkillsFilterModal = () => {
-    toggleModal('skillsFilter');
+    toggleModal("skillsFilter");
+  };
+
+  const toggleClientsFilterModal = () => {
+    toggleModal("clientsFilter");
   };
 
   // Helper to toggle create project modal
@@ -84,16 +88,17 @@ export const useManagerDashboardPage = () => {
   
   // Navigate to applicants page
   const handleViewApplicants = () => {
-    navigate('/manager/applicants');
+    navigate("/manager/applicants");
   };
   
   // Get filtered projects for the current tab
   const getTabProjects = () => {
     let filteredProjects;
-    
+
     switch (listPage.activeTab) {
-      case 'All':
+      case "All":
         filteredProjects = dashboardData.projects;
+
         break;
       case 'Applied To':
         // Projects where the user has applied to a role
@@ -110,29 +115,29 @@ export const useManagerDashboardPage = () => {
       default:
         filteredProjects = dashboardData.projects;
     }
-    
+
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
   };
   
   // Generate active filters for header
   const getActiveFilters = () => {
     const filters = {};
-    
+
     if (dashboardData.selectedSkillFilters.length > 0) {
       filters.skills = {
-        label: 'Skill',
+        label: "Skill",
         values: dashboardData.selectedSkillFilters,
-        color: 'rgba(139, 92, 246, 0.2)',
-        borderColor: 'rgba(139, 92, 246, 0.5)'
+        color: "rgba(139, 92, 246, 0.2)",
+        borderColor: "rgba(139, 92, 246, 0.5)",
       };
     }
-    
+
     return filters;
   };
   
   // Handle removing a specific filter
   const handleRemoveFilter = (filterType, value) => {
-    if (filterType === 'skills') {
+    if (filterType === "skills") {
       dashboardData.removeSkillFilter(value);
     }
   };
@@ -154,14 +159,14 @@ export const useManagerDashboardPage = () => {
   // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
-      return { 'All': 0, 'Applied To': 0, 'My Projects': 0 };
+      return { All: 0, "Applied To": 0, "My Projects": 0 };
     }
     
     // Initial counts
     const counts = {
-      'All': 0,
-      'Applied To': 0,
-      'My Projects': 0
+      All: 0,
+      "Applied To": 0,
+      "My Projects": 0,
     };
     
     // Calculate flattened projects (roles) for each tab
@@ -178,10 +183,15 @@ export const useManagerDashboardPage = () => {
     const myProjects = dashboardData.projects.filter(project => 
       project.managerId === dashboardData.currentUserId || project.ownerId === dashboardData.currentUserId
     );
-    counts['My Projects'] = dashboardData.flattenProjectsForList(myProjects).length;
-    
+    counts["My Projects"] =
+      dashboardData.flattenProjectsForList(myProjects).length;
+
     return counts;
-  }, [dashboardData.projects, dashboardData.flattenProjectsForList, dashboardData.currentUserId]);
+  }, [
+    dashboardData.projects,
+    dashboardData.flattenProjectsForList,
+    dashboardData.currentUserId,
+  ]);
 
   return {
     ...listPage,
