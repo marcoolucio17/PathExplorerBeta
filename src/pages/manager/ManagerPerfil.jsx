@@ -1,7 +1,1 @@
-import React from 'react'
-
-export const ManagerPerfil = () => {
-  return (
-    <div>ManagerPerfil</div>
-  )
-}
+export { ManagerPerfilPage as ManagerPerfil } from './ManagerPerfilPage/ManagerPerfilPage';

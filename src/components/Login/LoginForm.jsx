@@ -132,7 +132,7 @@ export const LoginForm = () => {
           }}
         >
           <button
-            type="button"
+            type="submit"
             onClick={handleLogin}
             className="customSubmitButton"
             disabled={isLoading}
@@ -151,10 +151,6 @@ export const LoginForm = () => {
           </button>
         </div>
 
-        <div className="d-flex mt-2 h-25 align-items-center justify-content-center gap-3">
-          <p className="text-light m-0">Don't have an account?</p>
-          <NavLink to="register">Register</NavLink>
-        </div>
 
         {/* Alerta de error */}
         {loginError && (
