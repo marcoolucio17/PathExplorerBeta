@@ -6,120 +6,186 @@ import useModalControl from "../useModalControl";
 import useGetFetch from "../useGetFetch";
 /**
  * Hook for managing dashboard data including project filtering and processing
- * 
+ *
  * @returns {Object} Dashboard data and related functions
  */
 export const useDashboardData = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Parse search param from URL
   const searchParams = new URLSearchParams(location.search);
-  const searchFromURL = searchParams.get('search') || '';
-  
+  const searchFromURL = searchParams.get("search") || "";
+
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState(searchFromURL);
   const [skillSelected, setSkillSelected] = useState("Skills");
   const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
-  const [userSkills, setUserSkills] = useState(['C#', 'React', 'Node.js']); // Example user skills
-  
+  const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
+  //Selected the name of the client
+  const [clientNameSelected, setClientNameSelected] = useState("Clients");
+  //Selected the id client
+  const [clientId, setClientId] = useState(null);
+  //Name of the selected role
+  const [roleNameSelected, setRoleNameSelected] = useState("Roles");
+  //Selected the id role
+  const [roleId, setRoleId] = useState(null);
+
   // Mock current user ID (this would come from authentication context in real app)
   const currentUserId = 1;
-  
+
   // URL management for search
   useEffect(() => {
     if (searchTerm) {
       const params = new URLSearchParams(location.search);
-      params.set('search', searchTerm);
+      params.set("search", searchTerm);
       navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     } else if (searchFromURL) {
       // If search term is cleared, remove it from URL
       const params = new URLSearchParams(location.search);
-      params.delete('search');
-      navigate(`${location.pathname}${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+      params.delete("search");
+      navigate(
+        `${location.pathname}${
+          params.toString() ? `?${params.toString()}` : ""
+        }`,
+        { replace: true }
+      );
     }
   }, [searchTerm, navigate, location.pathname, location.search, searchFromURL]);
-  
+
   // Update search term when URL changes
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const searchParam = params.get('search');
+    const searchParam = params.get("search");
     if (searchParam && searchParam !== searchTerm) {
       setSearchTerm(searchParam);
     }
   }, [location.search]);
 
   // Fetch data
-  const { data } = useDataFetching(
-    {
-      projects: { 
-        rutaApi: 'projects', 
-        nombre: searchTerm, 
-        condicion1: skillSelected,
-        condicion2: ''
-      },
-      skills: { 
-        rutaApi: 'skills', 
-        nombre: '', 
-        condicion1: 'Skills' 
-      }
-    },
-    {
-      projects: () => getDummyProjects(),
-      skills: () => []
-    }
-  );
+  const { data: projectsData } = useGetFetch({ rutaApi: "projects" });
+
+  const { data: clientsData } = useGetFetch({ rutaApi: "clientes" });
+
+  //const { data: skillsData } = useGetFetch({ rutaApi: 'habilidades' });
+
+  const { data: rolesData } = useGetFetch({ rutaApi: "roles" });
 
   // Function to generate dummy projects for testing
   const getDummyProjects = () => {
-    return Array(8).fill().map((_, index) => ({
-      idproyecto: index + 1,
-      pnombre: `Project ${index + 1}`,
-      descripcion: `Description for Project ${index + 1}`,
-      imagen: "/images/ImagenProyectoDefault.png",
-      cliente: { clnombre: `Client ${(index % 4) + 1}` },
-      status: index % 4 === 0 ? 'Active' : (index % 4 === 1 ? 'Upcoming' : (index % 4 === 2 ? 'Completed' : 'All')),
-      // User application and ownership data
-      userHasApplied: index % 3 === 0, // Every 3rd project user has applied to
-      managerId: index % 2 === 0 ? currentUserId : index + 10, // User manages every other project
-      ownerId: index % 4 === 0 ? currentUserId : index + 20, // User owns every 4th project
-      proyecto_roles: [
-        {
-          idrol: index * 2 + 1,
-          roles: {
-            nombrerol: `Role ${index * 2 + 1}`,
-            descripcionrol: `Description for Role ${index * 2 + 1}`,
-            requerimientos_roles: [
-              { requerimientos: { habilidades: { idhabilidad: index * 4 + 1, nombre: "JavaScript" } } },
-              { requerimientos: { habilidades: { idhabilidad: index * 4 + 2, nombre: "React" } } },
-              { requerimientos: { habilidades: { idhabilidad: index * 4 + 3, nombre: "Node.js" } } }
-            ]
-          }
-        },
-        {
-          idrol: index * 2 + 2,
-          roles: {
-            nombrerol: `Role ${index * 2 + 2}`,
-            descripcionrol: `Description for Role ${index * 2 + 2}`,
-            requerimientos_roles: [
-              { requerimientos: { habilidades: { idhabilidad: index * 4 + 4, nombre: "CSS" } } },
-              { requerimientos: { habilidades: { idhabilidad: index * 4 + 5, nombre: "UI/UX" } } }
-            ]
-          }
-        }
-      ]
-    }));
+    return Array(8)
+      .fill()
+      .map((_, index) => ({
+        idproyecto: index + 1,
+        pnombre: `Project ${index + 1}`,
+        descripcion: `Description for Project ${index + 1}`,
+        imagen: "/images/ImagenProyectoDefault.png",
+        cliente: { clnombre: `Client ${(index % 4) + 1}` },
+        status:
+          index % 4 === 0
+            ? "Active"
+            : index % 4 === 1
+            ? "Upcoming"
+            : index % 4 === 2
+            ? "Completed"
+            : "All",
+        // User application and ownership data
+        userHasApplied: index % 3 === 0, // Every 3rd project user has applied to
+        managerId: index % 2 === 0 ? currentUserId : index + 10, // User manages every other project
+        ownerId: index % 4 === 0 ? currentUserId : index + 20, // User owns every 4th project
+        proyecto_roles: [
+          {
+            idrol: index * 2 + 1,
+            roles: {
+              nombrerol: `Role ${index * 2 + 1}`,
+              descripcionrol: `Description for Role ${index * 2 + 1}`,
+              requerimientos_roles: [
+                {
+                  requerimientos: {
+                    habilidades: {
+                      idhabilidad: index * 4 + 1,
+                      nombre: "JavaScript",
+                    },
+                  },
+                },
+                {
+                  requerimientos: {
+                    habilidades: {
+                      idhabilidad: index * 4 + 2,
+                      nombre: "React",
+                    },
+                  },
+                },
+                {
+                  requerimientos: {
+                    habilidades: {
+                      idhabilidad: index * 4 + 3,
+                      nombre: "Node.js",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            idrol: index * 2 + 2,
+            roles: {
+              nombrerol: `Role ${index * 2 + 2}`,
+              descripcionrol: `Description for Role ${index * 2 + 2}`,
+              requerimientos_roles: [
+                {
+                  requerimientos: {
+                    habilidades: { idhabilidad: index * 4 + 4, nombre: "CSS" },
+                  },
+                },
+                {
+                  requerimientos: {
+                    habilidades: {
+                      idhabilidad: index * 4 + 5,
+                      nombre: "UI/UX",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      }));
   };
 
   // Apply skills filters
   const handleApplySkillFilters = (selectedSkills) => {
     setSelectedSkillFilters(selectedSkills);
-    
+
     // Update the Skills button text based on selected skills
     if (selectedSkills.length > 0) {
       setSkillSelected(`${selectedSkills.length} skills`);
     } else {
-      setSkillSelected('Skills');
+      setSkillSelected("Skills");
+    }
+  };
+
+  //Apply client filters
+  const handleApplyClientFilters = (clientName, clientId) => {
+    //update the Client button text based on selected clients
+    if (clientName && clientId) {
+      setClientNameSelected(clientName);
+      setClientId(clientId);
+    } else {
+      setClientNameSelected("Clients");
+      setClientId(null);
+    }
+  };
+
+  //Apply role filters
+  const handleApplyRoleFilters = (roleName, roleId) => {
+    //update the Role button text based on selected roles
+    if (roleName && roleId) {
+      setRoleNameSelected(roleName);
+      setRoleId(roleId);
+    } else {
+      setRoleNameSelected("Roles");
+      setRoleId(null);
     }
   };
 
@@ -139,7 +205,7 @@ export const useDashboardData = () => {
   // Calculate matching percentage
   const calculateMatchPercentage = (project, proyecto_rol) => {
     if (!project || !proyecto_rol) return 0;
-    
+
     // Placeholder implementation
     return Math.floor(Math.random() * 101); // Random value between 0-100 for demo
   };
