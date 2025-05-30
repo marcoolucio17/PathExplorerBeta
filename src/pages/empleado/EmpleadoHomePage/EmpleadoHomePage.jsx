@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import components
+// Import components
 import { GlassCard } from "../../../components/shared/GlassCard";
 import { ProgressCircle } from "../../../components/ProgressCircle/ProgressCircle";
-//page-specific styles
+// Import page-specific styles
 import pageStyles from "./EmpleadoHomePage.module.css";
-//specific css - but the css should be refactored to one
+// Import styles for specific sections
 import quickActionsStyles from "./QuickActions.module.css";
 import announcementsStyles from "./Announcements.module.css";
 
-// Mock data 
+// Mock data - in a real app, this would come from props or API
 const MOCK_RECOMMENDED_PROJECTS = [
   {
     idproyecto: 1,
@@ -59,11 +59,12 @@ export const EmpleadoHomePage = () => {
   const navigate = useNavigate();
   const [recommendedProjects] = useState(MOCK_RECOMMENDED_PROJECTS);
   const [announcements] = useState(MOCK_ANNOUNCEMENTS);
-  const [goalProgress] = useState(1); 
-  const [projectProgress] = useState(96); 
+  const [goalProgress] = useState(1); // 1/3
+  const [projectProgress] = useState(96); // 96%
 
   const handleApplyToProject = (projectId) => {
     console.log(`Applying to project ${projectId}`);
+    // Handle application logic here
   };
 
   const quickActions = [
@@ -133,7 +134,7 @@ export const EmpleadoHomePage = () => {
             </div>
           </div>
 
-          {/* Project Recommendations Section */}
+          {/* Project Recommendations Section - Fills remaining height */}
           <div className={pageStyles.recommendationsCard}>
             <h3 className={pageStyles.recommendationTitle}>
               Based on your profile, you'd be a great fit for these projects:

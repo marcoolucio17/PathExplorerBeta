@@ -7,7 +7,8 @@ import Spinner from "react-bootstrap/Spinner";
 import "../../styles/Login.css";
 import axios from "axios";
 
-const DB_URL = "https://pathexplorer-backend.onrender.com/";
+// const DB_URL = "https://pathexplorer-backend.onrender.com/";
+const DB_URL = "http://localhost:8080/";
 
 const roleMap = {
   Manager: "manager",
@@ -62,6 +63,7 @@ export const LoginForm = () => {
       let authz = res.data.authz;
       localStorage.setItem("role", roleMap[authz]);
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("id", res.data.user.idusuario);
       setIsLoading(false);
       navigate(roleMap[authz]);
     } catch (err) {
@@ -84,7 +86,7 @@ export const LoginForm = () => {
         Sign in
       </p>
 
-      <Form className="w-50">
+      <Form className="w-50" onSubmit={handleLogin}>
         <Form.Group className="mt-5 mb-3" controlId="formBasicEmail">
           <input
             className="transparent-input"
@@ -121,9 +123,16 @@ export const LoginForm = () => {
           </Button>
         </Form.Group>
 
-        <div style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <button
-            type="button"
+            type="submit"
             onClick={handleLogin}
             className="customSubmitButton"
             disabled={isLoading}
@@ -146,7 +155,7 @@ export const LoginForm = () => {
           <p className="text-light m-0">Don't have an account?</p>
           <NavLink to="register">Register</NavLink>
         </div>
-        
+
         {/* Alerta de error */}
         {loginError && (
           <Alert className="mt-4" variant="danger">
