@@ -86,10 +86,10 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
                 <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
                     {roles && roles.map((role) => (
 
-                        <div key={role.idrol} >
-                            <button onClick={() => toggleRole(role.nombrerol, role.idrol)}>
+                        <div key={role.idtitulo} >
+                            <button onClick={() => toggleRole(role.tnombre, role.idtitulo)}>
                                 <span>
-                                    {role.nombrerol}
+                                    {role.tnombre}
                                 </span>
                             </button>
 

@@ -47,7 +47,7 @@
   word-break: break-word;
 }
 
-/*fifferent announcement types */
+/* Different announcement types */
 .announcementIcon.bi-megaphone-fill {
   color: #8b5cf6;
 }
@@ -60,7 +60,7 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-/*custom scrollbar for announcements */
+/* Custom scrollbar for announcements */
 .announcementsContainer::-webkit-scrollbar {
   width: 3px;
 }

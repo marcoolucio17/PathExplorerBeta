@@ -28,26 +28,26 @@ const ProjectCard = ({
   selectedSkillFilters = [],
   userSkills = []
 }) => {
-  //deteermine class
-  const cardClass = viewMode === 'grid'
+  // Determine the class based on view mode
+  const cardClass = viewMode === 'grid' 
     ? styles.cardGrid
     : `${styles.cardList} ${customStyles.cardList}`;
   
-  //prepare sample data to ensure visualization
+  // Prepare sample data to ensure visualization
   const ensureRoleData = () => {
-    //current role data
+    // Get current role data
     return {
       roleName: proyecto_rol.roles?.nombrerol || 'Developer',
       projectName: project.pnombre || 'Project',
-      //random duration for nwo
-      duration: project.duracionMes || 'TBD'
+      // Generate random duration 3-18 months
+      duration: Math.floor(Math.random() * 16) + 3
     };
   };
   
   // Prepare sample skills to ensure visualization
   const ensureSkillsData = () => {
     // Every card should have at least 2 skills for demo
-    /*if (!proyecto_rol.roles?.requerimientos_roles || proyecto_rol.roles.requerimientos_roles.length === 0) {
+    if (!proyecto_rol.roles?.requerimientos_roles || proyecto_rol.roles.requerimientos_roles.length === 0) {
       // Generate demo skills if none exist
       return [
         { id: 'demo-1', name: 'JavaScript', isUser: true },
@@ -55,7 +55,9 @@ const ProjectCard = ({
         { id: 'demo-3', name: 'Python', isUser: false },
         { id: 'demo-4', name: 'Node.js', isUser: true }
       ];
-    }*/    // Use real skills data
+    }
+    
+    // Use real skills data
     return proyecto_rol.roles.requerimientos_roles.map(req_rol => ({
       id: req_rol.requerimientos.habilidades.idhabilidad,
       name: req_rol.requerimientos.habilidades.nombre,
@@ -103,10 +105,10 @@ const ProjectCard = ({
     );
   };
   
-  // Grid view
+  // Grid view content
   const gridContent = (
     <>
-      {/*match percentage when enabled */}
+      {/* Show match percentage when enabled */}
       {showCompatibility && (
         <div className={styles.statusCircle}>
           <ProgressCircle 
@@ -120,11 +122,11 @@ const ProjectCard = ({
       )}
       
       <div className={styles.cardHeader}>
-        {<img 
+        <img 
           className={styles.cardAvatar} 
           src={project.imagen || "/images/ImagenProyectoDefault.png"} 
           alt={`${project.pnombre} logo`}
-        />}
+        />
         <div className={styles.cardInfo}>
           <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
           <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
@@ -156,7 +158,7 @@ const ProjectCard = ({
     </>
   );
   
-  //List view 
+  // List view content with completely redesigned layout
   const listContent = (
     <>
       {/* Avatar area */}
@@ -168,13 +170,13 @@ const ProjectCard = ({
         />
       </div>
       
-      {/*Title and project name only */}
+      {/* Title and project name only */}
       <div className={customStyles.titleContainer}>
         <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
         <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
       </div>
       
-      {/*description in the middle */}
+      {/* Floating description in the middle */}
       <div className={customStyles.floatingDescription}>
         <p className={styles.descriptionText}>
           Description for Project {project.pnombre || '5'}
@@ -202,7 +204,7 @@ const ProjectCard = ({
         )}
       </div>
       
-      {/*hardcoded styles because its not being consistent */}
+      {/* Duration info - using hardcoded styles to ensure font consistency */}
       <div className={customStyles.durationColumn}>
         <span className={styles.detailLabel}>
           <i className="bi bi-clock"></i> Duration
@@ -214,7 +216,7 @@ const ProjectCard = ({
     </>
   );
   
-  // Grid view
+  // Grid view - wrap the content in a GlassCard
   if (viewMode === 'grid') {
     return (
       <GlassCard className={cardClass}>
@@ -223,7 +225,7 @@ const ProjectCard = ({
     );
   }
   
-  // List view
+  // List view - custom layout for horizontal display
   return (
     <GlassCard className={cardClass}>
       {listContent}

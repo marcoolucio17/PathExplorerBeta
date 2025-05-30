@@ -5,7 +5,7 @@ import CustomScrollbar from '../../../components/CustomScrollbar';
 import { Tabs } from '../../../components/Tabs';
 import { CVModal } from 'src/components/Modals/CVModal';
 
-//modular CSS files
+// Import modular CSS files
 import pageStyles from './ManagerViewApplicantPage.module.css';
 import profileStyles from './ApplicantProfile.module.css';
 import cvStyles from './CurriculumVitae.module.css';
@@ -15,14 +15,14 @@ import compatibilityStyles from './CompatibilitySection.module.css';
 import contactStyles from './ContactSection.module.css';
 
 /**
- * 
- * 
+ * Manager View Applicant Page
+ * Detailed view of an individual applicant including CV, motivation letter, skills, and actions
  */
 export const ManagerViewApplicantPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   
-  //states
+  // States
   const [applicant, setApplicant] = useState(null);
   const [cvModalOpen, setCvModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,9 +34,12 @@ export const ManagerViewApplicantPage = () => {
   const tabs = ['Overview', 'Motivation', 'CV', 'Contact'];
   const handleTabClick = (tabName) => setActiveTab(tabName);
   
-  //fetch applicant data
+  // Fetch applicant data
   useEffect(() => {
-
+    // This would be replaced with a real API call in production
+    // Example: fetchApplicantData(id).then(data => setApplicant(data));
+    
+    // Simulate loading delay
     setTimeout(() => {
       const dummyApplicant = {
         id: id || 'app-1',
@@ -78,7 +81,7 @@ I'm particularly interested in this project because it aligns with my passion fo
       
       setApplicant(dummyApplicant);
       
-      // calculate matching skills
+      // Calculate matching skills
       const matching = dummyApplicant.skills
         .filter(skill => dummyApplicant.project.skills.includes(skill.name))
         .map(skill => skill.name);
@@ -89,23 +92,23 @@ I'm particularly interested in this project because it aligns with my passion fo
     }, 800);
   }, [id]);
   
-  //navigate back to applicants list
+  // Navigate back to applicants list
   const handleBackToApplicants = () => {
     navigate('/manager/applicants');
   };
   
-  //toggle CV Modal
+  // Toggle CV Modal
   const toggleCVModal = () => {
     setCvModalOpen(!cvModalOpen);
   };
   
-  //calculate compatibility percentage
+  // Calculate compatibility percentage
   const calculateCompatibility = () => {
     if (!projectSkills.length) return 0;
     return Math.round((matchingSkills.length / projectSkills.length) * 100);
   };
   
-  //render tab content based on active tab
+  // Render tab content based on active tab
   const renderTabContent = () => {
     switch(activeTab) {
       case 'Overview':

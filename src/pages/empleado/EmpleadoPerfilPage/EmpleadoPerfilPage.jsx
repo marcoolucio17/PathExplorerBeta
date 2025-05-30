@@ -30,9 +30,11 @@ import { EditProfileDetailsModal } from "../../../components/Modals/EditProfileD
 // CSS
 import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
 
-
+/**
+ * Profile page component for Employee role
+ */
 export const EmpleadoPerfilPage = () => {
-  //use the custom hook to handle all logic
+  // Use the custom hook to handle all logic
   const profilePage = useProfilePage();
 
   const renderTabContent = () => {
@@ -52,7 +54,7 @@ export const EmpleadoPerfilPage = () => {
   };
 
   const handleEditSection = (section) => {
-    //handle editing specific sections
+    // Handle editing specific sections
     console.log('Edit section:', section);
     console.log('Current modals state:', profilePage.modals);
     switch (section) {
@@ -77,7 +79,7 @@ export const EmpleadoPerfilPage = () => {
     }
   };
 
-  //save handlers for edit modals
+  // Save handlers for edit modals
   const handleSaveContact = (contactData) => {
     profilePage.setUserProfile(prev => ({
       ...prev,
@@ -100,10 +102,14 @@ export const EmpleadoPerfilPage = () => {
     }));
   };
 
-  //certificate removal handler
+  // Certificate removal handler
   const handleRemoveCertificate = (certificateId) => {
     profilePage.handleRemoveCertificate(certificateId);
   };
+
+  if (profilePage.loading) {
+    return <>loading..</>;
+  }
 
   return (
     <div className={styles.profileContainer}>
@@ -185,7 +191,7 @@ export const EmpleadoPerfilPage = () => {
         userSkills={profilePage.userSkills}
         onUpdateSkills={profilePage.handleUpdateSkills}
       />
-      
+
       <AddCertificateModal
         isOpen={profilePage.modals.addCertificate}
         onClose={() => profilePage.closeModal('addCertificate')}
