@@ -6,15 +6,17 @@ import useModalControl from '../useModalControl';
 import useToggleState from '../useToggleState';
 
 /**
- *
+ * Main hook for the Dashboard page, combining all functionality
  * 
  * @returns {Object} Complete state and functions for the Dashboard page
  */
 export const useDashboardPage = () => {
   const navigate = useNavigate();
   
+  // Get dashboard data
   const dashboardData = useDashboardData();
   
+  // Tab names for the page
   const tabNames = ['Active', 'Upcoming', 'Completed', 'All'];
   
   // Modal controls
@@ -33,6 +35,7 @@ export const useDashboardPage = () => {
     toggle: toggleCompatibility 
   } = useToggleState(false);
   
+  // Setup list page logic
   const listPage = useListPage({
     data: dashboardData.projects,
     defaultSortOption: 'date_desc',
@@ -46,17 +49,19 @@ export const useDashboardPage = () => {
     baseUrl: '/manager/dashboard'
   });
   
+  // Override toggleViewMode to ensure animation works consistently
   const toggleViewMode = useCallback(() => {
-    // Toggle view mod
+    // Toggle view mode using the original function
     listPage.toggleViewMode();
     
+    // Force animation refresh for the newly displayed items
     setTimeout(() => {
       // Reset any placeholders immediately
       if (listPage.resetAnimation) {
         listPage.resetAnimation();
       }
       
-      //trigger a full animation sequence after a short delay
+      // Trigger a full animation sequence after a short delay
       setTimeout(() => {
         if (listPage.triggerAnimationSequence) {
           listPage.triggerAnimationSequence();
@@ -65,14 +70,17 @@ export const useDashboardPage = () => {
     }, 50);
   }, [listPage]);
   
+  // Helper to toggle skills filter modal
   const toggleSkillsFilterModal = () => {
     toggleModal('skillsFilter');
   };
-
+  
+  // Navigate to applicants page
   const handleViewApplicants = () => {
     navigate('/manager/applicants');
   };
   
+  // Get filtered projects for the current tab
   const getTabProjects = () => {
     return dashboardData.sortProjects(
       listPage.activeTab === 'All' 
@@ -82,6 +90,7 @@ export const useDashboardPage = () => {
     );
   };
   
+  // Generate active filters for header
   const getActiveFilters = () => {
     const filters = {};
     
@@ -97,20 +106,23 @@ export const useDashboardPage = () => {
     return filters;
   };
   
+  // Handle removing a specific filter
   const handleRemoveFilter = (filterType, value) => {
     if (filterType === 'skills') {
       dashboardData.removeSkillFilter(value);
     }
   };
   
+  // Handle clear filters action
   const handleClearFilters = () => {
     dashboardData.clearAllSkillFilters();
     listPage.handleClearFilters();
   };
   
-  
+  // Compute flattened projects for display
   const displayProjects = dashboardData.flattenProjectsForList(getTabProjects());
   
+  // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
       return { 'Active': 0, 'Upcoming': 0, 'Completed': 0, 'All': 0 };
@@ -124,7 +136,7 @@ export const useDashboardPage = () => {
       'All': 0
     };
     
-    //calculate flattened projects (roles) for each tab
+    // Calculate flattened projects (roles) for each tab
     tabNames.forEach(tabName => {
       if (tabName === 'All') {
         // For "All" tab, count all flattened projects
@@ -154,7 +166,9 @@ export const useDashboardPage = () => {
     getActiveFilters,
     handleRemoveFilter,
     handleClearFilters,
+    // Override toggleViewMode with our custom implementation
     toggleViewMode,
+    // Override tab counts with our corrected counts
     tabCounts: correctedTabCounts
   };
 };

@@ -1,1 +1,0 @@
-export { ClientsModal } from './ClientsModal';

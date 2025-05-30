@@ -1,7 +1,5 @@
 import React from "react";
 
-//missing from juan
-
 // Custom Hooks
 import useEmpleadoDashboardPage from '../../../hooks/dashboard/useEmpleadoDashboardPage';
 import useEmpleadoDashboardHeaderConfig from '../../../hooks/dashboard/useEmpleadoDashboardHeaderConfig';
@@ -16,12 +14,15 @@ import { Tabs } from "../../../components/Tabs";
 // CSS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
-
+/**
+ * Dashboard component for Employee role
+ * (Same as Manager but without "View Applicants" and "New Project" buttons)
+ */
 export const EmpleadoDashboardPage = () => {
-  //use the employee-specific dashboard hook
+  // Use the employee-specific dashboard hook
   const dashboardPage = useEmpleadoDashboardPage();
   
-  //get employee-specific header configuration 
+  // Get employee-specific header configuration (excludes manager buttons)
   const headerProps = useEmpleadoDashboardHeaderConfig(dashboardPage);
 
   return (

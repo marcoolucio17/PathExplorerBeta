@@ -12,7 +12,7 @@ export const useFetch = (ruta, body = null) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      let url = `https://pathexplorer-backend.onrender.com/api/${ruta}`;
+      let url = `http://localhost:8080/api/${ruta}`;
     try {
       let response;
       const config = {

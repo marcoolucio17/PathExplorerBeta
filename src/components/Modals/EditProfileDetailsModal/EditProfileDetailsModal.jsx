@@ -16,6 +16,7 @@ export const EditProfileDetailsModal = ({ isOpen, onClose, profileData, onSave }
     if (isOpen) {
       setIsVisible(true);
       setIsClosing(false);
+      // Populate form with current data
       setFormData({
         location: profileData?.location || '',
         profilePicture: null,
@@ -70,15 +71,20 @@ export const EditProfileDetailsModal = ({ isOpen, onClose, profileData, onSave }
     e.preventDefault();
     
     try {
-
+      // TODO: Replace with actual API call
+      // await updateProfileDetails(formData);
+      
+      // Prepare data for save
       const updateData = {
         location: formData.location
       };
       
+      // If there's a new image, include it
       if (formData.imagePreview) {
         updateData.avatarUrl = formData.imagePreview;
       }
-
+      
+      // For now, use the callback to update local state
       if (onSave) {
         onSave(updateData);
       }
@@ -86,12 +92,12 @@ export const EditProfileDetailsModal = ({ isOpen, onClose, profileData, onSave }
       handleClose();
     } catch (error) {
       console.error('Error updating profile details:', error);
-      //please add error handling UI
+      // TODO: Add error handling UI
     }
   };
 
   const isFormValid = () => {
-    return formData.location; 
+    return formData.location; // Only require location
   };
 
   const handleImageError = () => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Button from "../shared/Button";
 import styles from "./SearchHeader.module.css";
 
-//custom icon components
+// Custom icon components
 const PeopleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className={styles.customIcon} viewBox="0 0 16 16">
     <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664z"/>
@@ -73,18 +73,18 @@ export const SearchHeader = ({
     { key: 'skills', label: 'Skills', icon: 'skills' }
   ]
 }) => {
-  //state to track input focus
+  // State to track input focus
   const [isFocused, setIsFocused] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const dropdownRef = useRef(null);
   
-  //check if there are any active filters
+  // Check if there are any active filters
   const hasActiveFilters = activeFilters && 
     Object.values(activeFilters).some(
       filterGroup => filterGroup && filterGroup.values && filterGroup.values.length > 0
     );
 
-  //check if search term exists and immediately show results
+  // Check if search term exists and immediately show results
   useEffect(() => {
     if (inSearchBar && searchTerm && searchTerm.length > 0) {
       setShowResults(true);
@@ -93,7 +93,7 @@ export const SearchHeader = ({
     }
   }, [searchTerm, inSearchBar]);
 
-  //handle click outside to close dropdown
+  // Handle click outside to close dropdown
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -107,7 +107,7 @@ export const SearchHeader = ({
     };
   }, []);
 
-  //function to render the appropriate icon
+  // Function to render the appropriate icon
   const renderIcon = (iconType) => {
     switch (iconType) {
       case 'people':
@@ -129,6 +129,7 @@ export const SearchHeader = ({
         <div 
           className={`${styles.searchContainer} ${isFocused ? styles.searchContainerFocused : ''} ${inSearchBar ? styles.inSearchBarContainer : ''}`}
           style={{
+            // Width animation happens via CSS, but we add these inline styles for initial states
             width: inSearchBar ? (isFocused ? '350px' : '280px') : (isFocused ? '300px' : '250px')
           }}
           ref={dropdownRef}
@@ -162,6 +163,7 @@ export const SearchHeader = ({
               }
             }}
             onKeyUp={(e) => {
+              // Show results when user types something
               if (inSearchBar && searchTerm.length > 0) {
                 setShowResults(true);
               }
@@ -212,6 +214,7 @@ export const SearchHeader = ({
             
             {/* Filter buttons */}
             {filterButtons.map((button, index) => {
+              // Check if this is the compatibility button
               const isCompatibilityButton = 
                 button.label === "Compatibility" || 
                 button.label === "Compability";
@@ -242,19 +245,20 @@ export const SearchHeader = ({
                 isToggle={true}
                 toggleMode={viewMode}
                 onToggle={(newMode) => {
+                  // Get the current container based on view mode
                   const container = document.querySelector(`.${styles.gridContainer}`) || 
                                     document.querySelector(`.${styles.listContainer}`);
                   
-
+                  // Apply fade out effect if container exists
                   if (container) {
                     container.style.opacity = '0';
                     container.style.transform = 'translateY(8px) scale(0.98)';
                     
-                    //  view mode after short delay for animation
+                    // Change view mode after short delay for animation
                     setTimeout(() => {
                       setViewMode(newMode);
                       
-
+                      // Fade in the new container
                       setTimeout(() => {
                         const newContainer = document.querySelector(`.${styles.gridContainer}`) || 
                                             document.querySelector(`.${styles.listContainer}`);
@@ -265,7 +269,7 @@ export const SearchHeader = ({
                       }, 80);
                     }, 300);
                   } else {
-
+                    // Direct change if no container found
                     setViewMode(newMode);
                   }
                 }}
@@ -276,7 +280,7 @@ export const SearchHeader = ({
         )}
       </div>
       
-      {/* Active Filters */}
+      {/* Active Filters - Simplified version that matches screenshot */}
       {!inSearchBar && hasActiveFilters && (
         <div className={styles.activeFiltersContainer}>
           <span className={styles.activeFiltersLabel}>Active filters:</span>
