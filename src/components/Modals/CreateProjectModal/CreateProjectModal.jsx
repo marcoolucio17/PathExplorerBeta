@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from 'src/styles/Modals/Modal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import { usePost } from 'src/hooks/usePost';
+import axios from 'axios';
 
 export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
   const { triggerPost, loading, error } = usePost();
@@ -80,6 +81,31 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
     }
   };
 
+const handleRFPChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    console.log("RFP seleccionado:", file.name);
+    setFormData(prev => ({
+      ...prev,
+      projectRFP: file
+    }));
+  }
+};
+
+const handleClientImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({
+        ...prev,
+        clientImage: file,
+        imagePreview: reader.result
+      }));
+    };
+    reader.readAsDataURL(file);
+  }
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formatDate = (dateString) => {
@@ -100,59 +126,56 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
     };
 
     const informacion = {
-      informacion: {
-        proyect: {
-          pnombre: formData.title,
-          descripcion: formData.description,
-          fechainicio: formatDate(formData.startDate),
-          fechafin: formatDate(formData.endDate),
-          idcliente: 1 // Harcodeado
-        },
-        roles: [  //  Harcodeado
-          {
-            nombrerol: "Rol automático",
-            nivelrol: 1,
-            descripcionrol: "Generado automáticamente",
-            disponible: true,
-            requerimientos: [
-              {
-                tiempoexperiencia: "1 año",
-                idhabilidad: 1
-              }
-            ]
-          }
-        ]
-      }
+
+      proyect: {
+        pnombre: formData.title,
+        descripcion: formData.description,
+        fechainicio: formatDate(formData.startDate),
+        fechafin: formatDate(formData.endDate),
+        idcliente: 1 // Harcodeado
+      },
+      roles: [  //  Harcodeado
+        {
+          nombrerol: "Rol automático",
+          nivelrol: 1,
+          descripcionrol: "Generado automáticamente",
+          disponible: true,
+          requerimientos: [
+            {
+              tiempoexperiencia: "1 año",
+              idhabilidad: 1
+            }
+          ]
+        }
+      ]
+
     };
 
     try {
       // Paso 1: Crear el proyecto
       const result = await triggerPost('api/projects', { informacion });
-      console.log(informacion);
       const idproyecto = result?.idproyecto;
+      console.log(idproyecto);
       if (!idproyecto) {
         alert("El proyecto fue creado pero no se recibió un ID.");
         return;
       }
 
       const token = localStorage.getItem("token");
-
+      console.log("Archivo RFP:", formData.projectRFP?.name);
       // Paso 2: Subir el archivo RFP
       if (formData.projectRFP) {
         const rfpForm = new FormData();
+        console.log("Archivo RFP:", formData.projectRFP);
         rfpForm.append('file', formData.projectRFP);
         rfpForm.append('projectId', idproyecto);
 
-        await axios.post(
-          'http://localhost:8080/api/upload-rfp',
-          rfpForm,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data'
-            }
+        await axios.post('http://localhost:8080/api/upload-rfp', rfpForm, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
           }
-        );
+        });
       }
 
       // Finalizar
@@ -209,8 +232,8 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
                   <input
                     type="file"
                     id="projectoPlan"
-                    accept="image/*"
-                    onChange={handleFileChange}
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleRFPChange}
                     className={styles.fileInput}
                   />
                 </div>
@@ -236,7 +259,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
                     type="file"
                     id="clientImage"
                     accept="image/*"
-                    onChange={handleFileChange}
+                    onChange={handleClientImageChange}
                     className={styles.fileInput}
                   />
                 </div>
