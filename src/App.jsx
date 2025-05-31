@@ -20,6 +20,7 @@ import { ManagerPerfil } from "./pages/manager/ManagerPerfil";
 import { ManagerProyecto } from "./pages/manager/ManagerProyecto";
 import { ManagerVistaPerfil } from "./pages/manager/ManagerVistaPerfil";
 import { ManagerHomePage } from "./pages/manager/ManagerHomePage/ManagerHomePage";
+import {ManagerCreateProjectPage} from "./pages/manager/ManagerCreateProjectPage/ManagerCreateProjectPage";
 
 // Imports de TFS
 import { TFSDashboard } from "./pages/tfs/TFSDashboard";
@@ -53,6 +54,7 @@ function App() {
         <Route path="manager/perfil" element={<ManagerPerfil />} />
         {/*<Route path="manager/vistaperfil" element={<ManagerVistaPerfil />} /> */}
         <Route path="manager/proyecto" element={<EmpleadoProyecto />} />
+        <Route path="manager/create-project" element={<ManagerCreateProjectPage/>}></Route>
       </Route>
 
       {/* rutas de tfs */}
