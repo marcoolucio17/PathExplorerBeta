@@ -19,7 +19,7 @@ export function Notifications({ userId, visible }) {
 
   const handleDelete = (idnotificacion) => {
     axios
-      .delete(`http://localhost:8080/api/notifications/${idnotificacion}`)
+      .delete(`https://pathexplorer-backend.onrender.com/api/notifications/${idnotificacion}`)
       .then(() => {
         setNotifications((prev) =>
           prev.filter((n) => n.idnotificacion !== idnotificacion)
@@ -34,7 +34,7 @@ export function Notifications({ userId, visible }) {
     if (!userId) return;
 
     axios
-      .get(`http://localhost:8080/api/notifications/${userId}`)
+      .get(`https://pathexplorer-backend.onrender.com/api/notifications/${userId}`)
       .then((res) => {
         if (Array.isArray(res.data)) {
           setNotifications(res.data);

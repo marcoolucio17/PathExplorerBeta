@@ -61,11 +61,11 @@ function CustomNavbar() {
         onMouseLeave={() => setIsSidebarOpen(false)}
       >
         <ul className="sidebar-menu">
-          <li onClick={() => navigate("/")}>
+          <li onClick={() => navigate(`${authState}`)}>
             <i className="bi bi-house"></i>
             {isSidebarOpen && <span>Home</span>}
           </li>
-          <li onClick={() => navigate("/projects")}>
+          <li onClick={() => navigate(`${authState}/dashboard`)}>
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
