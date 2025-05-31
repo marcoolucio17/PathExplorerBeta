@@ -11,7 +11,6 @@ import useFetch from "src/hooks/useFetch";
 import { formatName } from "src/hooks/profile/useProfilePage";
 import ImageCarousel from "./ImageCarousel";
 import { TrendsCard } from "src/components/Home/TrendsCard";
-import useProfilePage from "src/hooks/profile/useProfilePage";
 
 // Mock data - in a real app, this would come from props or API
 const MOCK_RECOMMENDED_PROJECTS = [
@@ -38,31 +37,10 @@ const MOCK_RECOMMENDED_PROJECTS = [
   }
 ];
 
-const MOCK_ANNOUNCEMENTS = [
-  {
-    id: 1,
-    icon: "bi-megaphone-fill",
-    text: "A lot of important announcements are being made right now!",
-    type: "important"
-  },
-  {
-    id: 2,
-    icon: "bi-star-fill",
-    text: "A la bio a la boo a la bim bom bam, Leo Leo RAH RAH RAH!! Come and celebrate Leo right now!!",
-    type: "celebration"
-  },
-  {
-    id: 3,
-    icon: "bi-info-circle-fill",
-    text: "A la bio a la boo a la bim bom bam, Leo Leo RAH RAH RAH!! Come and celebrate Leo right now!!",
-    type: "info"
-  }
-];
-
 export const EmpleadoHomePage = () => {
   const navigate = useNavigate();
   const [recommendedProjects] = useState(MOCK_RECOMMENDED_PROJECTS);
-  const [announcements] = useState(MOCK_ANNOUNCEMENTS);
+
   const [goalProgress] = useState(1); // 1/3
   const [projectProgress] = useState(96); // 96%
   
@@ -70,6 +48,20 @@ export const EmpleadoHomePage = () => {
   const { data, error, loading } = useFetch(
     "usuario/" + localStorage.getItem("id")
   );
+
+  const {data1, loading1, error1} = useFetch(
+    "habilidades/top/5"
+  )
+
+  if (loading1) return <p>Loading skills...</p>;
+  if (error1) return <p>Error loading skills: {error1.message}</p>;
+
+  const skills = data1?.result || [];
+
+  const categorizedSkills = {
+    hardSkills: skills.map((skill) => skill.name), 
+    softSkills: [] 
+  };
 
   const handleApplyToProject = (projectId) => {
     console.log(`Applying to project ${projectId}`);
@@ -177,6 +169,7 @@ export const EmpleadoHomePage = () => {
             <div className={announcementsStyles.announcementsContainer}>
               <TrendsCard 
                 className={pageStyles.sidebarSection}
+                categorizedSkills={categorizedSkills}
               />
             </div>
         </div>

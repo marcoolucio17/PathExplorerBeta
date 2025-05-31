@@ -22,6 +22,13 @@ export const TrendsCard = ({ categorizedSkills = { hardSkills: [], softSkills: [
       <div className={styles.skillsScrollContainer}>
         <CustomScrollbar fadeBackground="transparent" fadeHeight={40}>
           <div className={styles.skillsContent}>
+            {hasNoSkills ? (
+              <div className={styles.placeholder}>
+                <i className="bi bi-gear-wide-connected"></i>
+                <p>Loading...</p>
+                <span>Fetching Skills</span>
+              </div>
+            ) : (
               <>
                 {hardSkills.length > 0 && (
                   <div className={styles.skillCategory}>
@@ -47,6 +54,7 @@ export const TrendsCard = ({ categorizedSkills = { hardSkills: [], softSkills: [
                   </div>
                 )}
               </>
+            )}
           </div>
         </CustomScrollbar>
       </div>
