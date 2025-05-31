@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import styles from 'src/styles/Modals/Modal.module.css';
-import modalStyles from './EditContactModal.module.css';
+import React, { useState, useEffect } from "react";
+import styles from "src/styles/Modals/Modal.module.css";
+import modalStyles from "./EditContactModal.module.css";
+
+import axios from "axios";
+
+// const DB_URL = "https://pathexplorer-backend.onrender.com/";
+const DB_URL = "http://localhost:8080/";
 
 export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    phone: '',
-    linkedin: '',
-    github: ''
+    email: "",
+    phone: "",
+    linkedin: "",
+    github: "",
   });
 
   useEffect(() => {
@@ -18,10 +23,10 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
       setIsClosing(false);
       // Populate form with current data
       setFormData({
-        email: contactInfo?.email || '',
-        phone: contactInfo?.phone || '',
-        linkedin: contactInfo?.linkedin || '',
-        github: contactInfo?.github || ''
+        email: contactInfo?.email || "",
+        phone: contactInfo?.phone || "",
+        linkedin: contactInfo?.linkedin || "",
+        github: contactInfo?.github || "",
       });
     }
   }, [isOpen, contactInfo]);
@@ -45,27 +50,40 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      // TODO: Replace with actual API call
-      // await updateContactInfo(formData);
-      
       // For now, use the callback to update local state
-      if (onSave) {
-        onSave(formData);
-      }
-      
+      const updateData = {
+        linkedin: formData.linkedin,
+        github: formData.github,
+        telefono: formData.phone
+      };
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+
+      const locRes = await axios.patch(
+        DB_URL + "api/usuario/" + localStorage.getItem("id"),
+        updateData,
+        config
+      );
+
+      window.location.reload();
+
       handleClose();
     } catch (error) {
-      console.error('Error updating contact info:', error);
+      console.error("Error updating contact info:", error);
       // TODO: Add error handling UI
     }
   };
@@ -75,15 +93,17 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
   };
 
   return (
-    <div 
-      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ''}`} 
+    <div
+      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ""}`}
       onClick={handleBackdropClick}
     >
-      <div className={`${styles.modalContent} ${isClosing ? styles.closing : ''}`}>
+      <div
+        className={`${styles.modalContent} ${isClosing ? styles.closing : ""}`}
+      >
         <button className={styles.closeButton} onClick={handleClose}>
           <i className="bi bi-x-lg"></i>
         </button>
-        
+
         <div className={styles.modalHeader}>
           <h2 className={styles.title}>Edit Contact Information</h2>
           <p className={styles.subtitle}>Update your contact details</p>
@@ -91,7 +111,7 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.modalBody}>
-            <div className={styles.formGroup}>
+            {/* <div className={styles.formGroup}>
               <label htmlFor="email">Email Address *</label>
               <input
                 type="email"
@@ -102,7 +122,7 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
                 placeholder="your.email@company.com"
                 required
               />
-            </div>
+            </div> */}
 
             <div className={styles.formGroup}>
               <label htmlFor="phone">Phone Number *</label>
@@ -143,19 +163,20 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button 
+            <button
               type="button"
-              onClick={handleClose} 
+              onClick={handleClose}
               className={styles.cancelButton}
             >
               <i className="bi bi-x-lg"></i>
               Cancel
             </button>
-            
-            <button 
+
+            <button
               type="submit"
               disabled={!isFormValid()}
               className={styles.saveButton}
+              // todo: add on click or sm
             >
               <i className="bi bi-check-lg"></i>
               Save Changes

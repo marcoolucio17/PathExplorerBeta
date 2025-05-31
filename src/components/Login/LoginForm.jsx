@@ -78,6 +78,11 @@ export const LoginForm = () => {
     }
   };
 
+  // si ya está verificado, lo pasamos adentro
+  useEffect(() => {
+
+  }, [])
+
   return (
     <div className="mainLoginForm">
       <img src="/images/accenturelogowhite.svg" width="170" height="170" />
@@ -151,10 +156,6 @@ export const LoginForm = () => {
           </button>
         </div>
 
-        <div className="d-flex mt-2 h-25 align-items-center justify-content-center gap-3">
-          <p className="text-light m-0">Don't have an account?</p>
-          <NavLink to="register">Register</NavLink>
-        </div>
 
         {/* Alerta de error */}
         {loginError && (

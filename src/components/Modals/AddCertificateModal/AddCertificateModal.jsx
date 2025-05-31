@@ -128,6 +128,7 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
         formData.append("file", image);
       }
 
+      // upload an image to the bucket
       const imageAssignResponse = await axios.post(
         `http://localhost:8080/api/certificaciones/upload-image/${certId}`,
         formData,
@@ -138,6 +139,7 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
         }
       );
 
+      // assign the 
       const userassign = await axios.post(
         `http://localhost:8080/api/certificados/asignar`,
         { idusuario: localStorage.getItem("id"), idcertificaciones: certId },

@@ -6,7 +6,12 @@ import useToggleState from "../useToggleState";
 // import api shit
 import { useFetch } from "src/hooks/useFetch";
 
-function transformBackendUser(user) {
+import axios from "axios";
+
+// const DB_URL = "https://pathexplorer-backend.onrender.com/";
+const DB_URL = "http://localhost:8080/";
+
+function transformBackendUser(user, projects) {
   // guardo un template de lo que espera la función de carta del empleado
   const newuser = {
     name: "",
@@ -28,12 +33,16 @@ function transformBackendUser(user) {
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/public/fotos-perfil/";
 
   newuser.name = formatName(user.nombre);
+  newuser.pnombre = projects[0].proyecto.pnombre || "Staff";
+  newuser.finicio = projects[0].fechainicio || "-";
+  newuser.fechafin = projects[0].fechafin || "-";
   newuser.location = user.ubicacion;
   newuser.email = user.correoelectronico;
   newuser.phone = user.telefono;
   newuser.linkedin = user.linkedin;
   newuser.github = user.github;
-  newuser.title = user.puesto;
+  newuser.title = projects[0].rol.nombrerol || "Staff";
+  newuser.role = user.tipo;
   newuser.avatarUrl =
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/sign/fotos-perfil/foto-15-1748207570840.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzFkNDY3ZWNhLTk2NDgtNGRjYy05YTQyLTJhMzQyNWZmM2VhMCJ9.eyJ1cmwiOiJmb3Rvcy1wZXJmaWwvZm90by0xNS0xNzQ4MjA3NTcwODQwLmpwZyIsImlhdCI6MTc0ODI5MTkyNywiZXhwIjoxNzc5ODI3OTI3fQ.gi_C6RcvsXN_fKFsLZHFZ8cAwQ065_8AjUxnZA-ecIU";
 
@@ -77,7 +86,7 @@ function transformBackendCertificates(certificates) {
   if (!certificates) return res;
 
   certificates.forEach((certificate) => {
-    let url = "/imagesUser/JavaScript-logo.png"
+    let url = "/imagesUser/JavaScript-logo.png";
 
     let temp = {
       id: certificate.certificaciones.idcertificaciones,
@@ -107,18 +116,6 @@ function transformBackendCertificates(certificates) {
 function transformBackendObjectives(objectives) {
   if (!objectives) return [];
   let res = [];
-
-  let ex = [
-    {
-      id: 1,
-      title: "Complete Q2 Performance Review",
-      description:
-        "Complete the self-assessment and gather feedback from peers and supervisors for the quarterly performance review.",
-      targetDate: "2025-06-30",
-      completed: false,
-      priority: "high",
-    },
-  ];
 
   objectives.forEach((objective) => {
     let temp = {
@@ -203,25 +200,10 @@ export const useProfilePage = () => {
   const [activeTab, setActiveTab] = useState("Contact Information");
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(loading);
+  const [isLoading, setIsLoading] = useState(false);
 
   // User profile data
-  const userProfile = transformBackendUser(data.user);
-
-  // User skills
-  const userSkills = [
-    "JavaScript",
-    "React",
-    "Node.js",
-    "Python",
-    "SQL",
-    "Git",
-    "Leadership",
-    "Communication",
-    "Problem Solving",
-    "Teamwork",
-    "Time Management",
-  ];
+  const userProfile = transformBackendUser(data.user, data.proyectos);
 
   // User certificates
   const userCertificates = transformBackendCertificates(data.certificados);
@@ -245,13 +227,29 @@ export const useProfilePage = () => {
   }, [userExperience.length, objectives]);
 
   // Handle objective toggle
-  const handleObjectiveToggle = useCallback((id) => {
-    setObjectives((prev) =>
-      prev.map((obj) =>
-        obj.id === id ? { ...obj, completed: !obj.completed } : obj
-      )
+  const handleObjectiveToggle = useCallback(async (obj) => {
+    // volteamos el status
+    let status = obj.completed ? false : true;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+    const res = await axios.patch(
+      DB_URL + "api/goals",
+      {
+        idmeta: obj.id,
+        cambio: { completa : status}
+      },
+      config
     );
+
+    window.location.reload();
   }, []);
+
+  // Handle objective addition
+  const handleSaveObjective = async (objective) => {};
 
   // Handle certificate click
   const handleCertificateClick = useCallback(
@@ -263,8 +261,22 @@ export const useProfilePage = () => {
   );
 
   // Handle skills update
-  const handleUpdateSkills = useCallback((newSkills) => {
-    //setUserSkills(newSkills);
+  const handleUpdateSkills = useCallback(async (newSkills) => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+    newSkills.forEach(async (skill) => {
+      const res = await axios.post(
+        DB_URL + "api/asignar",
+        {
+          idusuario: localStorage.getItem("id"),
+          nombreHabilidad: skill,
+        },
+        config
+      );
+    });
   }, []);
 
   // Handle add certificate
@@ -273,8 +285,22 @@ export const useProfilePage = () => {
   }, []);
 
   // Handle remove certificate
-  const handleRemoveCertificate = useCallback((certificateId) => {
+  // remove cert (no alert no cap no shit no fear)
+  const handleRemoveCertificate = useCallback( async(certificateId) => {
     // setUserCertificates(prev => prev.filter(cert => cert.id !== certificateId));
+
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+    const res = await axios.delete(
+      DB_URL + "api/certificaciones/" + certificateId,
+      config
+    );
+
+    window.location.reload();
   }, []);
 
   // Modal handlers
@@ -311,7 +337,6 @@ export const useProfilePage = () => {
   return {
     // Data
     userProfile,
-    userSkills,
     userCertificates,
     userExperience,
     objectives,
@@ -328,7 +353,7 @@ export const useProfilePage = () => {
     setSearchTerm,
 
     // Loading state
-    loading,
+    isLoading,
 
     // Modal state
     modals,
@@ -352,3 +377,4 @@ export const useProfilePage = () => {
 };
 
 export default useProfilePage;
+``;
