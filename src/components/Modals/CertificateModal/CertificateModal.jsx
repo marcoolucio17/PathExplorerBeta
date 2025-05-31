@@ -4,6 +4,9 @@ import ModalScrollbar from "src/components/Modals/ModalScrollbar";
 
 import axios from "axios";
 
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+//const DB_URL = "http://localhost:8080/";
+
 export const CertificateModal = ({
   certificate,
   isOpen,
@@ -21,7 +24,7 @@ export const CertificateModal = ({
 
     try {
       const res = await axios.get(
-        `http://localhost:8080/api/certificaciones/image-url/${certificate.id}`,
+        `${DB_URL}api/certificaciones/image-url/${certificate.id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -168,7 +171,7 @@ export const CertificateModal = ({
           </div>
         </div>
 
-        <div className={styles.buttonGroup}>
+        {/* <div className={styles.buttonGroup}>
           <button onClick={handleDownload} className={styles.secondaryButton}>
             <i className="bi bi-download"></i>
             Download Certificate
@@ -185,7 +188,7 @@ export const CertificateModal = ({
               Verify Certificate
             </a>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

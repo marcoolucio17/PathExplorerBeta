@@ -1,41 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import styles from 'src/styles/Modals/Modal.module.css';
-import modalStyles from './EditObjectivesModal.module.css';
+import React, { useState, useEffect } from "react";
+import styles from "src/styles/Modals/Modal.module.css";
+import modalStyles from "./EditObjectivesModal.module.css";
 
-export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }) => {
+import axios from "axios";
+
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+// const DB_URL = "http://localhost:8080/";
+
+export const EditObjectivesModal = ({
+  isOpen,
+  onClose,
+  objectives = [],
+  onSave,
+}) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [objectivesList, setObjectivesList] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    targetDate: '',
-    priority: 'medium',
-    completed: false
+    title: "",
+    description: "",
+    targetDate: "",
+    priority: "medium",
+    completed: false,
   });
 
-  // Move resetForm function before useEffect
   const resetForm = () => {
     setFormData({
-      title: '',
-      description: '',
-      targetDate: '',
-      priority: 'medium',
-      completed: false
+      title: "",
+      description: "",
+      targetDate: "",
+      priority: "medium",
+      completed: false,
     });
   };
 
   useEffect(() => {
-    console.log('EditObjectivesModal useEffect - isOpen:', isOpen, 'objectives:', objectives);
     if (isOpen) {
       setIsVisible(true);
       setIsClosing(false);
       setObjectivesList([...objectives]);
+      console.log(objectivesList);
       setEditingIndex(null);
-      resetForm();
+      // resetForm();
     }
-  }, [isOpen, objectives]);
+  }, [isOpen, formData]);
 
   if (!isVisible) return null;
 
@@ -56,9 +67,9 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -69,17 +80,49 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
       description: objective.description,
       targetDate: objective.targetDate,
       priority: objective.priority,
-      completed: objective.completed
+      completed: objective.completed,
     });
     setEditingIndex(index);
   };
 
+  // saves a new objective into the db
+  // const handleSaveObjective = async () => {
+  //   if (!formData.title || !formData.description || !formData.targetDate)
+  //     return;
+
+  //   // la transformamos en el formato del back
+  //   const formattedObj = {
+  //     idusuario: localStorage.getItem("id"),
+  //     meta: formData.title,
+  //     description: formData.description,
+  //     plazo: formData.targetDate,
+  //     completa: formData.completed,
+  //     priority: formData.priority,
+  //   };
+
+  //   const config = {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //     },
+  //   };
+
+  //   const res = await axios.post(
+  //     DB_URL + "api/goals",
+  //     formattedObj,
+  //     config
+  //   );
+
+  //   setEditingIndex(null);
+  //   handleClose();
+  // };
+
   const handleSaveObjective = () => {
-    if (!formData.title || !formData.description || !formData.targetDate) return;
+    if (!formData.title || !formData.description || !formData.targetDate)
+      return;
 
     const newObjective = {
       id: editingIndex !== null ? objectivesList[editingIndex].id : Date.now(),
-      ...formData
+      ...formData,
     };
 
     if (editingIndex !== null) {
@@ -92,13 +135,23 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
       setObjectivesList([...objectivesList, newObjective]);
     }
 
-    resetForm();
     setEditingIndex(null);
   };
 
+  // const handleDelete = (index) => {
+  //   const updated = objectivesList.filter((_, i) => i !== index);
+  //   setObjectivesList(updated);
+  //   if (editingIndex === index) {
+  //     //();
+  //     setEditingIndex(null);
+  //   }
+  // };
+
+  // versión pasada acoplada
   const handleDelete = (index) => {
     const updated = objectivesList.filter((_, i) => i !== index);
     setObjectivesList(updated);
+
     if (editingIndex === index) {
       resetForm();
       setEditingIndex(null);
@@ -106,25 +159,44 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
   };
 
   const handleCancel = () => {
-    resetForm();
+    //resetForm();
     setEditingIndex(null);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      // TODO: Replace with actual API call
-      // await updateObjectives(objectivesList);
-      
-      if (onSave) {
-        onSave(objectivesList);
-      }
-      
-      handleClose();
-    } catch (error) {
-      console.error('Error updating objectives:', error);
-    }
+  const handleSubmit = async () => {
+    const req = [];
+
+    // vamos a mandar todo lo que esté dentro de objectiveList
+    objectivesList.forEach((obj) => {
+      // la transformamos en el formato del back
+      const formattedObj = {
+        idusuario: localStorage.getItem("id"),
+        meta: obj.title,
+        description: obj.description,
+        plazo: obj.targetDate,
+        completa: obj.completed,
+        priority: obj.priority,
+      };
+      console.log("added thin");
+      req.push(formattedObj);
+    });
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+
+    console.log(req);
+
+    const res = await axios.put(
+      DB_URL + "api/update-goals/" + localStorage.getItem("id"),
+      { goals: req },
+      config
+    );
+
+    setEditingIndex(null);
+    handleClose();
   };
 
   const isFormValid = () => {
@@ -133,52 +205,71 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return '#ef4444';
-      case 'medium': return '#f59e0b';
-      case 'low': return '#10b981';
-      default: return '#6b7280';
+      case "high":
+        return "#ef4444";
+      case "medium":
+        return "#f59e0b";
+      case "low":
+        return "#10b981";
+      default:
+        return "#6b7280";
     }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   return (
-    <div 
-      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ''}`} 
+    <div
+      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ""}`}
       onClick={handleBackdropClick}
     >
-      <div className={`${styles.modalContent} ${isClosing ? styles.closing : ''}`} style={{ maxWidth: '700px' }}>
+      <div
+        className={`${styles.modalContent} ${isClosing ? styles.closing : ""}`}
+        style={{ maxWidth: "700px" }}
+      >
         <button className={styles.closeButton} onClick={handleClose}>
           <i className="bi bi-x-lg"></i>
         </button>
-        
+
         <div className={styles.modalHeader}>
           <h2 className={styles.title}>Edit Career Objectives</h2>
-          <p className={styles.subtitle}>Manage your professional goals and targets</p>
+          <p className={styles.subtitle}>
+            Manage your professional goals and targets
+          </p>
         </div>
 
-        <div className={styles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
+        <div
+          className={styles.modalBody}
+          style={{ height: "calc(100% - 200px)" }}
+        >
           <div className={modalStyles.objectivesEditor}>
             {/* Objectives List */}
             <div className={modalStyles.objectivesList}>
               <h3>Current Objectives</h3>
               {objectivesList.map((obj, index) => (
-                <div key={obj.id} className={`${modalStyles.objectiveItem} ${editingIndex === index ? modalStyles.editing : ''} ${obj.completed ? modalStyles.completed : ''}`}>
+                <div
+                  key={obj.id}
+                  className={`${modalStyles.objectiveItem} ${
+                    editingIndex === index ? modalStyles.editing : ""
+                  } ${obj.completed ? modalStyles.completed : ""}`}
+                >
                   <div className={modalStyles.objectiveInfo}>
                     <div className={modalStyles.objectiveHeader}>
                       <h4>{obj.title}</h4>
                       <div className={modalStyles.objectiveMeta}>
-                        <span 
+                        <span
                           className={modalStyles.priorityBadge}
-                          style={{ backgroundColor: getPriorityColor(obj.priority) }}
+                          style={{
+                            backgroundColor: getPriorityColor(obj.priority),
+                          }}
                         >
                           {obj.priority}
                         </span>
@@ -196,14 +287,14 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
                     )}
                   </div>
                   <div className={modalStyles.objectiveActions}>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => handleEdit(index)}
                       className={modalStyles.editBtn}
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => handleDelete(index)}
                       className={modalStyles.deleteBtn}
@@ -217,8 +308,10 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
 
             {/* Objectives Form */}
             <div className={modalStyles.objectiveForm}>
-              <h3>{editingIndex !== null ? 'Edit Objective' : 'Add New Objective'}</h3>
-              
+              <h3>
+                {editingIndex !== null ? "Edit Objective" : "Add New Objective"}
+              </h3>
+
               <div className={styles.formGroup}>
                 <label htmlFor="title">Objective Title *</label>
                 <input
@@ -284,7 +377,7 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
 
               <div className={modalStyles.formActions}>
                 {editingIndex !== null && (
-                  <button 
+                  <button
                     type="button"
                     onClick={handleCancel}
                     className={styles.cancelButton}
@@ -292,15 +385,15 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
                     Cancel Edit
                   </button>
                 )}
-                
-                <button 
+
+                <button
                   type="button"
                   onClick={handleSaveObjective}
                   disabled={!isFormValid()}
                   className={styles.primaryButton}
                 >
                   <i className="bi bi-plus-lg"></i>
-                  {editingIndex !== null ? 'Update' : 'Add'} Objective
+                  {editingIndex !== null ? "Update" : "Add"} Objective
                 </button>
               </div>
             </div>
@@ -308,16 +401,16 @@ export const EditObjectivesModal = ({ isOpen, onClose, objectives = [], onSave }
         </div>
 
         <div className={styles.buttonGroup}>
-          <button 
+          <button
             type="button"
-            onClick={handleClose} 
+            onClick={handleClose}
             className={styles.cancelButton}
           >
             <i className="bi bi-x-lg"></i>
             Cancel
           </button>
-          
-          <button 
+
+          <button
             type="button"
             onClick={handleSubmit}
             className={styles.saveButton}

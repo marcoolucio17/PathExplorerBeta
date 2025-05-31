@@ -7,8 +7,8 @@ import Spinner from "react-bootstrap/Spinner";
 import "../../styles/Login.css";
 import axios from "axios";
 
-// const DB_URL = "https://pathexplorer-backend.onrender.com/";
-const DB_URL = "http://localhost:8080/";
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+//const DB_URL = "http://localhost:8080/";
 
 const roleMap = {
   Manager: "manager",
@@ -77,6 +77,11 @@ export const LoginForm = () => {
       }, 5000);
     }
   };
+
+  // si ya está verificado, lo pasamos adentro
+  useEffect(() => {
+
+  }, [])
 
   return (
     <div className="mainLoginForm">
@@ -151,10 +156,6 @@ export const LoginForm = () => {
           </button>
         </div>
 
-        <div className="d-flex mt-2 h-25 align-items-center justify-content-center gap-3">
-          <p className="text-light m-0">Don't have an account?</p>
-          <NavLink to="register">Register</NavLink>
-        </div>
 
         {/* Alerta de error */}
         {loginError && (
