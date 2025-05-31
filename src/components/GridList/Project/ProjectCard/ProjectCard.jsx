@@ -19,12 +19,14 @@ import useGetFetch from 'src/hooks/useGetFetch';
  * @param {Array} props.userSkills - Array of skills that the current user has
  */
 const ProjectCard = ({
+  id,
   project,
   proyecto_rol,
   viewMode,
   idEmployee,
   idrol,
   showCompatibility,
+  onClick,
   selectedSkillFilters = [],
   userSkills = []
 }) => {
@@ -220,7 +222,7 @@ const ProjectCard = ({
   // Grid view - wrap the content in a GlassCard
   if (viewMode === 'grid') {
     return (
-      <GlassCard className={cardClass}>
+      <GlassCard id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
         {gridContent}
       </GlassCard>
     );
@@ -228,7 +230,7 @@ const ProjectCard = ({
 
   // List view - custom layout for horizontal display
   return (
-    <GlassCard className={cardClass}>
+    <GlassCard id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
       {listContent}
     </GlassCard>
   );
