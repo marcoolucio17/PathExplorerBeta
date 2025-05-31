@@ -3,6 +3,10 @@ import styles from "src/styles/Modals/Modal.module.css";
 import ModalScrollbar from "src/components/Modals/ModalScrollbar";
 import axios from "axios";
 
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+//const DB_URL = "http://localhost:8080/";
+
+
 export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -110,7 +114,7 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
     try {
       // 2. POST certificate (without image for now)
       const certResponse = await axios.post(
-        `http://localhost:8080/api/certificados`,
+        `${DB_URL}api/certificados`,
         //
         newCertificate,
         {
@@ -130,7 +134,7 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
 
       // upload an image to the bucket
       const imageAssignResponse = await axios.post(
-        `http://localhost:8080/api/certificaciones/upload-image/${certId}`,
+        `${DB_URL}api/certificaciones/upload-image/${certId}`,
         formData,
         {
           headers: {
@@ -141,7 +145,7 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
 
       // assign the 
       const userassign = await axios.post(
-        `http://localhost:8080/api/certificados/asignar`,
+        `${DB_URL}api/certificados/asignar`,
         { idusuario: localStorage.getItem("id"), idcertificaciones: certId },
         {
           headers: {
