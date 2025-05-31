@@ -61,14 +61,15 @@ export const ManagerDashboardPage = () => {
           {/* New Project button for My Projects tab */}
           {dashboardPage.activeTab === 'My Projects' && (
             <div className={styles.tabActionSimple}>
-              <Button
-                type="primary"
-                icon="bi-plus"
-                onClick={handleCreateProject}
-                className={styles.createProjectButton}
-              >
-                New Project
-              </Button>
+              <NavLink to="/manager/create-project">
+                <Button
+                  type="primary"
+                  icon="bi-plus"
+                  className={styles.createProjectButton}
+                >
+                  New Project
+                </Button>
+              </NavLink>
             </div>
           )}
 
@@ -101,11 +102,7 @@ export const ManagerDashboardPage = () => {
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
       />
 
-      <NavLink to="/manager/create-project">
-        <button className="btn btn-primary">
-          Crear Proyecto
-        </button>
-      </NavLink>
+
 
       <ClientsModal
         isOpen={dashboardPage.modals.clientsFilter}
@@ -125,7 +122,7 @@ export const ManagerDashboardPage = () => {
         updateRoles={dashboardPage.handleApplyRoleFilters}
       />
 
-    </div>
+    </div >
   );
 };
 
