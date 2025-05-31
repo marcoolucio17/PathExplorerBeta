@@ -135,6 +135,23 @@ export const useManagerDashboardPage = () => {
       };
     }
 
+    if (dashboardData.clientNameSelected !== "Clients") {
+      filters.clients = {
+        label: "Client",
+        values: [dashboardData.clientNameSelected],
+        color: "rgba(0, 123, 255, 0.2)",
+        borderColor: "rgba(0, 123, 255, 0.5)",
+      };
+    }
+
+    if (dashboardData.roleNameSelected !== "Roles") {
+      filters.roles = {
+        label: "Role",
+        values: [dashboardData.roleNameSelected],
+        color: "rgba(0, 123, 255, 0.2)",
+        borderColor: "rgba(0, 123, 255, 0.5)",
+      };
+    }
     return filters;
   };
 
@@ -142,6 +159,10 @@ export const useManagerDashboardPage = () => {
   const handleRemoveFilter = (filterType, value) => {
     if (filterType === "skills") {
       dashboardData.removeSkillFilter(value);
+    } else if (filterType === "clients") {
+      dashboardData.removeClientFilter();
+    } else if (filterType === "roles") {
+      dashboardData.removeRoleFilter();
     }
   };
 
@@ -149,6 +170,8 @@ export const useManagerDashboardPage = () => {
   const handleClearFilters = () => {
     dashboardData.clearAllSkillFilters();
     listPage.handleClearFilters();
+    dashboardData.removeRoleFilter();
+    dashboardData.removeClientFilter();
   };
 
   // Handle Project creation

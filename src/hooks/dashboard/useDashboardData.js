@@ -197,6 +197,16 @@ export const useDashboardData = () => {
     handleApplySkillFilters(updatedSkills);
   };
 
+  // Remove the client filter
+  const removeClientFilter = () => {
+    handleApplyClientFilters("Clients", null);
+  };
+
+  // Remove the role filter
+  const removeRoleFilter = () => {
+    handleApplyRoleFilters("Roles", null);
+  };
+
   // Clear all skill filters
   const clearAllSkillFilters = () => {
     handleApplySkillFilters([]);
@@ -285,6 +295,8 @@ export const useDashboardData = () => {
     handleApplyRoleFilters,
     removeSkillFilter,
     clearAllSkillFilters,
+    removeRoleFilter,
+    removeClientFilter,
     sortProjects,
     flattenProjectsForList,
   };

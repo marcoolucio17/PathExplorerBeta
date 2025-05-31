@@ -5,7 +5,7 @@ import { ChipModalSelect } from '../ChipModalSelect';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
 
-export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
+export const RolesModal = ({ isOpen, onClose, roleNameStatus, roleIdStatus, roles = [], updateRoles }) => {
 
 
     const [isClosing, setIsClosing] = useState(false);
@@ -18,6 +18,12 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
         if (isOpen) {
             setIsVisible(true);
             setIsClosing(false);
+            if (roleNameStatus === 'Roles') {
+                setselectRole('')
+            }
+            if (roleIdStatus === null) {
+                setSelectRoleId(null);
+            }
         }
     }, [isOpen]);
 
@@ -47,9 +53,8 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
     };
 
     const handleSave = () => {
-        if (selectRole && selectRoleId) {
-            onRoleSelected(selectRole, selectRoleId);
-        }
+
+        updateRoles(selectRole, selectRoleId);
         handleClose();
     }
 

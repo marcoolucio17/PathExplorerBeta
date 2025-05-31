@@ -34,7 +34,8 @@ export const ManagerDashboardPage = () => {
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
   };
-
+  console.log(dashboardPage.clientNameSelected, " ", dashboardPage.clientId);
+  console.log(dashboardPage.roleNameSelected, " ", dashboardPage.roleId);
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -109,16 +110,19 @@ export const ManagerDashboardPage = () => {
       <ClientsModal
         isOpen={dashboardPage.modals.clientsFilter}
         onClose={() => dashboardPage.closeModal('clientsFilter')}
-        selectedClients={dashboardPage.selectedClientFilters}
-        onClientSelected={dashboardPage.handleApplyClientFilters}
+        clientNameStatus={dashboardPage.clientNameSelected}
+        clientIdStatus={dashboardPage.clientId}
         clients={dashboardPage.clients}
+        updateClients={dashboardPage.handleApplyClientFilters}
       />
 
       <RolesModal
         isOpen={dashboardPage.modals.rolesFilter}
         onClose={() => dashboardPage.closeModal('rolesFilter')}
-        onRoleSelected={dashboardPage.handleApplyRoleFilters}
+        roleNameStatus={dashboardPage.roleNameSelected}
+        roleIdStatus={dashboardPage.roleId}
         roles={dashboardPage.roles}
+        updateRoles={dashboardPage.handleApplyRoleFilters}
       />
 
     </div>
