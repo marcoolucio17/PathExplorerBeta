@@ -75,17 +75,10 @@ function CustomNavbar() {
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
-          <li onClick={() => navigate("/certificates")}>
-            <i className="bi bi-award"></i>
-            {isSidebarOpen && <span>Certificates</span>}
-          </li>
-          <li onClick={() => navigate("/settings")}>
-            <i className="bi bi-gear"></i>
-            {isSidebarOpen && <span>Settings</span>}
-          </li>
-          <li onClick={() => navigate("/about")}>
-            <i className="bi bi-info-circle"></i>
-            {isSidebarOpen && <span>About</span>}
+          <li onClick={() => navigate("/")}>
+            <i className="bi bi-box-arrow-left"></i>
+            {isSidebarOpen && <span>Logout</span>}
+
           </li>
         </ul>
       </div>
@@ -116,12 +109,6 @@ function CustomNavbar() {
 
           {/* Icons */}
           <div className="nav-icons d-flex gap-3 align-items-center">
-            <button
-              onClick={() => navigate(`/${authState}/dashboard`)}
-              className="icon-btn"
-            >
-              <i className="bi bi-list-ul"></i>
-            </button>
 
             <div className="position-relative">
               <button

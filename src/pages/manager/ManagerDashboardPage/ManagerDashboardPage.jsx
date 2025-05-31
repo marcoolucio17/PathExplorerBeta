@@ -8,8 +8,8 @@ import useDashboardHeaderConfig from '../../../hooks/dashboard/useDashboardHeade
 import ProjectList from '../../../components/GridList/Project/ProjectList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
-import { ClientsModal } from "../../../components/Modals/ClientsModal";
-import { RolesModal } from "../../../components/Modals/RolesModal";
+import { ClientsModal } from "src/components/Modals/ClientsModal/ClientsModal";
+import { RolesModal } from "src/components/Modals/RolesModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
