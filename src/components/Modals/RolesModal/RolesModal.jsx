@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import modalStyles from 'src/styles/Modals/Modal.module.css';
 import styles from './RolesModal.module.css';
+import { ChipModalSelect } from '../ChipModalSelect';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
 
-export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
+export const RolesModal = ({ isOpen, onClose, roleNameStatus, roleIdStatus, roles = [], updateRoles }) => {
 
 
     const [isClosing, setIsClosing] = useState(false);
@@ -17,6 +18,12 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
         if (isOpen) {
             setIsVisible(true);
             setIsClosing(false);
+            if (roleNameStatus === 'Roles') {
+                setselectRole('')
+            }
+            if (roleIdStatus === null) {
+                setSelectRoleId(null);
+            }
         }
     }, [isOpen]);
 
@@ -46,11 +53,13 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
     };
 
     const handleSave = () => {
-        if (selectRole && selectRoleId) {
-            onRoleSelected(selectRole, selectRoleId);
-        }
+
+        updateRoles(selectRole, selectRoleId);
         handleClose();
     }
+
+    const filteredRoles = searchTerm !== "" ? roles.filter(role =>
+        role.tnombre.toLowerCase().includes(searchTerm.toLowerCase())) : roles;
 
     return (
 
@@ -84,18 +93,20 @@ export const RolesModal = ({ isOpen, onClose, onRoleSelected, roles = [] }) => {
                 </div>
 
                 <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
-                    {roles && roles.map((role) => (
+                    <div className={styles.rolesList} >
 
-                        <div key={role.idtitulo} >
-                            <button onClick={() => toggleRole(role.tnombre, role.idtitulo)}>
-                                <span>
-                                    {role.tnombre}
-                                </span>
-                            </button>
 
-                        </div>
-                    ))
-                    }
+                        {filteredRoles && filteredRoles.map((role) => (
+                            <ChipModalSelect
+                                key={role.idtitulo}
+                                text={role.tnombre}
+                                iconClass={selectRole === role.tnombre ? "bi bi-check-circle-fill" : null}
+                                isSelectText={selectRole === role.tnombre}
+                                onClick={() => toggleRole(role.tnombre, role.idtitulo)} />
+
+                        ))
+                        }
+                    </div>
                 </div>
 
                 <div className={modalStyles.buttonGroup}>

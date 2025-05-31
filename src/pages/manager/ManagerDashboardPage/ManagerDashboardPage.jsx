@@ -34,11 +34,8 @@ export const ManagerDashboardPage = () => {
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
   };
+  console.log(dashboardPage.filterOptions);
 
-  console.log("Client name", dashboardPage.clientNameSelected);
-  console.log("Client ID", dashboardPage.clientId);
-  console.log("Role ID", dashboardPage.roleId);
-  console.log("Role name", dashboardPage.roleNameSelected);
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -63,16 +60,14 @@ export const ManagerDashboardPage = () => {
         <div className={styles.cardsContainer}>
           {/* New Project button for My Projects tab */}
           {dashboardPage.activeTab === 'My Projects' && (
-            <div className={styles.tabActionSimple}>
+            <NavLink to="/manager/create-project">
               <Button
                 type="primary"
                 icon="bi-plus"
-                onClick={handleCreateProject}
-                className={styles.createProjectButton}
               >
                 New Project
               </Button>
-            </div>
+            </NavLink>
           )}
 
           <CustomScrollbar
@@ -104,12 +99,23 @@ export const ManagerDashboardPage = () => {
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
       />
 
-      <NavLink to="/manager/create-project">
-        <button className="btn btn-primary">
-          Crear Proyecto
-        </button>
-      </NavLink>
+      <ClientsModal
+        isOpen={dashboardPage.modals.clientsFilter}
+        onClose={() => dashboardPage.closeModal('clientsFilter')}
+        clientNameStatus={dashboardPage.clientNameSelected}
+        clientIdStatus={dashboardPage.clientId}
+        clients={dashboardPage.clients}
+        updateClients={dashboardPage.handleApplyClientFilters}
+      />
 
+      <RolesModal
+        isOpen={dashboardPage.modals.rolesFilter}
+        onClose={() => dashboardPage.closeModal('rolesFilter')}
+        roleNameStatus={dashboardPage.roleNameSelected}
+        roleIdStatus={dashboardPage.roleId}
+        roles={dashboardPage.roles}
+        updateRoles={dashboardPage.handleApplyRoleFilters}
+      />
 
     </div>
   );

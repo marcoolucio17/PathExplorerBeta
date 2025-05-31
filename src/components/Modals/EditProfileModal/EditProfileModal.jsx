@@ -46,13 +46,6 @@ export const EditProfileModal = ({ isOpen, onClose, onEditSection }) => {
       color: 'var(--purple-progress-1)'
     },
     {
-      id: 'experience',
-      title: 'Work Experience',
-      description: 'Add, edit, or remove work experience entries',
-      icon: 'bi-briefcase-fill',
-      color: 'var(--blue-progress-1)'
-    },
-    {
       id: 'objectives',
       title: 'Career Objectives',
       description: 'Manage your professional goals and targets',
