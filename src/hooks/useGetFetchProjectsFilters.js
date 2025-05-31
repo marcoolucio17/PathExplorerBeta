@@ -44,14 +44,27 @@ export const useGetFetchProjectsFilters = ({ rutaApi = "", filters = {} }) => {
         const response = await axiosInstance.get(url);
         setData(response.data);
       } catch (error) {
-        console.error(`Error fetching ${rutaApi}:`, error);
         setError(error);
       }
     };
 
-    const fetchDataFilters = async () => {
-      let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}?`;
+    const constructQueryParams = (filters) => {
+      let filtros = [];
+      for (const key in filters) {
+        if (filters[key]) {
+          filtros.push(
+            `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`
+          );
+        }
+      }
+      return filtros.length > 0 ? `?${filtros.join("&")}` : "";
+    };
 
+    const fetchDataFilters = async () => {
+      const queryParams = constructQueryParams(filters);
+      console.log(`Fetching data with filters: ${queryParams}`);
+      let url = `http://localhost:8080/api/${rutaApi}${queryParams}`;
+      console.log(`Constructed URL: ${url}`);
       try {
         const response = await axiosInstance.get(url);
         setData(response.data);
@@ -60,11 +73,15 @@ export const useGetFetchProjectsFilters = ({ rutaApi = "", filters = {} }) => {
         setError(error);
       }
     };
-    if (filters) {
+
+    if (Object.keys(filters).length > 0) {
+      console.log("Filters provided, fetching filtered data");
+      fetchDataFilters();
     } else {
+      console.log("No filters provided, fetching all data");
       fetchData();
     }
-  }, []);
+  }, [filters]);
 
   return { data, error };
 };

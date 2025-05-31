@@ -70,6 +70,7 @@ const ProjectCard = ({
     rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`
   })
 
+
   const matchPercentageValue = matchPercentage ? matchPercentage : 0;
   // Get role data
   const roleData = ensureRoleData();

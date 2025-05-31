@@ -34,8 +34,8 @@ export const ManagerDashboardPage = () => {
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
   };
-  console.log(dashboardPage.clientNameSelected, " ", dashboardPage.clientId);
-  console.log(dashboardPage.roleNameSelected, " ", dashboardPage.roleId);
+  console.log(dashboardPage.filterOptions);
+
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>

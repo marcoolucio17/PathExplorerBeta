@@ -91,7 +91,33 @@ export const useManagerDashboardPage = () => {
   const handleViewApplicants = () => {
     navigate("/manager/applicants");
   };
+  //  Get current user ID from local or session storage
+  const idusuarioActual =
+    localStorage.getItem("id") || sessionStorage.getItem("id");
 
+  // Change the projects list based on the current tab
+  useEffect(() => {
+    switch (listPage.activeTab) {
+      case "All":
+        const { idusuario, ...rest } = dashboardData.filterOptions;
+        dashboardData.setFilterOptions({
+          ...rest,
+        });
+        break;
+      case "Applied To":
+        console.log("Applied To tab selected");
+        break;
+      case "My Projects":
+        // Set filter options for My Projects tab
+        dashboardData.setFilterOptions({
+          ...dashboardData.filterOptions,
+          idusuario: idusuarioActual,
+        });
+        break;
+      default:
+        break;
+    }
+  }, [listPage.activeTab]);
   // Get filtered projects for the current tab
   const getTabProjects = () => {
     let filteredProjects;
@@ -109,11 +135,7 @@ export const useManagerDashboardPage = () => {
         break;
       case "My Projects":
         // Projects managed/owned by the current user
-        filteredProjects = dashboardData.projects.filter(
-          (project) =>
-            project.managerId === dashboardData.currentUserId ||
-            project.ownerId === dashboardData.currentUserId
-        );
+        filteredProjects = dashboardData.projects;
         break;
       default:
         filteredProjects = dashboardData.projects;

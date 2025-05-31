@@ -4,6 +4,7 @@ import useDataFetching from "../useDataFetching";
 import useListPage from "../useListPage";
 import useModalControl from "../useModalControl";
 import useGetFetch from "../useGetFetch";
+import useGetFetchProjectsFilters from "../useGetFetchProjectsFilters";
 /**
  * Hook for managing dashboard data including project filtering and processing
  *
@@ -19,6 +20,7 @@ export const useDashboardData = () => {
 
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState(searchFromURL);
+
   const [skillSelected, setSkillSelected] = useState("Skills");
   const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
   const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
@@ -30,6 +32,8 @@ export const useDashboardData = () => {
   const [roleNameSelected, setRoleNameSelected] = useState("Roles");
   //Selected the id role
   const [roleId, setRoleId] = useState(null);
+  //Gather the filter options
+  const [filterOptions, setFilterOptions] = useState({});
 
   // Mock current user ID (this would come from authentication context in real app)
   const currentUserId = 1;
@@ -39,11 +43,13 @@ export const useDashboardData = () => {
     if (searchTerm) {
       const params = new URLSearchParams(location.search);
       params.set("search", searchTerm);
+      handdlyApplyNameProject(searchTerm); // Apply project name filter
       navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     } else if (searchFromURL) {
       // If search term is cleared, remove it from URL
       const params = new URLSearchParams(location.search);
       params.delete("search");
+      handdlyApplyNameProject(); // Clear project name filter
       navigate(
         `${location.pathname}${
           params.toString() ? `?${params.toString()}` : ""
@@ -62,8 +68,11 @@ export const useDashboardData = () => {
     }
   }, [location.search]);
 
-  // Fetch data
-  const { data: projectsData } = useGetFetch({ rutaApi: "projects" });
+  // Fetch data considering filters
+  const { data: projectsData } = useGetFetchProjectsFilters({
+    rutaApi: "projects",
+    filters: filterOptions,
+  });
 
   const { data: clientsData } = useGetFetch({ rutaApi: "clientes" });
 
@@ -164,15 +173,32 @@ export const useDashboardData = () => {
       setSkillSelected("Skills");
     }
   };
-
+  //Apply project name as filter
+  const handdlyApplyNameProject = (nameProject) => {
+    if (nameProject !== "") {
+      setFilterOptions({
+        ...filterOptions,
+        projectName: nameProject, // Update filter options with project name
+      });
+    } else {
+      const { projectName, ...rest } = filterOptions; // Remove project name filter
+      setFilterOptions(rest);
+    }
+  };
   //Apply client filters
   const handleApplyClientFilters = (clientName, clientId) => {
     //update the Client button text based on selected clients
     if (clientName && clientId) {
       setClientNameSelected(clientName);
+      setFilterOptions({
+        ...filterOptions,
+        idcliente: clientId, // Update filter options with selected client ID
+      });
       setClientId(clientId);
     } else {
       setClientNameSelected("Clients");
+      const { idcliente, ...rest } = filterOptions; // Remove client filter
+      setFilterOptions(rest);
       setClientId(null);
     }
   };
@@ -183,9 +209,15 @@ export const useDashboardData = () => {
     if (roleName && roleId) {
       setRoleNameSelected(roleName);
       setRoleId(roleId);
+      setFilterOptions({
+        ...filterOptions,
+        nombrerol: roleName, // Update filter options with selected role ID
+      });
     } else {
       setRoleNameSelected("Roles");
       setRoleId(null);
+      const { nombrerol, ...rest } = filterOptions; // Remove role filter
+      setFilterOptions(rest);
     }
   };
 
@@ -213,11 +245,11 @@ export const useDashboardData = () => {
   };
 
   // Calculate matching percentage
-  const calculateMatchPercentage = (project, proyecto_rol) => {
-    if (!project || !proyecto_rol) return 0;
-
-    // Placeholder implementation
-    return Math.floor(Math.random() * 101); // Random value between 0-100 for demo
+  const calculateMatchPercentage = (idrol, idEmployee) => {
+    const { data: matchPercentage } = useGetFetch({
+      rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`,
+    });
+    return matchPercentage ? matchPercentage : 0;
   };
 
   // Sort projects function
@@ -299,6 +331,9 @@ export const useDashboardData = () => {
     removeClientFilter,
     sortProjects,
     flattenProjectsForList,
+    filterOptions,
+    setFilterOptions,
+    calculateMatchPercentage,
   };
 };
 
