@@ -32,7 +32,7 @@ axiosRetry(axiosInstance, {
   shouldResetTimeout: true,
 });
 
-export const useGetFetch = ({ rutaApi = "" }) => {
+export const useGetFetchProjectsFilters = ({ rutaApi = "", filters = {} }) => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
@@ -48,10 +48,25 @@ export const useGetFetch = ({ rutaApi = "" }) => {
         setError(error);
       }
     };
-    fetchData();
+
+    const fetchDataFilters = async () => {
+      let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}?`;
+
+      try {
+        const response = await axiosInstance.get(url);
+        setData(response.data);
+      } catch (error) {
+        console.error(`Error fetching ${rutaApi}:`, error);
+        setError(error);
+      }
+    };
+    if (filters) {
+    } else {
+      fetchData();
+    }
   }, []);
 
   return { data, error };
 };
 
-export default useGetFetch;
+export default useGetFetchProjectsFilters;

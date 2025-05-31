@@ -13,8 +13,6 @@ const useFilters = (data = [], options = {}) => {
     searchTerm = "",
     skillsField = "skills",
     projectField = "project",
-    clientField = "clients",
-    roleField = "roles",
   } = options;
 
   // Ensure data is always an array
