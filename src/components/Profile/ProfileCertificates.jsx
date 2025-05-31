@@ -4,6 +4,9 @@ import CustomScrollbar from "../CustomScrollbar";
 import styles from "./ProfileCertificates.module.css";
 import axios from "axios";
 
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+//const DB_URL = "http://localhost:8080/";
+
 export const ProfileCertificates = ({
   certificates = [],
   onCertificateClick,
@@ -20,7 +23,7 @@ export const ProfileCertificates = ({
         certificates.map(async (cert) => {
           try {
             const res = await axios.get(
-              `http://localhost:8080/api/certificaciones/image-url/${cert.id}`,
+              `${DB_URL}api/certificaciones/image-url/${cert.id}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
