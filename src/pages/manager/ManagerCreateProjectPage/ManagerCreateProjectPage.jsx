@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import styles from 'src/styles/Modals/Modal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import { usePost } from 'src/hooks/usePost';
-import axios from 'axios'; 
+import axios from 'axios';
 import useFetch from 'src/hooks/useFetch';
+import { useNavigate} from "react-router";
 
-export const CreateProjectModal = ({ isOpen, onClose }) => {
+export const ManagerCreateProjectPage = () => {
   const { triggerPost, loading, error } = usePost();
-  const [isClosing, setIsClosing] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
   const { data: clientes, loading: loadingClientes } = useFetch("clientes");
   const [clientImageUrl, setClientImageUrl] = useState(null);
+  const { data: habilidades } = useFetch("habilidades");
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     clientName: '',
@@ -18,25 +19,28 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
     description: '',
     startDate: '',
     endDate: '',
-    roles: '',
+    roles: [],
     clientImage: null,
     RfpPreview: null,
     imagePreview: null,
     projectRFP: null
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-      setIsClosing(false);
-    }
-  }, [isOpen]);
-
-  if (!isVisible) return null;
-
   const handleClientSelect = async (e) => {
     const selectedId = parseInt(e.target.value);
+
+    if (!selectedId) {
+      setFormData(prev => ({
+        ...prev,
+        clientName: '',
+        idcliente: null
+      }));
+      setClientImageUrl(null);
+      return;
+    }
+
     const selectedCliente = clientes.find(c => c.idcliente === selectedId);
+    if (!selectedCliente) return; // por si acaso
 
     setFormData(prev => ({
       ...prev,
@@ -63,34 +67,6 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsVisible(false);
-      setIsClosing(false);
-      // Reset form
-      setFormData({
-        title: '',
-        clientName: '',
-        skills: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        roles: '',
-        clientImage: null,
-        RfpPreview: null,
-        imagePreview: null,
-        projectRFP: null
-      });
-    }, 300);
-  };
-
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -119,20 +95,65 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleClientImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          clientImage: file,
-          imagePreview: reader.result
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleAddRequerimiento = (roleIndex) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[roleIndex].requerimientos.push({
+      tiempoexperiencia: '',
+      idhabilidad: ''
+    });
+    setFormData(prev => ({ ...prev, roles: updatedRoles }));
   };
+
+  const handleRemoveRequerimiento = (roleIndex, reqIndex) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[roleIndex].requerimientos.splice(reqIndex, 1);
+    setFormData(prev => ({ ...prev, roles: updatedRoles }));
+  };
+
+  const handleRequerimientoChange = (roleIndex, reqIndex, field, value) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[roleIndex].requerimientos[reqIndex][field] = value;
+    setFormData(prev => ({ ...prev, roles: updatedRoles }));
+  };
+
+
+  const handleAddRole = () => {
+    setFormData(prev => ({
+      ...prev,
+      roles: [
+        ...prev.roles,
+        {
+          nombrerol: '',
+          nivelrol: '',
+          descripcionrol: '',
+          disponible: true,
+          requerimientos: [
+            {
+              tiempoexperiencia: '',
+              idhabilidad: 1 // puedes luego hacer esto dinámico
+            }
+          ]
+        }
+      ]
+    }));
+  };
+
+  const handleRemoveRole = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: prev.roles.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleRoleChange = (index, field, value) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[index][field] = value;
+    setFormData(prev => ({
+      ...prev,
+      roles: updatedRoles
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formatDate = (dateString) => {
@@ -162,21 +183,13 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
         idcliente: formData.idcliente,
         idusuario: localStorage.getItem("id")
       },
-      roles: [  //  Harcodeado
-        {
-          nombrerol: "Rol automático",
-          nivelrol: 1,
-          descripcionrol: "Generado automáticamente",
-          disponible: true,
-          requerimientos: [
-            {
-              tiempoexperiencia: "1 año",
-              idhabilidad: 1
-            }
-          ]
-        }
-      ]
-
+      roles: formData.roles.map((rol) => ({
+        nombrerol: rol.nombrerol,
+        nivelrol: parseInt(rol.nivelrol),
+        descripcionrol: rol.descripcionrol,
+        disponible: true, // o puedes hacer esto editable si quieres
+        requerimientos: rol.requerimientos || []
+      }))
     };
 
     try {
@@ -208,7 +221,7 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
 
       // Finalizar
       alert("Proyecto creado con éxito.");
-      handleClose();
+      navigate('/manager/dashboard');
 
     } catch (err) {
       console.error("Error al crear proyecto o subir archivos:", err);
@@ -221,22 +234,16 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
     const hasRequiredFields =
       formData.title &&
       formData.clientName &&
+      formData.projectRFP !== null &&
       formData.startDate;
 
-    const hasFiles =
-      formData.projectRFP !== null &&
-      formData.clientImage !== null;
-
-    return hasRequiredFields && hasFiles;
+    return hasRequiredFields;
   };
 
   return (
-    <div
-      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ''}`}
-      onClick={handleBackdropClick}
-    >
-      <div className={`${styles.modalContent} ${isClosing ? styles.closing : ''}`} style={{ maxWidth: '1200px' }}>
-        <button className={styles.closeButton} onClick={handleClose}>
+    <div>
+      <div>
+        <button className={styles.closeButton} onClick={() => navigate('/manager/dashboard')}>
           <i className="bi bi-x-lg"></i>
         </button>
 
@@ -369,18 +376,6 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="skills">Skills</label>
-                    <input
-                      type="text"
-                      id="skills"
-                      name="skills"
-                      value={formData.skills}
-                      onChange={handleInputChange}
-                      placeholder="e.g. JavaScript, Project Management"
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
                     <label htmlFor="description">Description *</label>
                     <input
                       type="text"
@@ -420,26 +415,129 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <div className={styles.buttonGroup}>
-            <button
-              type="button"
-              onClick={handleClose}
-              className={styles.cancelButton}
-            >
-              Cancel
+
+          <button className={styles.closeButton} onClick={() => navigate('/manager/dashboard')}>
+            Cancel
+          </button>
+
+          <div style={{ marginTop: '2rem' }}>
+            <h3>Roles del Proyecto</h3>
+            <button type="button" onClick={handleAddRole} className={styles.secondaryButton}>
+              + Agregar Rol
             </button>
 
-            <button
-              type="submit"
-              disabled={!isFormValid()}
-              className={styles.saveButton}
-            >
-              <i className="bi bi-plus-lg"></i>
-              Create Project
-            </button>
+            {formData.roles.map((rol, index) => (
+              <div key={index} style={{ border: '1px solid #ccc', padding: '1rem', marginTop: '1rem', position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveRole(index)}
+                  style={{ position: 'absolute', top: 0, right: 0 }}
+                >
+                  ❌
+                </button>
+                <div className={styles.formGroup}>
+                  <label>Nombre del Rol</label>
+                  <input
+                    type="text"
+                    value={rol.nombrerol}
+                    onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Nivel del Rol</label>
+                  <input
+                    type="number"
+                    value={rol.nivelrol}
+                    onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Descripción</label>
+                  <input
+                    type="text"
+                    value={rol.descripcionrol}
+                    onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
+                  />
+                </div>
+                <div style={{ marginTop: '1rem' }}>
+                  <h4>Habilidades requeridas</h4>
+                  {rol.requerimientos?.map((req, reqIndex) => (
+                    <div key={reqIndex} style={{ borderLeft: '2px solid #ccc', paddingLeft: '1rem', marginBottom: '1rem' }}>
+                      <div className={styles.formGroup}>
+                        <label>Habilidad</label>
+                        <select
+                          value={req.idhabilidad}
+                          onChange={(e) =>
+                            handleRequerimientoChange(index, reqIndex, 'idhabilidad', e.target.value)
+                          }
+                        >
+                          <option value="">Selecciona una habilidad</option>
+                          {[...habilidades]
+                            .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                            .map((hab) => (
+                              <option key={hab.idhabilidad} value={hab.idhabilidad}>
+                                {hab.nombre}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Tiempo de experiencia</label>
+                        <select
+                          value={req.tiempoexperiencia}
+                          onChange={(e) =>
+                            handleRequerimientoChange(index, reqIndex, 'tiempoexperiencia', e.target.value)
+                          }
+                        >
+                          <option value="">Selecciona una opción</option>
+                          <option>3 months</option>
+                          <option>6 months</option>
+                          <option>1 year</option>
+                          <option>2 years</option>
+                          <option>3 years</option>
+                          <option>4 years</option>
+                          <option>5 years</option>
+                        </select>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRequerimiento(index, reqIndex)}
+                        className={styles.cancelButton}
+                      >
+                        Eliminar habilidad
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => handleAddRequerimiento(index)}
+                    className={styles.secondaryButton}
+                  >
+                    + Agregar Habilidad
+                  </button>
+                </div>
+
+              </div>
+            ))}
           </div>
+
+
+          <button
+            type="submit"
+            disabled={!isFormValid()}
+            className={styles.saveButton}
+          >
+            <i className="bi bi-plus-lg"></i>
+            Create Project
+          </button>
+
         </form>
       </div>
     </div>
   );
 };
+
+export default ManagerCreateProjectPage;

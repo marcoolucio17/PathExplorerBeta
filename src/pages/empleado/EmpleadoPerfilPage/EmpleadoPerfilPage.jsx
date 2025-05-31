@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 // Custom Hooks
 import useProfilePage from '../../../hooks/profile/useProfilePage';
@@ -47,11 +47,14 @@ export const EmpleadoPerfilPage = () => {
         return <ProfileObjectives 
           objectives={profilePage.objectives} 
           onObjectiveToggle={profilePage.handleObjectiveToggle} 
+          isLoading = {profilePage.isLoading}
         />;
       default:
         return <ProfileContactInfo userProfile={profilePage.userProfile} />;
     }
   };
+
+  useEffect(() => {}, [profilePage.isLoading]);
 
   const handleEditSection = (section) => {
     // Handle editing specific sections

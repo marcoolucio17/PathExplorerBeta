@@ -58,7 +58,7 @@ export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }
       setIsClosing(false);
       setSelectedSkills(new Set(userSkills));
     }
-  }, [isOpen, userSkills]);
+  }, [isOpen]);
 
   if (!isVisible) return null;
 

@@ -8,12 +8,12 @@ import useDashboardHeaderConfig from '../../../hooks/dashboard/useDashboardHeade
 import ProjectList from '../../../components/GridList/Project/ProjectList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
-import { ClientsModal } from "../../../components/Modals/ClientsModal";
-import { RolesModal } from "../../../components/Modals/RolesModal";
+import { ClientsModal } from "src/components/Modals/ClientsModal/ClientsModal";
+import { RolesModal } from "src/components/Modals/RolesModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
-
+import { useNavigate, NavLink } from "react-router";
 // CSS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
@@ -101,11 +101,11 @@ export const ManagerDashboardPage = () => {
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
       />
 
-      <CreateProjectModal
-        isOpen={dashboardPage.modals.createProject}
-        onClose={() => dashboardPage.closeModal('createProject')}
-        onCreateProject={dashboardPage.handleCreateProject}
-      />
+      <NavLink to="/manager/create-project">
+        <button className="btn btn-primary">
+          Crear Proyecto
+        </button>
+      </NavLink>
 
       <ClientsModal
         isOpen={dashboardPage.modals.clientsFilter}
