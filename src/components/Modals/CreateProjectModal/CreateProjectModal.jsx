@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import styles from 'src/styles/Modals/Modal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import { usePost } from 'src/hooks/usePost';
-import axios from 'axios';
+import axios from 'axios'; 
+import useFetch from 'src/hooks/useFetch';
 
 export const CreateProjectModal = ({ isOpen, onClose }) => {
   const { triggerPost, loading, error } = usePost();
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const { data: clientes, loading: loadingClientes } = useFetch("clientes");
+  const [clientImageUrl, setClientImageUrl] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     clientName: '',
@@ -30,6 +33,35 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   if (!isVisible) return null;
+
+  const handleClientSelect = async (e) => {
+    const selectedId = parseInt(e.target.value);
+    const selectedCliente = clientes.find(c => c.idcliente === selectedId);
+
+    setFormData(prev => ({
+      ...prev,
+      clientName: selectedCliente.clnombre,
+      idcliente: selectedId
+    }));
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`http://localhost:8080/api/clientes/${selectedId}/foto`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data.fotodecliente_url) {
+        setClientImageUrl(res.data.fotodecliente_url);
+      } else {
+        setClientImageUrl(null);
+      }
+    } catch (err) {
+      console.error("Error cargando imagen del cliente:", err);
+      setClientImageUrl(null);
+    }
+  };
 
   const handleClose = () => {
     setIsClosing(true);
@@ -79,7 +111,7 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
         setFormData(prev => ({
           ...prev,
           projectRFP: file,
-          RfpPreview: reader.result 
+          RfpPreview: reader.result
         }));
       };
 
@@ -127,7 +159,7 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
         descripcion: formData.description,
         fechainicio: formatDate(formData.startDate),
         fechafin: formatDate(formData.endDate),
-        idcliente: 1, // Harcodeado
+        idcliente: formData.idcliente,
         idusuario: localStorage.getItem("id")
       },
       roles: [  //  Harcodeado
@@ -288,28 +320,21 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
               </div>
               <div style={{ flex: 1 }}>
                 <div className={styles.uploadSection} style={{ marginBottom: '2rem' }}>
-                  <label className={styles.uploadLabel} htmlFor="clientImage">
-                    {formData.imagePreview ? (
+                  <label className={styles.uploadLabel}>
+                    {clientImageUrl ? (
                       <img
-                        src={formData.imagePreview}
-                        alt="Client preview"
+                        src={clientImageUrl}
+                        alt="Logo del cliente"
                         className={styles.uploadPreview}
                         style={{ width: '150px', height: '150px' }}
                       />
                     ) : (
                       <div className={styles.uploadPlaceholder} style={{ width: '150px', height: '150px' }}>
-                        <i className="bi bi-cloud-upload"></i>
-                        <span>Click to upload client logo</span>
+                        <i className="bi bi-person-circle"></i>
+                        <span>Logo no disponible</span>
                       </div>
                     )}
                   </label>
-                  <input
-                    type="file"
-                    id="clientImage"
-                    accept="image/*"
-                    onChange={handleClientImageChange}
-                    className={styles.fileInput}
-                  />
                 </div>
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
@@ -326,16 +351,21 @@ export const CreateProjectModal = ({ isOpen, onClose }) => {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="clientName">Client Name *</label>
-                    <input
-                      type="text"
-                      id="clientName"
-                      name="clientName"
-                      value={formData.clientName}
-                      onChange={handleInputChange}
-                      placeholder="e.g. Whirlpool"
+                    <label htmlFor="clientSelect">Cliente *</label>
+                    <select
+                      id="clientSelect"
+                      name="idcliente"
+                      onChange={handleClientSelect}
                       required
-                    />
+                      value={formData.idcliente || ''}
+                    >
+                      <option value="">Selecciona un cliente</option>
+                      {clientes.map(cliente => (
+                        <option key={cliente.idcliente} value={cliente.idcliente}>
+                          {cliente.clnombre}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className={styles.formGroup}>
