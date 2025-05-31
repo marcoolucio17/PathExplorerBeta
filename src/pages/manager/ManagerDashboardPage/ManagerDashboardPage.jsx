@@ -100,7 +100,6 @@ export const ManagerDashboardPage = () => {
       <CreateProjectModal
         isOpen={dashboardPage.modals.createProject}
         onClose={() => dashboardPage.closeModal('createProject')}
-        onCreateProject={dashboardPage.handleCreateProject}
       />
 
 

@@ -4,7 +4,7 @@ import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import { usePost } from 'src/hooks/usePost';
 import axios from 'axios';
 
-export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
+export const CreateProjectModal = ({ isOpen, onClose }) => {
   const { triggerPost, loading, error } = usePost();
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -17,6 +17,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
     endDate: '',
     roles: '',
     clientImage: null,
+    RfpPreview: null,
     imagePreview: null,
     projectRFP: null
   });
@@ -46,6 +47,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
         endDate: '',
         roles: '',
         clientImage: null,
+        RfpPreview: null,
         imagePreview: null,
         projectRFP: null
       });
@@ -66,7 +68,26 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
     }));
   };
 
-  const handleFileChange = (e) => {
+
+  const handleRFPChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log("RFP seleccionado:", file.name);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          projectRFP: file,
+          RfpPreview: reader.result 
+        }));
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleClientImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -80,32 +101,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
       reader.readAsDataURL(file);
     }
   };
-
-const handleRFPChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    console.log("RFP seleccionado:", file.name);
-    setFormData(prev => ({
-      ...prev,
-      projectRFP: file
-    }));
-  }
-};
-
-const handleClientImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData(prev => ({
-        ...prev,
-        clientImage: file,
-        imagePreview: reader.result
-      }));
-    };
-    reader.readAsDataURL(file);
-  }
-};
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formatDate = (dateString) => {
@@ -132,7 +127,8 @@ const handleClientImageChange = (e) => {
         descripcion: formData.description,
         fechainicio: formatDate(formData.startDate),
         fechafin: formatDate(formData.endDate),
-        idcliente: 1 // Harcodeado
+        idcliente: 1, // Harcodeado
+        idusuario: localStorage.getItem("id")
       },
       roles: [  //  Harcodeado
         {
@@ -179,7 +175,7 @@ const handleClientImageChange = (e) => {
       }
 
       // Finalizar
-      onCreateProject(result);
+      alert("Proyecto creado con éxito.");
       handleClose();
 
     } catch (err) {
@@ -190,8 +186,16 @@ const handleClientImageChange = (e) => {
 
 
   const isFormValid = () => {
-    return formData.title && formData.clientName && formData.startDate;
-    //Agregar checks de que End Date must be after Start Date
+    const hasRequiredFields =
+      formData.title &&
+      formData.clientName &&
+      formData.startDate;
+
+    const hasFiles =
+      formData.projectRFP !== null &&
+      formData.clientImage !== null;
+
+    return hasRequiredFields && hasFiles;
   };
 
   return (
@@ -214,21 +218,65 @@ const handleClientImageChange = (e) => {
             <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
                 <div className={styles.uploadSection}>
-                  <label className={styles.uploadLabel} htmlFor="projectoPlan">
-                    {formData.imagePreview ? (
-                      <img
-                        src={formData.imagePreview}
-                        alt="Project preview"
-                        className={styles.uploadPreview}
-                        style={{ width: '500px', height: '500px' }}
-                      />
-                    ) : (
-                      <div className={styles.uploadPlaceholder} style={{ width: '500px', height: '500px' }}>
-                        <i className="bi bi-cloud-upload"></i>
-                        <span>Click to upload project RFP</span>
-                      </div>
-                    )}
-                  </label>
+                  <div className={styles.uploadSection}>
+                    <label className={styles.uploadLabel} htmlFor="projectoPlan">
+                      {formData.RfpPreview ? (
+                        <>
+                          {formData.projectRFP?.type === 'application/pdf' ? (
+                            <iframe
+                              src={formData.RfpPreview}
+                              style={{ width: '500px', height: '300px' }}
+                              title="RFP Preview"
+                            />
+                          ) : (
+                            <p>Archivo seleccionado: {formData.projectRFP.name}</p>
+                          )}
+
+                          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                            <button
+                              type="button"
+                              className={styles.cancelButton}
+                              onClick={() =>
+                                setFormData(prev => ({
+                                  ...prev,
+                                  projectRFP: null,
+                                  RfpPreview: null
+                                }))
+                              }
+                            >
+                              Quitar archivo
+                            </button>
+                            <label className={styles.secondaryButton}>
+                              Cambiar archivo
+                              <input
+                                type="file"
+                                id="projectoPlan"
+                                accept=".pdf,.doc,.docx"
+                                onChange={handleRFPChange}
+                                className={styles.fileInput}
+                                style={{ display: 'none' }}
+                              />
+                            </label>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className={styles.uploadPlaceholder} style={{ width: '500px', height: '500px' }}>
+                            <i className="bi bi-cloud-upload"></i>
+                            <span>Click to upload project RFP</span>
+                          </div>
+                          <input
+                            type="file"
+                            id="projectoPlan"
+                            accept=".pdf,.doc,.docx"
+                            onChange={handleRFPChange}
+                            className={styles.fileInput}
+                          />
+                        </>
+                      )}
+                    </label>
+                  </div>
+
                   <input
                     type="file"
                     id="projectoPlan"

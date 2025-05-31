@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import Logo from "../assets/Acc_GT_Dimensional_RGB 1.png";
 import { SearchHeader } from "../components/SearchHeader";
+import { Notifications } from "../components/Notifications";
+
 
 import "./CustomNavBar.css";
 
@@ -65,29 +67,25 @@ function CustomNavbar() {
         }}
       >
         <ul className="sidebar-menu">
-          <li onClick={() => navigate(`/${authState}`)}>
+          <li onClick={() => navigate("/")}>
             <i className="bi bi-house"></i>
             {isSidebarOpen && <span>Home</span>}
           </li>
-          <li onClick={() => navigate(`/${authState}/dashboard`)}>
+          <li onClick={() => navigate("/projects")}>
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
-          <li onClick={() => navigate(`/${authState}/certificates`)}>
+          <li onClick={() => navigate("/certificates")}>
             <i className="bi bi-award"></i>
             {isSidebarOpen && <span>Certificates</span>}
           </li>
-          <li onClick={() => navigate(`/${authState}/settings`)}>
+          <li onClick={() => navigate("/settings")}>
             <i className="bi bi-gear"></i>
             {isSidebarOpen && <span>Settings</span>}
           </li>
-          <li onClick={() => navigate(`/${authState}/about`)}>
+          <li onClick={() => navigate("/about")}>
             <i className="bi bi-info-circle"></i>
             {isSidebarOpen && <span>About</span>}
-          </li>
-          <li onClick={() => navigate("/")}>
-            <i className="bi bi-box-arrow-left"></i>
-            {isSidebarOpen && <span>Logout</span>}
           </li>
         </ul>
       </div>
@@ -105,7 +103,7 @@ function CustomNavbar() {
 
           {/* Search bar with SearchHeader component */}
           <div className="nav-search-container">
-            <SearchHeader 
+            <SearchHeader
               searchTerm={searchTerm}
               setSearchTerm={handleSearch}
               placeholder="Search..."
@@ -131,26 +129,13 @@ function CustomNavbar() {
                 className="icon-btn"
               >
                 <i className="bi bi-bell"></i>
-                <span className="badge-notif">1</span>
+                <span className="badge-notif">!</span>
               </button>
-              {showNotifications && (
-                <div className="glass-popover">
-                  <h6 className="fw-bold mb-2">Notifications</h6>
-                  <div className="notification-item d-flex align-items-center">
-                    <img
-                      src={Logo}
-                      alt="Avatar"
-                      className="rounded avatar-sm me-2"
-                    />
-                    <div>
-                      <p className="mb-1"><strong>Welcome!!!</strong></p>
-                      <p className="small mb-0">
-                        We're excited to have you here! 🚀
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+
+              <Notifications
+                userId={localStorage.getItem("id")}
+                visible={showNotifications}
+              />
             </div>
 
             <button
