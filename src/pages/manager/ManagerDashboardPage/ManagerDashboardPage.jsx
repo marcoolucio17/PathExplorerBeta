@@ -60,17 +60,16 @@ export const ManagerDashboardPage = () => {
         <div className={styles.cardsContainer}>
           {/* New Project button for My Projects tab */}
           {dashboardPage.activeTab === 'My Projects' && (
-            <div className={styles.tabActionSimple}>
-              <NavLink to="/manager/create-project">
-                <Button
-                  type="primary"
-                  icon="bi-plus"
-                  className={styles.createProjectButton}
-                >
-                  New Project
-                </Button>
-              </NavLink>
-            </div>
+
+            <NavLink to="/manager/create-project">
+              <Button
+                type="primary"
+                icon="bi-plus"
+              >
+                New Project
+              </Button>
+            </NavLink>
+
           )}
 
           <CustomScrollbar
@@ -101,7 +100,6 @@ export const ManagerDashboardPage = () => {
         userSkills={dashboardPage.selectedSkillFilters}
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
       />
-
 
 
       <ClientsModal
