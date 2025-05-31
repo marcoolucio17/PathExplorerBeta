@@ -12,7 +12,6 @@ function CustomNavbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const authState = localStorage.getItem("role");
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Define search categories
@@ -57,14 +56,9 @@ function CustomNavbar() {
     <>
       {/* Sidebar */}
       <div
-        className={`sidebar 
-          ${isSidebarVisible ? "sidebar-visible" : ""} 
-          ${isSidebarOpen ? "open" : ""}`}
+        className={`sidebar sidebar-visible ${isSidebarOpen ? "open" : ""}`}
         onMouseEnter={() => setIsSidebarOpen(true)}
-        onMouseLeave={() => {
-          setIsSidebarOpen(false);
-          setIsSidebarVisible(false);
-        }}
+        onMouseLeave={() => setIsSidebarOpen(false)}
       >
         <ul className="sidebar-menu">
           <li onClick={() => navigate("/")}>
@@ -94,10 +88,7 @@ function CustomNavbar() {
       <nav className="navbar glass-navbar navbar-expand-lg">
         <div className="container-fluid d-flex align-items-center">
           {/* Logo only */}
-          <button
-            onMouseEnter={() => setIsSidebarVisible(true)}
-            className="navbar-brand btn btn-link p-0 nav-logo"
-          >
+          <button className="navbar-brand btn btn-link p-0 nav-logo">
             <img src={Logo} alt="Logo" className="logo-img" />
           </button>
 
