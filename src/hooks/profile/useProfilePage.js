@@ -33,7 +33,7 @@ function transformBackendUser(user, projects) {
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/public/fotos-perfil/";
 
   newuser.name = formatName(user.nombre);
-  newuser.pnombre = projects[0].pnombre || "Staff";
+  newuser.pnombre = projects[0].proyecto.pnombre || "Staff";
   newuser.finicio = projects[0].fechainicio || "-";
   newuser.fechafin = projects[0].fechafin || "-";
   newuser.location = user.ubicacion;

@@ -78,6 +78,11 @@ export const LoginForm = () => {
     }
   };
 
+  // si ya está verificado, lo pasamos adentro
+  useEffect(() => {
+
+  }, [])
+
   return (
     <div className="mainLoginForm">
       <img src="/images/accenturelogowhite.svg" width="170" height="170" />

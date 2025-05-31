@@ -168,7 +168,7 @@ export const CertificateModal = ({
           </div>
         </div>
 
-        <div className={styles.buttonGroup}>
+        {/* <div className={styles.buttonGroup}>
           <button onClick={handleDownload} className={styles.secondaryButton}>
             <i className="bi bi-download"></i>
             Download Certificate
@@ -185,7 +185,7 @@ export const CertificateModal = ({
               Verify Certificate
             </a>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

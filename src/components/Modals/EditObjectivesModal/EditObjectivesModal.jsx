@@ -18,6 +18,7 @@ export const EditObjectivesModal = ({
   const [objectivesList, setObjectivesList] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -26,15 +27,26 @@ export const EditObjectivesModal = ({
     completed: false,
   });
 
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      description: "",
+      targetDate: "",
+      priority: "medium",
+      completed: false,
+    });
+  };
+
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
       setIsClosing(false);
       setObjectivesList([...objectives]);
+      console.log(objectivesList);
       setEditingIndex(null);
       // resetForm();
     }
-  }, [isOpen, objectives]);
+  }, [isOpen, formData]);
 
   if (!isVisible) return null;
 
@@ -74,41 +86,74 @@ export const EditObjectivesModal = ({
   };
 
   // saves a new objective into the db
-  const handleSaveObjective = async () => {
+  // const handleSaveObjective = async () => {
+  //   if (!formData.title || !formData.description || !formData.targetDate)
+  //     return;
+
+  //   // la transformamos en el formato del back
+  //   const formattedObj = {
+  //     idusuario: localStorage.getItem("id"),
+  //     meta: formData.title,
+  //     description: formData.description,
+  //     plazo: formData.targetDate,
+  //     completa: formData.completed,
+  //     priority: formData.priority,
+  //   };
+
+  //   const config = {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //     },
+  //   };
+
+  //   const res = await axios.post(
+  //     DB_URL + "api/goals",
+  //     formattedObj,
+  //     config
+  //   );
+
+  //   setEditingIndex(null);
+  //   handleClose();
+  // };
+
+  const handleSaveObjective = () => {
     if (!formData.title || !formData.description || !formData.targetDate)
       return;
 
-    // la transformamos en el formato del back
-    const formattedObj = {
-      idusuario: localStorage.getItem("id"),
-      meta: formData.title,
-      description: formData.description,
-      plazo: formData.targetDate,
-      completa: formData.completed,
-      priority: formData.priority,
+    const newObjective = {
+      id: editingIndex !== null ? objectivesList[editingIndex].id : Date.now(),
+      ...formData,
     };
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    };
-    
-    const res = await axios.post(
-      DB_URL + "api/goals",
-      formattedObj,
-      config
-    );
+    if (editingIndex !== null) {
+      // Update existing
+      const updated = [...objectivesList];
+      updated[editingIndex] = newObjective;
+      setObjectivesList(updated);
+    } else {
+      // Add new
+      setObjectivesList([...objectivesList, newObjective]);
+    }
 
     setEditingIndex(null);
-    handleClose();
   };
 
+  // const handleDelete = (index) => {
+  //   const updated = objectivesList.filter((_, i) => i !== index);
+  //   setObjectivesList(updated);
+  //   if (editingIndex === index) {
+  //     //();
+  //     setEditingIndex(null);
+  //   }
+  // };
+
+  // versión pasada acoplada
   const handleDelete = (index) => {
     const updated = objectivesList.filter((_, i) => i !== index);
     setObjectivesList(updated);
+
     if (editingIndex === index) {
-      //();
+      resetForm();
       setEditingIndex(null);
     }
   };
@@ -116,6 +161,42 @@ export const EditObjectivesModal = ({
   const handleCancel = () => {
     //resetForm();
     setEditingIndex(null);
+  };
+
+  const handleSubmit = async () => {
+    const req = [];
+
+    // vamos a mandar todo lo que esté dentro de objectiveList
+    objectivesList.forEach((obj) => {
+      // la transformamos en el formato del back
+      const formattedObj = {
+        idusuario: localStorage.getItem("id"),
+        meta: obj.title,
+        description: obj.description,
+        plazo: obj.targetDate,
+        completa: obj.completed,
+        priority: obj.priority,
+      };
+      console.log("added thin");
+      req.push(formattedObj);
+    });
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+
+    console.log(req);
+
+    const res = await axios.put(
+      DB_URL + "api/update-goals/" + localStorage.getItem("id"),
+      { goals: req },
+      config
+    );
+
+    setEditingIndex(null);
+    handleClose();
   };
 
   const isFormValid = () => {
@@ -319,7 +400,7 @@ export const EditObjectivesModal = ({
           </div>
         </div>
 
-        {/* <div className={styles.buttonGroup}>
+        <div className={styles.buttonGroup}>
           <button
             type="button"
             onClick={handleClose}
@@ -337,7 +418,7 @@ export const EditObjectivesModal = ({
             <i className="bi bi-check-lg"></i>
             Save All Changes
           </button>
-        </div> */}
+        </div>
       </div>
     </div>
   );
