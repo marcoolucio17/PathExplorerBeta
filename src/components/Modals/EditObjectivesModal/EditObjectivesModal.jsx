@@ -4,8 +4,8 @@ import modalStyles from "./EditObjectivesModal.module.css";
 
 import axios from "axios";
 
-// const DB_URL = "https://pathexplorer-backend.onrender.com/";
-const DB_URL = "http://localhost:8080/";
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+// const DB_URL = "http://localhost:8080/";
 
 export const EditObjectivesModal = ({
   isOpen,

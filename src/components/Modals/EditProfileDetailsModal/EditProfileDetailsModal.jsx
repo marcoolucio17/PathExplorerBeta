@@ -5,8 +5,8 @@ import useFetch from "src/hooks/useFetch";
 
 import axios from "axios";
 
-// const DB_URL = "https://pathexplorer-backend.onrender.com/";
-const DB_URL = "http://localhost:8080/";
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+// const DB_URL = "http://localhost:8080/";
 
 export const EditProfileDetailsModal = ({
   isOpen,

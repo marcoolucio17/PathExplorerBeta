@@ -8,8 +8,8 @@ import { useFetch } from "src/hooks/useFetch";
 
 import axios from "axios";
 
-// const DB_URL = "https://pathexplorer-backend.onrender.com/";
-const DB_URL = "http://localhost:8080/";
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+// const DB_URL = "http://localhost:8080/";
 
 function transformBackendUser(user, projects) {
   // guardo un template de lo que espera la función de carta del empleado
