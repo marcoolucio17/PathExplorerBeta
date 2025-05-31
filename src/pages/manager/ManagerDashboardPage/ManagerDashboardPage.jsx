@@ -60,6 +60,7 @@ export const ManagerDashboardPage = () => {
         <div className={styles.cardsContainer}>
           {/* New Project button for My Projects tab */}
           {dashboardPage.activeTab === 'My Projects' && (
+
             <NavLink to="/manager/create-project">
               <Button
                 type="primary"
@@ -68,6 +69,7 @@ export const ManagerDashboardPage = () => {
                 New Project
               </Button>
             </NavLink>
+
           )}
 
           <CustomScrollbar
@@ -99,6 +101,7 @@ export const ManagerDashboardPage = () => {
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
       />
 
+
       <ClientsModal
         isOpen={dashboardPage.modals.clientsFilter}
         onClose={() => dashboardPage.closeModal('clientsFilter')}
@@ -117,7 +120,7 @@ export const ManagerDashboardPage = () => {
         updateRoles={dashboardPage.handleApplyRoleFilters}
       />
 
-    </div>
+    </div >
   );
 };
 
