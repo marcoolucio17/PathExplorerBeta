@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // Import components
 import { GlassCard } from "../../../components/shared/GlassCard";
-import { ProgressCircle } from "../../../components/ProgressCircle/ProgressCircle";
 // Import page-specific styles
 import pageStyles from "./EmpleadoHomePage.module.css";
 // Import styles for specific sections
@@ -10,6 +9,9 @@ import quickActionsStyles from "./QuickActions.module.css";
 import announcementsStyles from "./Announcements.module.css";
 import useFetch from "src/hooks/useFetch";
 import { formatName } from "src/hooks/profile/useProfilePage";
+import ImageCarousel from "./ImageCarousel";
+import { TrendsCard } from "src/components/Home/TrendsCard";
+import useProfilePage from "src/hooks/profile/useProfilePage";
 
 // Mock data - in a real app, this would come from props or API
 const MOCK_RECOMMENDED_PROJECTS = [
@@ -111,7 +113,7 @@ export const EmpleadoHomePage = () => {
             <div className={pageStyles.progressCard}>
               <div className={pageStyles.progressContent}>
                 <GlassCard className={pageStyles.mainbarAnnouncementCard}>
-              
+                  <ImageCarousel />
                 </GlassCard>
               </div>
             </div>
@@ -172,19 +174,11 @@ export const EmpleadoHomePage = () => {
           </GlassCard>
 
           {/* Announcements Card - Flexible height */}
-          <GlassCard className={pageStyles.sidebarCard}>
-            <h2 className={announcementsStyles.sectionTitle}>Announcements</h2>
             <div className={announcementsStyles.announcementsContainer}>
-              {announcements.map((announcement) => (
-                <div key={announcement.id} className={announcementsStyles.announcementItem}>
-                  <i className={`${announcement.icon} ${announcementsStyles.announcementIcon}`} />
-                  <div className={announcementsStyles.announcementText}>
-                    {announcement.text}
-                  </div>
-                </div>
-              ))}
+              <TrendsCard 
+                className={pageStyles.sidebarSection}
+              />
             </div>
-          </GlassCard>
         </div>
       </div>
     </div>
