@@ -156,7 +156,7 @@ function transformBackendSkils(skills) {
 }
 
 // the name doesn't come formatted so i need to apply this function
-function formatName(name) {
+export function formatName(name) {
   if (!name) return "";
   // Split by lowercase-to-uppercase transition or dot/underscore
   const parts = name
