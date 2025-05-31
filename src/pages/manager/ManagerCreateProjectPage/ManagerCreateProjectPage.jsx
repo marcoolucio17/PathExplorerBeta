@@ -4,12 +4,13 @@ import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import { usePost } from 'src/hooks/usePost';
 import axios from 'axios';
 import useFetch from 'src/hooks/useFetch';
-import { useNavigate, NavLink } from "react-router";
+import { useNavigate} from "react-router";
 
 export const ManagerCreateProjectPage = () => {
   const { triggerPost, loading, error } = usePost();
   const { data: clientes, loading: loadingClientes } = useFetch("clientes");
   const [clientImageUrl, setClientImageUrl] = useState(null);
+  const { data: habilidades } = useFetch("habilidades");
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
@@ -27,7 +28,19 @@ export const ManagerCreateProjectPage = () => {
 
   const handleClientSelect = async (e) => {
     const selectedId = parseInt(e.target.value);
+
+    if (!selectedId) {
+      setFormData(prev => ({
+        ...prev,
+        clientName: '',
+        idcliente: null
+      }));
+      setClientImageUrl(null);
+      return;
+    }
+
     const selectedCliente = clientes.find(c => c.idcliente === selectedId);
+    if (!selectedCliente) return; // por si acaso
 
     setFormData(prev => ({
       ...prev,
@@ -53,6 +66,7 @@ export const ManagerCreateProjectPage = () => {
       setClientImageUrl(null);
     }
   };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,20 +95,27 @@ export const ManagerCreateProjectPage = () => {
     }
   };
 
-  const handleClientImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          clientImage: file,
-          imagePreview: reader.result
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleAddRequerimiento = (roleIndex) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[roleIndex].requerimientos.push({
+      tiempoexperiencia: '',
+      idhabilidad: ''
+    });
+    setFormData(prev => ({ ...prev, roles: updatedRoles }));
   };
+
+  const handleRemoveRequerimiento = (roleIndex, reqIndex) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[roleIndex].requerimientos.splice(reqIndex, 1);
+    setFormData(prev => ({ ...prev, roles: updatedRoles }));
+  };
+
+  const handleRequerimientoChange = (roleIndex, reqIndex, field, value) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[roleIndex].requerimientos[reqIndex][field] = value;
+    setFormData(prev => ({ ...prev, roles: updatedRoles }));
+  };
+
 
   const handleAddRole = () => {
     setFormData(prev => ({
@@ -355,18 +376,6 @@ export const ManagerCreateProjectPage = () => {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="skills">Skills</label>
-                    <input
-                      type="text"
-                      id="skills"
-                      name="skills"
-                      value={formData.skills}
-                      onChange={handleInputChange}
-                      placeholder="e.g. JavaScript, Project Management"
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
                     <label htmlFor="description">Description *</label>
                     <input
                       type="text"
@@ -406,65 +415,125 @@ export const ManagerCreateProjectPage = () => {
             </div>
           </div>
 
-          <div className={styles.buttonGroup}>
-            <button className={styles.closeButton} onClick={() => navigate('/manager/dashboard')}>
-              Cancel
+
+          <button className={styles.closeButton} onClick={() => navigate('/manager/dashboard')}>
+            Cancel
+          </button>
+
+          <div style={{ marginTop: '2rem' }}>
+            <h3>Roles del Proyecto</h3>
+            <button type="button" onClick={handleAddRole} className={styles.secondaryButton}>
+              + Agregar Rol
             </button>
 
-            <div style={{ marginTop: '2rem' }}>
-              <h3>Roles del Proyecto</h3>
-              <button type="button" onClick={handleAddRole} className={styles.secondaryButton}>
-                + Agregar Rol
-              </button>
+            {formData.roles.map((rol, index) => (
+              <div key={index} style={{ border: '1px solid #ccc', padding: '1rem', marginTop: '1rem', position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveRole(index)}
+                  style={{ position: 'absolute', top: 0, right: 0 }}
+                >
+                  ❌
+                </button>
+                <div className={styles.formGroup}>
+                  <label>Nombre del Rol</label>
+                  <input
+                    type="text"
+                    value={rol.nombrerol}
+                    onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Nivel del Rol</label>
+                  <input
+                    type="number"
+                    value={rol.nivelrol}
+                    onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Descripción</label>
+                  <input
+                    type="text"
+                    value={rol.descripcionrol}
+                    onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
+                  />
+                </div>
+                <div style={{ marginTop: '1rem' }}>
+                  <h4>Habilidades requeridas</h4>
+                  {rol.requerimientos?.map((req, reqIndex) => (
+                    <div key={reqIndex} style={{ borderLeft: '2px solid #ccc', paddingLeft: '1rem', marginBottom: '1rem' }}>
+                      <div className={styles.formGroup}>
+                        <label>Habilidad</label>
+                        <select
+                          value={req.idhabilidad}
+                          onChange={(e) =>
+                            handleRequerimientoChange(index, reqIndex, 'idhabilidad', e.target.value)
+                          }
+                        >
+                          <option value="">Selecciona una habilidad</option>
+                          {[...habilidades]
+                            .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                            .map((hab) => (
+                              <option key={hab.idhabilidad} value={hab.idhabilidad}>
+                                {hab.nombre}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
 
-              {formData.roles.map((rol, index) => (
-                <div key={index} style={{ border: '1px solid #ccc', padding: '1rem', marginTop: '1rem', position: 'relative' }}>
+                      <div className={styles.formGroup}>
+                        <label>Tiempo de experiencia</label>
+                        <select
+                          value={req.tiempoexperiencia}
+                          onChange={(e) =>
+                            handleRequerimientoChange(index, reqIndex, 'tiempoexperiencia', e.target.value)
+                          }
+                        >
+                          <option value="">Selecciona una opción</option>
+                          <option>3 months</option>
+                          <option>6 months</option>
+                          <option>1 year</option>
+                          <option>2 years</option>
+                          <option>3 years</option>
+                          <option>4 years</option>
+                          <option>5 years</option>
+                        </select>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRequerimiento(index, reqIndex)}
+                        className={styles.cancelButton}
+                      >
+                        Eliminar habilidad
+                      </button>
+                    </div>
+                  ))}
+
                   <button
                     type="button"
-                    onClick={() => handleRemoveRole(index)}
-                    style={{ position: 'absolute', top: 0, right: 0 }}
+                    onClick={() => handleAddRequerimiento(index)}
+                    className={styles.secondaryButton}
                   >
-                    ❌
+                    + Agregar Habilidad
                   </button>
-                  <div className={styles.formGroup}>
-                    <label>Nombre del Rol</label>
-                    <input
-                      type="text"
-                      value={rol.nombrerol}
-                      onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Nivel del Rol</label>
-                    <input
-                      type="number"
-                      value={rol.nivelrol}
-                      onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Descripción</label>
-                    <input
-                      type="text"
-                      value={rol.descripcionrol}
-                      onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
-                    />
-                  </div>
-                  {/* puedes agregar más campos de requerimientos después */}
                 </div>
-              ))}
-            </div>
 
-
-            <button
-              type="submit"
-              disabled={!isFormValid()}
-              className={styles.saveButton}
-            >
-              <i className="bi bi-plus-lg"></i>
-              Create Project
-            </button>
+              </div>
+            ))}
           </div>
+
+
+          <button
+            type="submit"
+            disabled={!isFormValid()}
+            className={styles.saveButton}
+          >
+            <i className="bi bi-plus-lg"></i>
+            Create Project
+          </button>
+
         </form>
       </div>
     </div>
