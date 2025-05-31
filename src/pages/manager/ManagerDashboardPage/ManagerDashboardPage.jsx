@@ -61,16 +61,23 @@ export const ManagerDashboardPage = () => {
           {/* New Project button for My Projects tab */}
           {dashboardPage.activeTab === 'My Projects' && (
 
-            <NavLink to="/manager/create-project">
-              <Button
-                type="primary"
-                icon="bi-plus"
-              >
-                New Project
-              </Button>
-            </NavLink>
+            <div className={styles.tabActionSimple}>
+              <NavLink to="/manager/create-project">
+                <Button
+                  type="primary"
+                  icon="bi-plus"
+                  onClick={handleCreateProject}
+                  className={styles.createProjectButton}
+                >
+                  New Project
+                </Button>
+              </NavLink>
+            </div>
 
           )}
+
+
+
 
           <CustomScrollbar
             fadeBackground="transparent"
