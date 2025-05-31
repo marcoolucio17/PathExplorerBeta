@@ -18,7 +18,7 @@ export const ManagerCreateProjectPage = () => {
     description: '',
     startDate: '',
     endDate: '',
-    roles: '',
+    roles: [],
     clientImage: null,
     RfpPreview: null,
     imagePreview: null,
@@ -95,6 +95,44 @@ export const ManagerCreateProjectPage = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleAddRole = () => {
+    setFormData(prev => ({
+      ...prev,
+      roles: [
+        ...prev.roles,
+        {
+          nombrerol: '',
+          nivelrol: '',
+          descripcionrol: '',
+          disponible: true,
+          requerimientos: [
+            {
+              tiempoexperiencia: '',
+              idhabilidad: 1 // puedes luego hacer esto dinámico
+            }
+          ]
+        }
+      ]
+    }));
+  };
+
+  const handleRemoveRole = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: prev.roles.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleRoleChange = (index, field, value) => {
+    const updatedRoles = [...formData.roles];
+    updatedRoles[index][field] = value;
+    setFormData(prev => ({
+      ...prev,
+      roles: updatedRoles
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formatDate = (dateString) => {
@@ -124,21 +162,13 @@ export const ManagerCreateProjectPage = () => {
         idcliente: formData.idcliente,
         idusuario: localStorage.getItem("id")
       },
-      roles: [  //  Harcodeado
-        {
-          nombrerol: "Rol automático",
-          nivelrol: 1,
-          descripcionrol: "Generado automáticamente",
-          disponible: true,
-          requerimientos: [
-            {
-              tiempoexperiencia: "1 año",
-              idhabilidad: 1
-            }
-          ]
-        }
-      ]
-
+      roles: formData.roles.map((rol) => ({
+        nombrerol: rol.nombrerol,
+        nivelrol: parseInt(rol.nivelrol),
+        descripcionrol: rol.descripcionrol,
+        disponible: true, // o puedes hacer esto editable si quieres
+        requerimientos: rol.requerimientos || []
+      }))
     };
 
     try {
@@ -380,6 +410,51 @@ export const ManagerCreateProjectPage = () => {
             <button className={styles.closeButton} onClick={() => navigate('/manager/dashboard')}>
               Cancel
             </button>
+
+            <div style={{ marginTop: '2rem' }}>
+              <h3>Roles del Proyecto</h3>
+              <button type="button" onClick={handleAddRole} className={styles.secondaryButton}>
+                + Agregar Rol
+              </button>
+
+              {formData.roles.map((rol, index) => (
+                <div key={index} style={{ border: '1px solid #ccc', padding: '1rem', marginTop: '1rem', position: 'relative' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRole(index)}
+                    style={{ position: 'absolute', top: 0, right: 0 }}
+                  >
+                    ❌
+                  </button>
+                  <div className={styles.formGroup}>
+                    <label>Nombre del Rol</label>
+                    <input
+                      type="text"
+                      value={rol.nombrerol}
+                      onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Nivel del Rol</label>
+                    <input
+                      type="number"
+                      value={rol.nivelrol}
+                      onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Descripción</label>
+                    <input
+                      type="text"
+                      value={rol.descripcionrol}
+                      onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
+                    />
+                  </div>
+                  {/* puedes agregar más campos de requerimientos después */}
+                </div>
+              ))}
+            </div>
+
 
             <button
               type="submit"
