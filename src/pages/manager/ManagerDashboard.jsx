@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import '../../styles/EmpleadoDashboard.css'
 import '../../styles/ManagerDashboard.css'
@@ -13,12 +13,12 @@ import { useGetFetch } from '../../hooks/useGetFetch';
 
 export const ManagerDashboard = () => {
   const authState = localStorage.getItem("role");
-  
-  const {data: data_projects }= useGetFetch({rutaApi: `projects`});
+
+  const { data: data_projects } = useGetFetch({ rutaApi: `projects` });
 
   return (
-    <div className = "contenedor-Dashboard">
+    <div className="contenedor-Dashboard">
     </div>
-    
+
   )
 }

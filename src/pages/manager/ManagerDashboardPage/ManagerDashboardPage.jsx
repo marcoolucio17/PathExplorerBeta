@@ -34,11 +34,8 @@ export const ManagerDashboardPage = () => {
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
   };
+  console.log(dashboardPage.filterOptions);
 
-  console.log("Client name", dashboardPage.clientNameSelected);
-  console.log("Client ID", dashboardPage.clientId);
-  console.log("Role ID", dashboardPage.roleId);
-  console.log("Role name", dashboardPage.roleNameSelected);
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -110,6 +107,23 @@ export const ManagerDashboardPage = () => {
         </button>
       </NavLink>
 
+      <ClientsModal
+        isOpen={dashboardPage.modals.clientsFilter}
+        onClose={() => dashboardPage.closeModal('clientsFilter')}
+        clientNameStatus={dashboardPage.clientNameSelected}
+        clientIdStatus={dashboardPage.clientId}
+        clients={dashboardPage.clients}
+        updateClients={dashboardPage.handleApplyClientFilters}
+      />
+
+      <RolesModal
+        isOpen={dashboardPage.modals.rolesFilter}
+        onClose={() => dashboardPage.closeModal('rolesFilter')}
+        roleNameStatus={dashboardPage.roleNameSelected}
+        roleIdStatus={dashboardPage.roleId}
+        roles={dashboardPage.roles}
+        updateRoles={dashboardPage.handleApplyRoleFilters}
+      />
 
     </div>
   );

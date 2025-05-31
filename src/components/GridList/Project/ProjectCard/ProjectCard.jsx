@@ -29,10 +29,10 @@ const ProjectCard = ({
   userSkills = []
 }) => {
   // Determine the class based on view mode
-  const cardClass = viewMode === 'grid' 
+  const cardClass = viewMode === 'grid'
     ? styles.cardGrid
     : `${styles.cardList} ${customStyles.cardList}`;
-  
+
   // Prepare sample data to ensure visualization
   const ensureRoleData = () => {
     // Get current role data
@@ -43,7 +43,7 @@ const ProjectCard = ({
       duration: Math.floor(Math.random() * 16) + 3
     };
   };
-  
+
   // Prepare sample skills to ensure visualization
   const ensureSkillsData = () => {
     // Every card should have at least 2 skills for demo
@@ -56,7 +56,7 @@ const ProjectCard = ({
         { id: 'demo-4', name: 'Node.js', isUser: true }
       ];
     }
-    
+
     // Use real skills data
     return proyecto_rol.roles.requerimientos_roles.map(req_rol => ({
       id: req_rol.requerimientos.habilidades.idhabilidad,
@@ -65,24 +65,25 @@ const ProjectCard = ({
         selectedSkillFilters.includes(req_rol.requerimientos.habilidades.nombre)
     }));
   };
-  
+
   const { data: matchPercentage } = useGetFetch({
     rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`
   })
 
-  const matchPercentageValue = matchPercentage? matchPercentage : 0;
+
+  const matchPercentageValue = matchPercentage ? matchPercentage : 0;
   // Get role data
   const roleData = ensureRoleData();
-  
+
   // Get skills data
   const skillsData = ensureSkillsData();
-  
+
   // Render skills with consistent display
   const renderSkills = () => {
     // Always show 2 skills maximum, and a "+ more" button if there are more
     const showMoreButton = skillsData.length > 2;
     const visibleSkills = skillsData.slice(0, showMoreButton ? 2 : Math.min(3, skillsData.length));
-    
+
     return (
       <>
         {visibleSkills.map((skill) => (
@@ -93,7 +94,7 @@ const ProjectCard = ({
             iconClass={skill.isUser ? "bi bi-check" : null}
           />
         ))}
-        
+
         {showMoreButton && (
           <SkillChip
             key="more-skills"
@@ -104,27 +105,27 @@ const ProjectCard = ({
       </>
     );
   };
-  
+
   // Grid view content
   const gridContent = (
     <>
       {/* Show match percentage when enabled */}
       {showCompatibility && (
         <div className={styles.statusCircle}>
-          <ProgressCircle 
+          <ProgressCircle
             value={matchPercentageValue}
             size={60}
-            fontSize="1.1rem" 
+            fontSize="1.1rem"
             strokeWidth={6}
             fontWeight="light"
           />
         </div>
       )}
-      
+
       <div className={styles.cardHeader}>
-        <img 
-          className={styles.cardAvatar} 
-          src={project.imagen || "/images/ImagenProyectoDefault.png"} 
+        <img
+          className={styles.cardAvatar}
+          src={project.imagen || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
         <div className={styles.cardInfo}>
@@ -132,14 +133,14 @@ const ProjectCard = ({
           <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
         </div>
       </div>
-      
+
       {/* Project Description */}
       <div className={`${styles.cardDescription} ${styles.reducedMargin}`}>
         <p className={styles.descriptionText}>
           {project.descripcion || 'This project aims to develop a comprehensive solution that meets client requirements while leveraging modern technologies...'}
         </p>
       </div>
-      
+
       <div className={styles.cardDetails}>
         {/* Show estimated duration instead of roles */}
         <div className={styles.detailRow}>
@@ -151,51 +152,51 @@ const ProjectCard = ({
           </span>
         </div>
       </div>
-      
+
       <div className={styles.cardSkills}>
         {renderSkills()}
       </div>
     </>
   );
-  
+
   // List view content with completely redesigned layout
   const listContent = (
     <>
       {/* Avatar area */}
       <div className={styles.cardHeader}>
-        <img 
-          className={styles.cardAvatar} 
-          src={project.imagen || "/images/ImagenProyectoDefault.png"} 
+        <img
+          className={styles.cardAvatar}
+          src={project.imagen || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
       </div>
-      
+
       {/* Title and project name only */}
       <div className={customStyles.titleContainer}>
         <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
         <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
       </div>
-      
+
       {/* Floating description in the middle */}
       <div className={customStyles.floatingDescription}>
         <p className={styles.descriptionText}>
           Description for Project {project.pnombre || '5'}
         </p>
       </div>
-      
+
       {/* Skills and Circle container */}
       <div className={customStyles.skillsCircleContainer}>
         {/* Skills */}
         <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
           {renderSkills()}
         </div>
-        
+
         {/* Compatibility Circle */}
         {showCompatibility && (
           <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
-            <ProgressCircle 
+            <ProgressCircle
               value={matchPercentage}
-              size={60} 
+              size={60}
               strokeWidth={6}
               fontSize="1rem"
               fontWeight="light"
@@ -203,7 +204,7 @@ const ProjectCard = ({
           </div>
         )}
       </div>
-      
+
       {/* Duration info - using hardcoded styles to ensure font consistency */}
       <div className={customStyles.durationColumn}>
         <span className={styles.detailLabel}>
@@ -215,7 +216,7 @@ const ProjectCard = ({
       </div>
     </>
   );
-  
+
   // Grid view - wrap the content in a GlassCard
   if (viewMode === 'grid') {
     return (
@@ -224,7 +225,7 @@ const ProjectCard = ({
       </GlassCard>
     );
   }
-  
+
   // List view - custom layout for horizontal display
   return (
     <GlassCard className={cardClass}>
