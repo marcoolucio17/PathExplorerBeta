@@ -7,8 +7,8 @@ import Spinner from "react-bootstrap/Spinner";
 import "../../styles/Login.css";
 import axios from "axios";
 
-// const DB_URL = "https://pathexplorer-backend.onrender.com/";
-const DB_URL = "http://localhost:8080/";
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
+//const DB_URL = "http://localhost:8080/";
 
 const roleMap = {
   Manager: "manager",
@@ -91,7 +91,7 @@ export const LoginForm = () => {
         Sign in
       </p>
 
-      <Form className="w-50">
+      <Form className="w-50" onSubmit={handleLogin}>
         <Form.Group className="mt-5 mb-3" controlId="formBasicEmail">
           <input
             className="transparent-input"

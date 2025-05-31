@@ -33,22 +33,16 @@ axiosRetry(axiosInstance, {
 
 });
 
-export const useGetFetch = ({rutaApi,nombre,condicion1}) => {
+export const useGetFetch = ({rutaApi = ""}) => {
 
     const [data,setData] = useState([]);  
     const [error,setError] = useState(null);
     
     useEffect(() => {
         const fetchData = async () => {
-            let url =`https://pathexplorer-backend.onrender.com/api/${rutaApi}`;
-            if (nombre !== '' && condicion1 === 'Skills' && rutaApi === 'projects') {
-                url += `?projectName=${nombre}`;
-            } else if (nombre === '' && condicion1 !== 'Skills' && rutaApi === 'projects') {
-                url += `?skill=${condicion1}`;
-            } else if (nombre !== '' && condicion1 !== 'Skills') {
-                url = `projectName=${nombre}&skill=${condicion1}`;
-            } 
-
+            //let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}`;
+            let url = `http://localhost:8080/api/${rutaApi}`;
+            
             try {
                 const response = await axiosInstance.get(url);
                 setData(response.data)
@@ -58,7 +52,7 @@ export const useGetFetch = ({rutaApi,nombre,condicion1}) => {
             }
         };  
         fetchData();
-    }, [rutaApi, nombre,condicion1]);
+    }, []);
 
     return { data, error };
 }

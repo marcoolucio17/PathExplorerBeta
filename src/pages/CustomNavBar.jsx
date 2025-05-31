@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import Logo from "../assets/Acc_GT_Dimensional_RGB 1.png";
 import { SearchHeader } from "../components/SearchHeader";
+import { Notifications } from "../components/Notifications";
+
 
 import "./CustomNavBar.css";
 
@@ -10,7 +12,6 @@ function CustomNavbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const authState = localStorage.getItem("role");
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Define search categories
@@ -55,14 +56,9 @@ function CustomNavbar() {
     <>
       {/* Sidebar */}
       <div
-        className={`sidebar 
-          ${isSidebarVisible ? "sidebar-visible" : ""} 
-          ${isSidebarOpen ? "open" : ""}`}
+        className={`sidebar sidebar-visible ${isSidebarOpen ? "open" : ""}`}
         onMouseEnter={() => setIsSidebarOpen(true)}
-        onMouseLeave={() => {
-          setIsSidebarOpen(false);
-          setIsSidebarVisible(false);
-        }}
+        onMouseLeave={() => setIsSidebarOpen(false)}
       >
         <ul className="sidebar-menu">
           <li onClick={() => navigate("/")}>
@@ -73,17 +69,10 @@ function CustomNavbar() {
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
-          <li onClick={() => navigate("/certificates")}>
-            <i className="bi bi-award"></i>
-            {isSidebarOpen && <span>Certificates</span>}
-          </li>
-          <li onClick={() => navigate("/settings")}>
-            <i className="bi bi-gear"></i>
-            {isSidebarOpen && <span>Settings</span>}
-          </li>
-          <li onClick={() => navigate("/about")}>
-            <i className="bi bi-info-circle"></i>
-            {isSidebarOpen && <span>About</span>}
+          <li onClick={() => navigate("/")}>
+            <i className="bi bi-box-arrow-left"></i>
+            {isSidebarOpen && <span>Logout</span>}
+
           </li>
         </ul>
       </div>
@@ -92,16 +81,13 @@ function CustomNavbar() {
       <nav className="navbar glass-navbar navbar-expand-lg">
         <div className="container-fluid d-flex align-items-center">
           {/* Logo only */}
-          <button
-            onMouseEnter={() => setIsSidebarVisible(true)}
-            className="navbar-brand btn btn-link p-0 nav-logo"
-          >
+          <button className="navbar-brand btn btn-link p-0 nav-logo">
             <img src={Logo} alt="Logo" className="logo-img" />
           </button>
 
           {/* Search bar with SearchHeader component */}
           <div className="nav-search-container">
-            <SearchHeader 
+            <SearchHeader
               searchTerm={searchTerm}
               setSearchTerm={handleSearch}
               placeholder="Search..."
@@ -114,12 +100,6 @@ function CustomNavbar() {
 
           {/* Icons */}
           <div className="nav-icons d-flex gap-3 align-items-center">
-            <button
-              onClick={() => navigate(`/${authState}/dashboard`)}
-              className="icon-btn"
-            >
-              <i className="bi bi-list-ul"></i>
-            </button>
 
             <div className="position-relative">
               <button
@@ -127,26 +107,13 @@ function CustomNavbar() {
                 className="icon-btn"
               >
                 <i className="bi bi-bell"></i>
-                <span className="badge-notif">1</span>
+                <span className="badge-notif">!</span>
               </button>
-              {showNotifications && (
-                <div className="glass-popover">
-                  <h6 className="fw-bold mb-2">Notifications</h6>
-                  <div className="notification-item d-flex align-items-center">
-                    <img
-                      src={Logo}
-                      alt="Avatar"
-                      className="rounded avatar-sm me-2"
-                    />
-                    <div>
-                      <p className="mb-1"><strong>Welcome!!!</strong></p>
-                      <p className="small mb-0">
-                        We're excited to have you here! 🚀
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+
+              <Notifications
+                userId={localStorage.getItem("id")}
+                visible={showNotifications}
+              />
             </div>
 
             <button

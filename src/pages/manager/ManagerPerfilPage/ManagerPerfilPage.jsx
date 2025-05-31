@@ -107,10 +107,6 @@ export const ManagerPerfilPage = () => {
     profilePage.handleRemoveCertificate(certificateId);
   };
 
-  if (profilePage.loading) {
-    return <>loading..</>;
-  }
-
   return (
     <div className={styles.profileContainer}>
       <div className={styles.profileContent}>
@@ -191,7 +187,7 @@ export const ManagerPerfilPage = () => {
         userSkills={profilePage.userSkills}
         onUpdateSkills={profilePage.handleUpdateSkills}
       />
-
+      
       <AddCertificateModal
         isOpen={profilePage.modals.addCertificate}
         onClose={() => profilePage.closeModal('addCertificate')}

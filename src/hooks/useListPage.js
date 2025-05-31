@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useSearchParams from './useSearchParams';
-import useAnimatedList from './useAnimatedList';
-import useTabbedData from './useTabbedData';
-import useFilters from './useFilters';
-import useToggleState from './useToggleState';
-import useModalControl from './useModalControl';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import useSearchParams from "./useSearchParams";
+import useAnimatedList from "./useAnimatedList";
+import useTabbedData from "./useTabbedData";
+import useFilters from "./useFilters";
+import useToggleState from "./useToggleState";
+import useModalControl from "./useModalControl";
 
 /**
  * A hook that provides common list page functionality
@@ -23,13 +23,13 @@ import useModalControl from './useModalControl';
  */
 export const useListPage = ({
   data = [],
-  defaultSortOption = 'date_desc',
-  defaultViewMode = 'grid',
+  defaultSortOption = "date_desc",
+  defaultViewMode = "grid",
   tabConfig = {},
   filterConfig = {},
   sortFunction = null,
-  baseUrl = '/',
-  itemIdField = 'id'
+  baseUrl = "/",
+  itemIdField = "id",
 }) => {
   const navigate = useNavigate();
   
@@ -47,7 +47,7 @@ export const useListPage = ({
     activeTab,
     setActiveTab,
     tabCounts,
-    filteredData: tabFilteredData
+    filteredData: tabFilteredData,
   } = useTabbedData(data, tabConfig);
   
   // Filters setup
@@ -55,12 +55,14 @@ export const useListPage = ({
     searchTerm, 
     ...filterConfig 
   });
-  
+
   const { filteredData: filteredByFilters, ...filterStates } = filterResults;
   
   // Sort the filtered data
   const sortedData = useMemo(() => {
-    return sortFunction ? sortFunction(filteredByFilters, sortOption) : filteredByFilters;
+    return sortFunction
+      ? sortFunction(filteredByFilters, sortOption)
+      : filteredByFilters;
   }, [filteredByFilters, sortOption, sortFunction]);
   
   // Animated list 
@@ -91,13 +93,15 @@ export const useListPage = ({
     isLoading: compatibilityLoading, 
     toggle: toggleCompatibility 
   } = useToggleState(false, 1500);
-  
+
   // Modal controls
   const { modals, openModal, closeModal } = useModalControl({
     skillsFilter: false,
+    clientsFilter: false,
+    rolesFilter: false,
     projectFilter: false,
     denialReason: false,
-    details: false
+    details: false,
   });
   
   // Selected item for modals
@@ -113,9 +117,9 @@ export const useListPage = ({
   
   // Navigation functions
   const handleBack = () => {
-    navigate(baseUrl || '/');
+    navigate(baseUrl || "/");
   };
-  
+
   const handleViewItem = (itemId) => {
     // Custom view logic can be added here
     const item = data.find(item => item[itemIdField] === itemId);
@@ -129,20 +133,20 @@ export const useListPage = ({
   const handleClearFilters = () => {
     // Reset all filter states
     Object.entries(filterStates).forEach(([key, value]) => {
-      if (typeof value === 'function' && key.startsWith('set')) {
-        if (key === 'setSelectedSkills') {
+      if (typeof value === "function" && key.startsWith("set")) {
+        if (key === "setSelectedSkills") {
           value([]);
-        } else if (key === 'setSelectedProject') {
-          value('All Projects');
+        } else if (key === "setSelectedProject") {
+          value("All Projects");
         } else {
-          value('');
+          value("");
         }
       }
     });
-    
-    setSearchTerm('');
+
+    setSearchTerm("");
   };
-  
+
   return {
     // States
     viewMode,
@@ -154,11 +158,11 @@ export const useListPage = ({
     visibleItems,
     selectedItem,
     modals,
-    
+
     // Compatibility specific
     showCompatibility,
     compatibilityLoading,
-    
+
     // Functions
     setViewMode,
     toggleViewMode,
@@ -171,12 +175,12 @@ export const useListPage = ({
     handleViewItem,
     handleClearFilters,
     toggleCompatibility,
-    
+
     // Filter states
     filterStates,
-    
+
     // Modal helpers
-    setSelectedItem
+    setSelectedItem,
   };
 };
 

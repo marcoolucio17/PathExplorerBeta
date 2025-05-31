@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import useDataFetching from '../useDataFetching';
-import useListPage from '../useListPage';
-import useModalControl from '../useModalControl';
-
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import useDataFetching from "../useDataFetching";
+import useListPage from "../useListPage";
+import useModalControl from "../useModalControl";
+import useGetFetch from "../useGetFetch";
 /**
  * Hook for managing dashboard data including project filtering and processing
  * 
@@ -19,7 +19,7 @@ export const useDashboardData = () => {
   
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState(searchFromURL);
-  const [skillSelected, setSkillSelected] = useState('Skills');
+  const [skillSelected, setSkillSelected] = useState("Skills");
   const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
   const [userSkills, setUserSkills] = useState(['C#', 'React', 'Node.js']); // Example user skills
   
@@ -125,7 +125,9 @@ export const useDashboardData = () => {
 
   // Remove a specific skill filter
   const removeSkillFilter = (skillToRemove) => {
-    const updatedSkills = selectedSkillFilters.filter(skill => skill !== skillToRemove);
+    const updatedSkills = selectedSkillFilters.filter(
+      (skill) => skill !== skillToRemove
+    );
     handleApplySkillFilters(updatedSkills);
   };
 
@@ -144,35 +146,36 @@ export const useDashboardData = () => {
 
   // Sort projects function
   const sortProjects = (projects, option) => {
+    if (!Array.isArray(projects)) return [];
     const sorted = [...projects];
-    
-    switch(option) {
-      case 'name_asc': // Name: A to Z
+
+    switch (option) {
+      case "name_asc": // Name: A to Z
         return sorted.sort((a, b) => a.pnombre.localeCompare(b.pnombre));
-        
-      case 'name_desc': // Name: Z to A
+
+      case "name_desc": // Name: Z to A
         return sorted.sort((a, b) => b.pnombre.localeCompare(a.pnombre));
-        
-      case 'date_desc': // Newest First
+
+      case "date_desc": // Newest First
         return sorted.sort((a, b) => b.idproyecto - a.idproyecto);
-        
-      case 'date_asc': // Oldest First
+
+      case "date_asc": // Oldest First
         return sorted.sort((a, b) => a.idproyecto - b.idproyecto);
-        
-      case 'match_desc': // Compatibility: High to Low
+
+      case "match_desc": // Compatibility: High to Low
         return sorted.sort((a, b) => {
           const matchA = calculateMatchPercentage(a);
           const matchB = calculateMatchPercentage(b);
           return matchB - matchA;
         });
-        
-      case 'match_asc': // Compatibility: Low to High
+
+      case "match_asc": // Compatibility: Low to High
         return sorted.sort((a, b) => {
           const matchA = calculateMatchPercentage(a);
           const matchB = calculateMatchPercentage(b);
           return matchA - matchB;
         });
-        
+
       default:
         return sorted;
     }
@@ -180,32 +183,44 @@ export const useDashboardData = () => {
 
   // Flatten the projects to map each role to a project for the ProjectList component
   const flattenProjectsForList = (projects) => {
-    return projects.flatMap(project => 
-      project.proyecto_roles.map(proyecto_rol => ({ 
-        project, 
-        proyecto_rol,
-        hasSelectedSkills: selectedSkillFilters.length === 0 || 
-          proyecto_rol.roles.requerimientos_roles.some(req_rol => 
-            selectedSkillFilters.includes(req_rol.requerimientos.habilidades.nombre)
-          )
-      }))
-    ).filter(item => item.hasSelectedSkills);
+    return projects
+      .flatMap((project) =>
+        project.proyecto_roles.map((proyecto_rol) => ({
+          project,
+          proyecto_rol,
+          hasSelectedSkills:
+            selectedSkillFilters.length === 0 ||
+            proyecto_rol.roles.requerimientos_roles.some((req_rol) =>
+              selectedSkillFilters.includes(
+                req_rol.requerimientos.habilidades.nombre
+              )
+            ),
+        }))
+      )
+      .filter((item) => item.hasSelectedSkills);
   };
 
   return {
-    projects: data.projects,
-    skills: data.skills,
+    projects: Array.isArray(projectsData) ? projectsData : [],
+    clients: Array.isArray(clientsData) ? clientsData : [],
+    //skills: Array.isArray(skillsData) ? skillsData : [],
+    roles: Array.isArray(rolesData) ? rolesData : [],
     searchTerm,
     setSearchTerm,
     selectedSkillFilters,
     userSkills,
     currentUserId,
     handleApplySkillFilters,
+    clientNameSelected,
+    clientId,
+    handleApplyClientFilters,
+    roleNameSelected,
+    roleId,
+    handleApplyRoleFilters,
     removeSkillFilter,
     clearAllSkillFilters,
-    calculateMatchPercentage,
     sortProjects,
-    flattenProjectsForList
+    flattenProjectsForList,
   };
 };
 
