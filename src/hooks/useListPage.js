@@ -8,8 +8,8 @@ import useToggleState from "./useToggleState";
 import useModalControl from "./useModalControl";
 
 /**
- * A hook that provides common list page functionality
- * 
+ *
+ *
  * @param {Object} options - Configuration options
  * @param {Array} options.data - The data array to display
  * @param {string} options.defaultSortOption - Default sort option
@@ -32,66 +32,60 @@ export const useListPage = ({
   itemIdField = "id",
 }) => {
   const navigate = useNavigate();
-  
-  // View mode toggle
+
+  //view mode toggle
   const [viewMode, setViewMode] = useState(defaultViewMode);
-  
-  // Sorting
+
+  //sorting
   const [sortOption, setSortOption] = useState(defaultSortOption);
-  
-  // Search
-  const [searchTerm, setSearchTerm] = useSearchParams('');
-  
-  // Tab setup
+
+  //search
+  const [searchTerm, setSearchTerm] = useSearchParams("");
+
+  //tabs
   const {
     activeTab,
     setActiveTab,
     tabCounts,
     filteredData: tabFilteredData,
   } = useTabbedData(data, tabConfig);
-  
-  // Filters setup
-  const filterResults = useFilters(tabFilteredData, { 
-    searchTerm, 
-    ...filterConfig 
+
+  //filters setup
+  const filterResults = useFilters(tabFilteredData, {
+    searchTerm,
+    ...filterConfig,
   });
 
   const { filteredData: filteredByFilters, ...filterStates } = filterResults;
-  
-  // Sort the filtered data
+
+  //sort the filtered data
   const sortedData = useMemo(() => {
     return sortFunction
       ? sortFunction(filteredByFilters, sortOption)
       : filteredByFilters;
   }, [filteredByFilters, sortOption, sortFunction]);
-  
-  // Animated list 
-  const {
-    isLoading,
-    visibleItems,
-    triggerAnimationSequence,
-    setIsLoading
-  } = useAnimatedList(sortedData, 80, 300);
-  
-  // Toggle view mode with animation
+
+  //animated list
+  const { isLoading, visibleItems, triggerAnimationSequence, setIsLoading } =
+    useAnimatedList(sortedData, 80, 300);
+
+  //toggle view mode with animation
   const toggleViewMode = useCallback(() => {
     // Set loading state first to trigger animation
     setIsLoading(true);
-    
-    // Toggle view mode
-    setViewMode(prev => prev === 'grid' ? 'list' : 'grid');
-    
-    // Trigger animation sequence with a short delay
+
+    setViewMode((prev) => (prev === "grid" ? "list" : "grid"));
+
     setTimeout(() => {
       triggerAnimationSequence();
     }, 50);
   }, [triggerAnimationSequence, setIsLoading]);
-  
-  // Compatibility state
-  const { 
-    state: showCompatibility, 
-    isLoading: compatibilityLoading, 
-    toggle: toggleCompatibility 
+
+  //compatibility state
+  const {
+    state: showCompatibility,
+    isLoading: compatibilityLoading,
+    toggle: toggleCompatibility,
   } = useToggleState(false, 1500);
 
   // Modal controls
@@ -103,33 +97,32 @@ export const useListPage = ({
     denialReason: false,
     details: false,
   });
-  
-  // Selected item for modals
+
+  //selected item for modals
   const [selectedItem, setSelectedItem] = useState(null);
-  
-  // Animation trigger for tab/filter/sort changes
+
+  //animation trigger
   useEffect(() => {
     const timerId = setTimeout(() => {
       triggerAnimationSequence();
     }, 50);
     return () => clearTimeout(timerId);
   }, [filteredByFilters, sortOption, activeTab, triggerAnimationSequence]);
-  
-  // Navigation functions
+
+  //navigation functions
   const handleBack = () => {
     navigate(baseUrl || "/");
   };
 
   const handleViewItem = (itemId) => {
-    // Custom view logic can be added here
-    const item = data.find(item => item[itemIdField] === itemId);
+    const item = data.find((item) => item[itemIdField] === itemId);
     if (item) {
       setSelectedItem(item);
       navigate(`${baseUrl}/${itemId}`);
     }
   };
-  
-  // Filter clearing
+
+  //filter clearing
   const handleClearFilters = () => {
     // Reset all filter states
     Object.entries(filterStates).forEach(([key, value]) => {

@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import useDataFetching from "../useDataFetching";
-import useListPage from "../useListPage";
-import useModalControl from "../useModalControl";
+// import useDataFetching from "../useDataFetching"; 
+// import useListPage from "../useListPage"; 
+// import useModalControl from "../useModalControl"; 
 import useGetFetch from "../useGetFetch";
-import useGetFetchProjectsFilters from "../useGetFetchProjectsFilters";
 /**
- * Hook for managing dashboard data including project filtering and processing
+ *
  *
  * @returns {Object} Dashboard data and related functions
  */
@@ -14,16 +13,14 @@ export const useDashboardData = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Parse search param from URL
+  //search param from URL
   const searchParams = new URLSearchParams(location.search);
   const searchFromURL = searchParams.get("search") || "";
 
-  // Search and filter state
+  //searchand filter state
   const [searchTerm, setSearchTerm] = useState(searchFromURL);
-
   const [skillSelected, setSkillSelected] = useState("Skills");
   const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
-  const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
   //Selected the name of the client
   const [clientNameSelected, setClientNameSelected] = useState("Clients");
   //Selected the id client
@@ -32,14 +29,15 @@ export const useDashboardData = () => {
   const [roleNameSelected, setRoleNameSelected] = useState("Roles");
   //Selected the id role
   const [roleId, setRoleId] = useState(null);
-  //Gather the filter options
-  const [filterOptions, setFilterOptions] = useState({});
+  const [filterOptions, setFilterOptions] = useState({}); // Added to manage all filter options centrally
 
-  // Mock current user ID (this would come from authentication context in real app)
+  const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
+
+  //mock current user ID (this would come from authentication context in real app)
   const currentUserId = 1;
 
-  // URL management for search
-  useEffect(() => {
+  //URL management for search
+  /*useEffect(() => {
     if (searchTerm) {
       const params = new URLSearchParams(location.search);
       params.set("search", searchTerm);
@@ -67,12 +65,9 @@ export const useDashboardData = () => {
       setSearchTerm(searchParam);
     }
   }, [location.search]);
-
-  // Fetch data considering filters
-  const { data: projectsData } = useGetFetchProjectsFilters({
-    rutaApi: "projects",
-    filters: filterOptions,
-  });
+*/
+  //fetch data
+  const { data: projectsData } = useGetFetch({ rutaApi: "projects" });
 
   const { data: clientsData } = useGetFetch({ rutaApi: "clientes" });
 
@@ -80,99 +75,19 @@ export const useDashboardData = () => {
 
   const { data: rolesData } = useGetFetch({ rutaApi: "roles" });
 
-  // Function to generate dummy projects for testing
-  const getDummyProjects = () => {
-    return Array(8)
-      .fill()
-      .map((_, index) => ({
-        idproyecto: index + 1,
-        pnombre: `Project ${index + 1}`,
-        descripcion: `Description for Project ${index + 1}`,
-        imagen: "/images/ImagenProyectoDefault.png",
-        cliente: { clnombre: `Client ${(index % 4) + 1}` },
-        status:
-          index % 4 === 0
-            ? "Active"
-            : index % 4 === 1
-            ? "Upcoming"
-            : index % 4 === 2
-            ? "Completed"
-            : "All",
-        // User application and ownership data
-        userHasApplied: index % 3 === 0, // Every 3rd project user has applied to
-        managerId: index % 2 === 0 ? currentUserId : index + 10, // User manages every other project
-        ownerId: index % 4 === 0 ? currentUserId : index + 20, // User owns every 4th project
-        proyecto_roles: [
-          {
-            idrol: index * 2 + 1,
-            roles: {
-              nombrerol: `Role ${index * 2 + 1}`,
-              descripcionrol: `Description for Role ${index * 2 + 1}`,
-              requerimientos_roles: [
-                {
-                  requerimientos: {
-                    habilidades: {
-                      idhabilidad: index * 4 + 1,
-                      nombre: "JavaScript",
-                    },
-                  },
-                },
-                {
-                  requerimientos: {
-                    habilidades: {
-                      idhabilidad: index * 4 + 2,
-                      nombre: "React",
-                    },
-                  },
-                },
-                {
-                  requerimientos: {
-                    habilidades: {
-                      idhabilidad: index * 4 + 3,
-                      nombre: "Node.js",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          {
-            idrol: index * 2 + 2,
-            roles: {
-              nombrerol: `Role ${index * 2 + 2}`,
-              descripcionrol: `Description for Role ${index * 2 + 2}`,
-              requerimientos_roles: [
-                {
-                  requerimientos: {
-                    habilidades: { idhabilidad: index * 4 + 4, nombre: "CSS" },
-                  },
-                },
-                {
-                  requerimientos: {
-                    habilidades: {
-                      idhabilidad: index * 4 + 5,
-                      nombre: "UI/UX",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      }));
-  };
-
-  // Apply skills filters
+  //apply skills filters
   const handleApplySkillFilters = (selectedSkills) => {
     setSelectedSkillFilters(selectedSkills);
 
-    // Update the Skills button text based on selected skills
+    //update the Skills button text based on selected skills
     if (selectedSkills.length > 0) {
       setSkillSelected(`${selectedSkills.length} skills`);
     } else {
       setSkillSelected("Skills");
     }
   };
+
+
   //Apply project name as filter
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
@@ -181,22 +96,24 @@ export const useDashboardData = () => {
         projectName: nameProject, // Update filter options with project name
       });
     } else {
+      // eslint-disable-next-line no-unused-vars
       const { projectName, ...rest } = filterOptions; // Remove project name filter
       setFilterOptions(rest);
     }
   };
   //Apply client filters
-  const handleApplyClientFilters = (clientName, clientId) => {
+  const handleApplyClientFilters = (clientName, selectedClientId) => {
     //update the Client button text based on selected clients
-    if (clientName && clientId) {
+    if (clientName && selectedClientId) {
       setClientNameSelected(clientName);
       setFilterOptions({
         ...filterOptions,
-        idcliente: clientId, // Update filter options with selected client ID
+        idcliente: selectedClientId, // Update filter options with selected client ID
       });
-      setClientId(clientId);
+      setClientId(selectedClientId);
     } else {
       setClientNameSelected("Clients");
+      // eslint-disable-next-line no-unused-vars
       const { idcliente, ...rest } = filterOptions; // Remove client filter
       setFilterOptions(rest);
       setClientId(null);
@@ -204,11 +121,11 @@ export const useDashboardData = () => {
   };
 
   //Apply role filters
-  const handleApplyRoleFilters = (roleName, roleId) => {
+  const handleApplyRoleFilters = (roleName, selectedRoleId) => {
     //update the Role button text based on selected roles
-    if (roleName && roleId) {
+    if (roleName && selectedRoleId) {
       setRoleNameSelected(roleName);
-      setRoleId(roleId);
+      setRoleId(selectedRoleId);
       setFilterOptions({
         ...filterOptions,
         nombrerol: roleName, // Update filter options with selected role ID
@@ -216,6 +133,7 @@ export const useDashboardData = () => {
     } else {
       setRoleNameSelected("Roles");
       setRoleId(null);
+      // eslint-disable-next-line no-unused-vars
       const { nombrerol, ...rest } = filterOptions; // Remove role filter
       setFilterOptions(rest);
     }
@@ -244,12 +162,12 @@ export const useDashboardData = () => {
     handleApplySkillFilters([]);
   };
 
-  // Calculate matching percentage
-  const calculateMatchPercentage = (idrol, idEmployee) => {
-    const { data: matchPercentage } = useGetFetch({
-      rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`,
-    });
-    return matchPercentage ? matchPercentage : 0;
+  // Calculate match percentage (placeholder function, implement actual logic)
+  const calculateMatchPercentage = (project) => {
+    // Replace with actual match calculation logic
+    // This is a placeholder and will return 0 for all projects
+    console.warn("calculateMatchPercentage is a placeholder. Implement actual logic.", project);
+    return 0;
   };
 
   // Sort projects function
@@ -326,14 +244,15 @@ export const useDashboardData = () => {
     roleId,
     handleApplyRoleFilters,
     removeSkillFilter,
-    clearAllSkillFilters,
+    removeClientFilter, 
     removeRoleFilter,
-    removeClientFilter,
+    clearAllSkillFilters,
     sortProjects,
     flattenProjectsForList,
-    filterOptions,
-    setFilterOptions,
-    calculateMatchPercentage,
+    skillSelected, 
+    handdlyApplyNameProject, 
+    filterOptions, 
+    setFilterOptions, 
   };
 };
 

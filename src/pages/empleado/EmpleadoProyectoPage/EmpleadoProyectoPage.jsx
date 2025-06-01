@@ -159,17 +159,13 @@ export const EmpleadoProyectoPage = () => {
                   <Button
                     type="secondary"
                     hasDropdown={true}
-                    dropdownItems={[
-                      { label: 'Frontend Developer', icon: 'bi-code-slash' },
-                      { label: 'Backend Developer', icon: 'bi-database' },
-                      { label: 'UI/UX Designer', icon: 'bi-palette' },
-                      { label: 'Project Manager', icon: 'bi-person-gear' },
-                      { label: 'QA Engineer', icon: 'bi-bug' },
-                      { label: 'DevOps Engineer', icon: 'bi-cloud' },
-                      { label: 'Data Scientist', icon: 'bi-graph-up' },
-                      { label: 'Product Owner', icon: 'bi-briefcase' }
-                    ]}
-                    onDropdownItemClick={(item) => console.log('Selected role:', item.label)}
+                    dropdownItems={(projectData.availableRoles || []).map(role => ({
+                      label: `${role.name}`,
+                      icon: 'bi-person-badge',
+                      roleId: role.id,
+                      available: role.available
+                    }))}
+                    onDropdownItemClick={(item) => proyectoPage.handleRoleSelect(item)}
                     className={peopleStyles.halfButton}
                   >
                     All Roles

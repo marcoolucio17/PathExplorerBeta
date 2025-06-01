@@ -4,14 +4,11 @@ import axiosRetry from "axios-retry";
 
 const axiosInstance = axios.create();
 
-// Add request interceptor to include authentication token
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Try to get the token from localStorage
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
 
-    // If token exists, add it to the headers
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,33 +20,35 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-//installe npm install axios-retry
 axiosRetry(axiosInstance, {
-  retries: 3, // Número de reintentos
+  retries: 3,
   retryDelay: (retryCount) => {
     return retryCount * 2000;
   },
   shouldResetTimeout: true,
 });
 
-export const useGetFetch = ({ rutaApi = "" }) => {
-  const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}`;
-
-      try {
-        const response = await axiosInstance.get(url);
-        setData(response.data);
-      } catch (error) {
-        console.error(`Error fetching ${rutaApi}:`, error);
-        setError(error);
-      }
-    };
-    fetchData();
-  }, []);
+export const useGetFetch = ({rutaApi = ""}) => {
+    const [data,setData] = useState([]);  
+    const [error,setError] = useState(null);
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!rutaApi) return; //don't fetch if no rutaApi provided
+            
+            let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}`;
+            //let url = `http://localhost:8080/api/${rutaApi}`;
+            
+            try {
+                const response = await axiosInstance.get(url);
+                setData(response.data)
+            } catch (error) {
+                console.error(`Error fetching ${rutaApi}:`, error);
+                setError(error);
+            }
+        };  
+        fetchData();
+    }, [rutaApi]); //added rutaApi dependency to fix infinite loop
 
   return { data, error };
 };
