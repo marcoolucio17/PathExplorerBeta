@@ -13,6 +13,7 @@ import styles from 'src/styles/GridList/GridListContainer.module.css';
  * @param {Function} props.calculateMatchPercentage - Function to calculate match percentage
  * @param {Function} props.onViewRequest - Function called when View Request button is clicked
  * @param {Function} props.onViewReason - Function called when View Reason button is clicked
+ * @param {Function} props.onViewAssign - Function called when View Appeal button is clicked
  * @param {Function} props.onClearFilters - Function called when Clear Filters button is clicked
  */
 const ApplicantsList = ({ 
@@ -24,6 +25,7 @@ const ApplicantsList = ({
   calculateMatchPercentage,
   onViewRequest,
   onViewReason,
+  onViewAssign,
   onClearFilters
 }) => {
   //loading, show loader
@@ -81,6 +83,7 @@ const ApplicantsList = ({
               activeTab={activeTab}
               onViewRequest={onViewRequest}
               onViewReason={onViewReason}
+              onViewAssign={onViewAssign}
               index={index}
             />
           </div>

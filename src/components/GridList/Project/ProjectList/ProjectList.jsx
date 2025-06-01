@@ -21,7 +21,6 @@ const ProjectList = ({
   showCompatibility, 
   selectedSkillFilters = [],
   userSkills = [],
-  calculateMatchPercentage,
   onClearFilters,
   isLoading = false
 }) => {
@@ -60,7 +59,7 @@ const ProjectList = ({
   
   //create a unique key for the container to force re-render and animation restart
   const containerKey = `container-projects-${viewMode}`;
-
+  const idEmployee = localStorage.getItem('idEmployee') || 1;
   return (
     <div 
       key={containerKey}
@@ -72,10 +71,8 @@ const ProjectList = ({
           return null; 
         }
         
-        const matchPercentage = calculateMatchPercentage ? 
-          calculateMatchPercentage(item.project, item.proyecto_rol) : 0;
         
-        const renderKey = `${item.project.idproyecto || 'unknown'}-${item.proyecto_rol.idrol || 'unknown'}-${index}`;
+        const renderKey = `${item.project.idproyecto || 'unknown'}-${item.proyecto_rol.roles.idrol || 'unknown'}-${index}`;
         
         return (
           <div 
@@ -86,8 +83,9 @@ const ProjectList = ({
               project={item.project}
               proyecto_rol={item.proyecto_rol}
               viewMode={viewMode}
+              idEmployee={idEmployee}
+              idrol={item.proyecto_rol.roles.idrol}
               showCompatibility={showCompatibility}
-              matchPercentage={matchPercentage}
               selectedSkillFilters={selectedSkillFilters}
               userSkills={userSkills}
               index={index}

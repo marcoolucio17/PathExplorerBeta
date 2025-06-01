@@ -15,6 +15,7 @@ import Button from 'src/components/shared/Button';
  * @param {string} props.activeTab - Current active tab
  * @param {Function} props.onViewRequest - Function called when View Request button is clicked
  * @param {Function} props.onViewReason - Function called when View Reason button is clicked
+ * @param {Function} props.onViewAssign - Function called when View Appeal button is clicked
  */
 const ApplicantCard = ({
   applicant,
@@ -23,7 +24,8 @@ const ApplicantCard = ({
   matchPercentage,
   activeTab,
   onViewRequest,
-  onViewReason
+  onViewReason,
+  onViewAssign
 }) => {
   //determine card type
   const cardClass = viewMode === 'grid' 
@@ -104,7 +106,19 @@ const ApplicantCard = ({
               View Request
             </Button>
           </div>
-        ) : (
+        ) : activeTab === 'Accepted' ? (
+          <div className={styles.buttonGroup}>
+            <Button 
+              type="secondary"
+              variant="approve"
+              icon="bi bi-check-circle"
+              onClick={() => onViewAssign(applicant.id)}
+            >
+              Assign
+            </Button>
+          </div>
+        ) : 
+        (
           <Button 
               type="secondary"
               variant="view"
@@ -170,7 +184,7 @@ const ApplicantCard = ({
       </div>
       
       <div className={styles.cardFooter}>
-        {activeTab === 'Denied' ? (
+      {activeTab === 'Denied' ? (
           <div className={styles.buttonGroup}>
             <Button 
               type="secondary"
@@ -189,7 +203,19 @@ const ApplicantCard = ({
               View Request
             </Button>
           </div>
-        ) : (
+        ) : activeTab === 'Accepted' ? (
+          <div className={styles.buttonGroup}>
+            <Button 
+              type="secondary"
+              variant="approve"
+              icon="bi bi-check-circle"
+              onClick={() => onViewAssign(applicant.id)}
+            >
+              Assign
+            </Button>
+          </div>
+        ) : 
+        (
           <Button 
               type="secondary"
               variant="view"

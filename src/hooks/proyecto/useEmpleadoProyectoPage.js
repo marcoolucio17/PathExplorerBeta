@@ -1,7 +1,8 @@
 import { useState, useRef, useMemo, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import useModalControl from '../useModalControl';
 import { useFetch } from 'src/hooks/useFetch';
+import useProjectApplication from './useProjectApplication';
 
 
 function isNonTechnicalSkill(skillName) {
@@ -16,7 +17,7 @@ function isNonTechnicalSkill(skillName) {
 }
 
 
-function transformBackendProject(projectData) {
+function transformBackendProject(projectData, roleId = null) {
   
   
   if (!projectData) {
@@ -32,7 +33,6 @@ function transformBackendProject(projectData) {
     }
     project = projectData[0];
   } else {
-    // projectData is already the project object
     project = projectData;
   }
 
@@ -40,27 +40,75 @@ function transformBackendProject(projectData) {
   const availableRoles = [];
   let primaryRole = null;
 
-  //transform roles array 
-  if (project.roles && Array.isArray(project.roles)) {
-    project.roles.forEach((roleName, index) => {
+  // Handle role data - check if we're viewing a specific role
+  const isSpecificRole = roleId && project.proyecto_roles?.find(r => r.idrol == roleId);
+  
+  if (project.proyecto_roles && Array.isArray(project.proyecto_roles)) {
+    project.proyecto_roles.forEach((role, index) => {
       const roleObj = {
-        id: index + 1,
-        name: roleName,
-        level: "",
-        available: true,
+        id: role.idrol,
+        name: role.nombrerol || `Role ${role.idrol}`,
+        level: role.nivelrol || "",
+        description: role.descripcionrol || "",
+        available: role.estado === "Pendiente",
       };
 
-      if (index === 0) {
+      // If viewing specific role, make it primary
+      if (isSpecificRole && role.idrol == roleId) {
+        primaryRole = roleObj;
+      } else if (!isSpecificRole && index === 0) {
         primaryRole = roleObj;
       }
 
       availableRoles.push(roleObj);
     });
   }
+  else if (project.roles) {
+    if (Array.isArray(project.roles)) {
+      project.roles.forEach((role, index) => {
+        const roleObj = {
+          id: role.idrol,
+          name: role.nombrerol,
+          level: role.nivelrol || "",
+          description: role.descripcionrol || "",
+          available: role.estado === "Pendiente",
+        };
+
+        if (index === 0) {
+          primaryRole = roleObj;
+        }
+
+        availableRoles.push(roleObj);
+      });
+    }
+    else if (project.roles.nombrerol && project.roles.idrol) {
+      const roleObj = {
+        id: project.roles.idrol,
+        name: project.roles.nombrerol,
+        level: "",
+        available: true,
+      };
+      
+      primaryRole = roleObj;
+      availableRoles.push(roleObj);
+    }
+  }
 
   //transform skills array 
   if (project.habilidades && Array.isArray(project.habilidades)) {
     project.habilidades.forEach((skillName) => {
+      requiredSkills.push({
+        name: skillName,
+        isUserSkill: false,
+        isTechnical: !isNonTechnicalSkill(skillName),
+        roleId: null,
+        experienceTime: null,
+      });
+    });
+  } else {
+    // Fallback skills when backend doesn't provide them
+    const fallbackSkills = ['JavaScript', 'React', 'Node.js', 'SQL', 'Git'];
+    fallbackSkills.forEach((skillName) => {
       requiredSkills.push({
         name: skillName,
         isUserSkill: false,
@@ -82,6 +130,14 @@ function transformBackendProject(projectData) {
         role: availableRoles[0]?.name || 'Team Member',
       });
     });
+  } else {
+    // Add some default team members when backend doesn't provide them
+    members.push({
+      id: 1,
+      name: 'Project Manager',
+      avatar: '/img/fotogabo.jpg',
+      role: 'Project Manager',
+    });
   }
 
   return {
@@ -96,8 +152,9 @@ function transformBackendProject(projectData) {
       ? project.projectdeliverables.split(',').map((d) => d.trim())
       : extractDeliverables(project.descripcion),
     client: {
-      name: project.cliente || "Unknown Client",
-      logo: "/img/pepsi-logo.png",
+      name: project.cliente?.clnombre || "Unknown Client",
+      logo: project.cliente?.fotodecliente ? `/img/${project.cliente.fotodecliente}` : "/img/pepsi-logo.png",
+      investment: project.cliente?.inversion || 0,
     },
     primaryRole: primaryRole,
     people: [
@@ -119,7 +176,7 @@ function transformBackendProject(projectData) {
 function formatDate(dateString) {
   if (!dateString) return "";
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) return dateString; // More robust check for invalid date
+  if (isNaN(date.getTime())) return dateString; 
   return date.toLocaleDateString();
 }
 //calculate progress
@@ -181,14 +238,15 @@ function checkUserSkills(requiredSkills, userSkills) {
   }));
 }
 
-//Custom hook for EmpleadoProyectoPageManages all state and logic for the project details page
+//Custom hook for EmpleadoProyectoPageManages
 
 const useEmpleadoProyectoPage = () => {
 
-  const { projectId } = useParams();
+  const { projectId, roleId } = useParams();
+  const navigate = useNavigate();
 
-  //API call to fetch project data
-  const { data, error, loading } = useFetch(`projects?idproyecto=${projectId || '87'}`); //remove 87
+  //Always use /completo to get all project data (better than por-rol)
+  const { data, error, loading } = useFetch(`${projectId || '87'}/completo`);
 
   // Modal control
   const { modals, openModal, closeModal } = useModalControl([
@@ -201,23 +259,34 @@ const useEmpleadoProyectoPage = () => {
   // Refs
   const peopleSectionRef = useRef(null);
 
-  // State for project application
-  const [isApplied, setIsApplied] = useState(false);
-  const [isLoadingApplication, setIsLoadingApplication] = useState(false); // Renamed to avoid conflict with 'loading' from useFetch
+  //get actual user ID from localStorage (replace 'user_id' with the correct key your app uses)
+  const userId = localStorage.getItem('user_id') || localStorage.getItem('userId') || '1'; 
+  
+  console.log('=== DEBUG: User Authentication ===');
+  console.log('User ID from localStorage:', userId);
+  console.log('Available localStorage keys:', Object.keys(localStorage));
+  console.log('====================================='); 
 
   //transform backend data to frontend format
   const projectData = useMemo(() => {
-    return transformBackendProject(data);
-  }, [data]);
+    const transformed = transformBackendProject(data, roleId);
+    console.log('=== DEBUG: Project Data ===');
+    console.log('Raw backend data:', data);
+    console.log('Transformed project data:', transformed);
+    console.log('Project ID from params:', projectId);
+    console.log('Role ID from params:', roleId);
+    console.log('=========================');
+    return transformed;
+  }, [data, roleId]);
 
-  // User skills for compatibility calculation (you might want to fetch this from user profile later)
+  //user skills for compatibility calculation temp only
   const [userSkills] = useState([
     "Python",
     "C#",
     "Figma"
   ]);
 
-  // Update required skills with user skill status
+  //update required skills with user skill status
   const enhancedProjectData = useMemo(() => {
     if (!projectData) return null;
 
@@ -227,29 +296,34 @@ const useEmpleadoProyectoPage = () => {
     };
   }, [projectData, userSkills]);
 
-  // Actions
+  // Project application hook (after project data is ready)
+  const {
+    submitApplication,
+    isLoading: isLoadingApplication,
+    error: applicationError,
+    isApplied
+  } = useProjectApplication(projectId, userId, enhancedProjectData);
+
+  //actions
   const handleShowApplication = useCallback(() => {
     openModal('application');
   }, [openModal]);
 
   const handleSubmitApplication = useCallback(async (applicationData) => {
-    setIsLoadingApplication(true);
     try {
-      //replace with actual API call to submit application
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setIsApplied(true);
-      closeModal('application');
-
-      console.log('Application submitted:', {
-        projectId: projectData?.id,
-        ...applicationData
-      });
+      const result = await submitApplication(applicationData);
+      
+      if (result.success) {
+        closeModal('application');
+        console.log('Application submitted successfully:', result.data);
+      } else {
+        console.error('Error submitting application:', result.error);
+        
+      }
     } catch (err) {
-      console.error('Error submitting application:', err);
-    } finally {
-      setIsLoadingApplication(false);
+      console.error('Unexpected error submitting application:', err);
     }
-  }, [projectData?.id, closeModal]); 
+  }, [submitApplication, closeModal]); 
 
   const handleShowCompatibility = useCallback(() => {
     openModal('compatibility');
@@ -265,8 +339,15 @@ const useEmpleadoProyectoPage = () => {
 
   const handleMemberSelect = useCallback((member) => {
     console.log('Selected member:', member);
-
   }, []);
+
+  const handleRoleSelect = useCallback((roleItem) => {
+    const roleId = roleItem.roleId;
+    if (roleId) {
+      // Navigate to /empleado/proyecto/{projectId}/{roleId} (not /por-rol/)
+      navigate(`/empleado/proyecto/${projectId}/${roleId}`);
+    }
+  }, [navigate, projectId]);
   
   //calculate compatibility percentage
   const calculateCompatibilityPercentage = useCallback(() => {
@@ -294,7 +375,7 @@ const useEmpleadoProyectoPage = () => {
 
     // State
     isApplied,
-    isLoadingApplication, 
+    isLoading: isLoadingApplication, 
 
     // Refs
     peopleSectionRef,
@@ -311,6 +392,7 @@ const useEmpleadoProyectoPage = () => {
     handleShowSkills,
     handleShowAllSkills,
     handleMemberSelect,
+    handleRoleSelect,
     calculateCompatibilityPercentage,
   };
 };
