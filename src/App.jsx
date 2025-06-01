@@ -53,7 +53,7 @@ function App() {
         /> */}
         <Route path="manager/perfil" element={<ManagerPerfil />} />
         {/*<Route path="manager/vistaperfil" element={<ManagerVistaPerfil />} /> */}
-        <Route path="manager/proyecto" element={<EmpleadoProyecto />} />
+        <Route path="manager/proyecto/:projectId/:roleId" element={<EmpleadoProyecto />} />
         <Route path="manager/create-project" element={<ManagerCreateProjectPage/>}></Route>
       </Route>
 
@@ -71,7 +71,7 @@ function App() {
         <Route path="empleado" element={<EmpleadoHome />} />
         <Route path="empleado/dashboard" element={<EmpleadoDashboardPage />} />
         <Route path="empleado/perfil" element={<EmpleadoPerfil />} />
-        <Route path="empleado/proyecto" element={<EmpleadoProyecto />} />
+        <Route path="empleado/proyecto/:projectId/:roleId" element={<EmpleadoProyecto />} />
       </Route>
     </Routes>
   );
