@@ -131,8 +131,7 @@ const useEmpleadoProyectoPage = () => {
     openModal("application");
   };
 
-  const handleSubmitApplication = async (applicationData) => {
-    setIsLoading(true);
+  const handleSubmitApplication = useCallback(async (applicationData) => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -185,6 +184,7 @@ const useEmpleadoProyectoPage = () => {
     projectData,
     userSkills,
 
+
     // State
     isApplied,
     isLoading,
@@ -192,10 +192,12 @@ const useEmpleadoProyectoPage = () => {
     // Refs
     peopleSectionRef,
 
+
     // Modals
     modals,
     openModal,
     closeModal,
+
 
     // Actions
     handleShowApplication,
@@ -204,6 +206,7 @@ const useEmpleadoProyectoPage = () => {
     handleShowSkills,
     handleShowAllSkills,
     handleMemberSelect,
+    handleRoleSelect,
     calculateCompatibilityPercentage,
   };
 };

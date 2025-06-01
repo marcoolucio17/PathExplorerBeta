@@ -13,9 +13,8 @@ export const ApplicationModal = ({
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   
-  // Form state
+  //form state
   const [selectedRole, setSelectedRole] = useState('');
-  const [referralEmployee, setReferralEmployee] = useState('');
   const [applicationReason, setApplicationReason] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
@@ -23,9 +22,8 @@ export const ApplicationModal = ({
     if (isOpen) {
       setIsVisible(true);
       setIsClosing(false);
-      // Reset form
+      //reset form
       setSelectedRole('');
-      setReferralEmployee('');
       setApplicationReason('');
       setFormErrors({});
     }
@@ -74,7 +72,6 @@ export const ApplicationModal = ({
 
     const applicationData = {
       role: selectedRole,
-      referral: referralEmployee || null,
       reason: applicationReason,
       timestamp: new Date().toISOString()
     };
@@ -113,7 +110,7 @@ export const ApplicationModal = ({
           <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
             <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
               <div className={styles.applicationContent}>
-                {/* Role Selection */}
+                {/*role selection*/}
                 <div className={styles.formSection}>
                   <label className={styles.formLabel}>
                     <i className="bi bi-person-badge"></i>
@@ -126,7 +123,11 @@ export const ApplicationModal = ({
                   >
                     <option value="">Select a role...</option>
                     {availableRoles.map((role, index) => (
-                      <option key={index} value={role}>{role}</option>
+                      <option key={index} value={typeof role === 'object' ? role.name : role}>
+                        {typeof role === 'object' ? (
+                          role.available !== false ? role.name : `${role.name} (Not Available)`
+                        ) : role}
+                      </option>
                     ))}
                   </select>
                   {formErrors.role && (
@@ -134,25 +135,7 @@ export const ApplicationModal = ({
                   )}
                 </div>
 
-                {/* Referral */}
-                <div className={styles.formSection}>
-                  <label className={styles.formLabel}>
-                    <i className="bi bi-people"></i>
-                    Employee referral (optional)
-                  </label>
-                  <input 
-                    type="text"
-                    className={styles.formInput}
-                    placeholder="Enter employee name or email..."
-                    value={referralEmployee}
-                    onChange={(e) => setReferralEmployee(e.target.value)}
-                  />
-                  <span className={styles.helpText}>
-                    If you were referred by a current employee, enter their name or email
-                  </span>
-                </div>
-
-                {/* Application Reason */}
+                {/*application reason*/}
                 <div className={styles.formSection}>
                   <label className={styles.formLabel}>
                     <i className="bi bi-chat-text"></i>
@@ -201,3 +184,5 @@ export const ApplicationModal = ({
     </div>
   );
 };
+
+export default ApplicationModal;

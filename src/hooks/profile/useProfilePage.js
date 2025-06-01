@@ -240,7 +240,7 @@ export const useProfilePage = () => {
       DB_URL + "api/goals",
       {
         idmeta: obj.id,
-        cambio: { completa : status}
+        cambio: { completa: status },
       },
       config
     );
@@ -286,9 +286,8 @@ export const useProfilePage = () => {
 
   // Handle remove certificate
   // remove cert (no alert no cap no shit no fear)
-  const handleRemoveCertificate = useCallback( async(certificateId) => {
+  const handleRemoveCertificate = useCallback(async (certificateId) => {
     // setUserCertificates(prev => prev.filter(cert => cert.id !== certificateId));
-
 
     const config = {
       headers: {
