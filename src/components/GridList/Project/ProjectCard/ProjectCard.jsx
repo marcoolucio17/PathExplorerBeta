@@ -7,12 +7,14 @@ import customStyles from 'src/styles/GridList/ProjectCard.module.css';
 import useGetFetch from 'src/hooks/useGetFetch';
 
 const ProjectCard = ({
+  id,
   project,
   proyecto_rol,
   viewMode,
   idEmployee,
   idrol,
   showCompatibility,
+  onClick,
   selectedSkillFilters = [],
   userSkills = []
 }) => {
@@ -182,14 +184,14 @@ const ProjectCard = ({
 
   if (viewMode === 'grid') {
     return (
-      <GlassCard className={cardClass}>
+      <GlassCard id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
         {gridContent}
       </GlassCard>
     );
   }
 
   return (
-    <GlassCard className={cardClass}>
+    <GlassCard id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
       {listContent}
     </GlassCard>
   );
