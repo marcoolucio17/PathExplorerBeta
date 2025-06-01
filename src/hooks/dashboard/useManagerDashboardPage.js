@@ -4,6 +4,12 @@ import useDashboardData from "./useDashboardData";
 import useListPage from "../useListPage";
 import useModalControl from "../useModalControl";
 import useToggleState from "../useToggleState";
+import { useState, useEffect, useMemo, useCallback, use } from "react";
+import { useNavigate } from "react-router-dom";
+import useDashboardData from "./useDashboardData";
+import useListPage from "../useListPage";
+import useModalControl from "../useModalControl";
+import useToggleState from "../useToggleState";
 
 /**
  * Manager-specific Dashboard hook
@@ -40,9 +46,15 @@ export const useManagerDashboardPage = () => {
     tabConfig: {
       defaultTab: "All",
       tabNameField: "status",
+    defaultSortOption: "date_desc",
+    defaultViewMode: "grid",
+    tabConfig: {
+      defaultTab: "All",
+      tabNameField: "status",
     },
     filterConfig: {},
     sortFunction: dashboardData.sortProjects,
+    baseUrl: "/manager/dashboard",
     baseUrl: "/manager/dashboard",
   });
 
@@ -63,6 +75,8 @@ export const useManagerDashboardPage = () => {
         if (listPage.triggerAnimationSequence) {
           listPage.triggerAnimationSequence();
         }
+      });
+    });
       });
     });
   }, [listPage]);
@@ -89,6 +103,7 @@ export const useManagerDashboardPage = () => {
 
   // Navigate to applicants page
   const handleViewApplicants = () => {
+    navigate("/manager/applicants");
     navigate("/manager/applicants");
   };
   //  Get current user ID from local or session storage
@@ -122,9 +137,12 @@ export const useManagerDashboardPage = () => {
   const getTabProjects = () => {
     let filteredProjects;
 
+
     switch (listPage.activeTab) {
       case "All":
+      case "All":
         filteredProjects = dashboardData.projects;
+
 
         break;
       case "Applied To":
@@ -141,6 +159,7 @@ export const useManagerDashboardPage = () => {
         filteredProjects = dashboardData.projects;
     }
 
+
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
   };
 
@@ -148,10 +167,14 @@ export const useManagerDashboardPage = () => {
   const getActiveFilters = () => {
     const filters = {};
 
+
     if (dashboardData.selectedSkillFilters.length > 0) {
       filters.skills = {
         label: "Skill",
+        label: "Skill",
         values: dashboardData.selectedSkillFilters,
+        color: "rgba(139, 92, 246, 0.2)",
+        borderColor: "rgba(139, 92, 246, 0.5)",
         color: "rgba(139, 92, 246, 0.2)",
         borderColor: "rgba(139, 92, 246, 0.5)",
       };
@@ -179,6 +202,7 @@ export const useManagerDashboardPage = () => {
 
   // Handle removing a specific filter
   const handleRemoveFilter = (filterType, value) => {
+    if (filterType === "skills") {
     if (filterType === "skills") {
       dashboardData.removeSkillFilter(value);
     } else if (filterType === "clients") {
@@ -210,10 +234,14 @@ export const useManagerDashboardPage = () => {
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
       return { All: 0, "Applied To": 0, "My Projects": 0 };
+      return { All: 0, "Applied To": 0, "My Projects": 0 };
     }
 
     // Initial counts
     const counts = {
+      All: 0,
+      "Applied To": 0,
+      "My Projects": 0,
       All: 0,
       "Applied To": 0,
       "My Projects": 0,
@@ -239,7 +267,15 @@ export const useManagerDashboardPage = () => {
     counts["My Projects"] =
       dashboardData.flattenProjectsForList(myProjects).length;
 
+    counts["My Projects"] =
+      dashboardData.flattenProjectsForList(myProjects).length;
+
     return counts;
+  }, [
+    dashboardData.projects,
+    dashboardData.flattenProjectsForList,
+    dashboardData.currentUserId,
+  ]);
   }, [
     dashboardData.projects,
     dashboardData.flattenProjectsForList,
@@ -275,3 +311,4 @@ export const useManagerDashboardPage = () => {
 };
 
 export default useManagerDashboardPage;
+

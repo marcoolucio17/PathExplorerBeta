@@ -60,6 +60,7 @@ const ProjectList = ({
   // Create a unique key for the container to force re-render and animation restart
   const containerKey = `container-projects-${viewMode}`;
   const idEmployee = localStorage.getItem('idEmployee') || 1;
+  const idEmployee = localStorage.getItem('idEmployee') || 1;
   return (
     <div
       key={containerKey}
@@ -88,6 +89,8 @@ const ProjectList = ({
               project={item.project}
               proyecto_rol={item.proyecto_rol}
               viewMode={viewMode}
+              idEmployee={idEmployee}
+              idrol={item.proyecto_rol.roles.idrol}
               idEmployee={idEmployee}
               idrol={item.proyecto_rol.roles.idrol}
               showCompatibility={showCompatibility}

@@ -32,24 +32,26 @@ axiosRetry(axiosInstance, {
   shouldResetTimeout: true,
 });
 
-export const useGetFetch = ({ rutaApi = "" }) => {
-  const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
+export const useGetFetch = ({rutaApi = ""}) => {
 
-  useEffect(() => {
-    const fetchData = async () => {
-      let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}`;
-
-      try {
-        const response = await axiosInstance.get(url);
-        setData(response.data);
-      } catch (error) {
-        console.error(`Error fetching ${rutaApi}:`, error);
-        setError(error);
-      }
-    };
-    fetchData();
-  }, []);
+    const [data,setData] = useState([]);  
+    const [error,setError] = useState(null);
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}`;
+            //let url = `http://localhost:8080/api/${rutaApi}`;
+            
+            try {
+                const response = await axiosInstance.get(url);
+                setData(response.data)
+            } catch (error) {
+                console.error(`Error fetching ${rutaApi}:`, error);
+                setError(error);
+            }
+        };  
+        fetchData();
+    }, []);
 
   return { data, error };
 };

@@ -8,8 +8,8 @@ import useDashboardHeaderConfig from '../../../hooks/dashboard/useDashboardHeade
 import ProjectList from '../../../components/GridList/Project/ProjectList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
-import { ClientsModal } from "src/components/Modals/ClientsModal/ClientsModal";
-import { RolesModal } from "src/components/Modals/RolesModal";
+import { ClientsModal } from "../../../components/Modals/ClientsModal";
+import { RolesModal } from "../../../components/Modals/RolesModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
@@ -27,15 +27,20 @@ export const ManagerDashboardPage = () => {
   // Use the manager-specific dashboard hook
   const dashboardPage = useManagerDashboardPage();
 
-  // Get header configuration
+  //get header configuration
   const headerProps = useDashboardHeaderConfig(dashboardPage);
 
-  // Handle creating a new project
+
+  //handle creating a new project
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
   };
   console.log(dashboardPage.filterOptions);
 
+  console.log("Client name", dashboardPage.clientNameSelected);
+  console.log("Client ID", dashboardPage.clientId);
+  console.log("Role ID", dashboardPage.roleId);
+  console.log("Role name", dashboardPage.roleNameSelected);
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -62,22 +67,17 @@ export const ManagerDashboardPage = () => {
           {dashboardPage.activeTab === 'My Projects' && (
 
             <div className={styles.tabActionSimple}>
-              <NavLink to="/manager/create-project">
-                <Button
-                  type="primary"
-                  icon="bi-plus"
-                  onClick={handleCreateProject}
-                  className={styles.createProjectButton}
-                >
-                  New Project
-                </Button>
-              </NavLink>
+              <Button
+                type="primary"
+                icon="bi-plus"
+                onClick={handleCreateProject}
+                className={styles.createProjectButton}
+              >
+                New Project
+              </Button>
             </div>
 
           )}
-
-
-
 
           <CustomScrollbar
             fadeBackground="transparent"
@@ -107,27 +107,20 @@ export const ManagerDashboardPage = () => {
         userSkills={dashboardPage.selectedSkillFilters}
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
       />
-
-
       <ClientsModal
         isOpen={dashboardPage.modals.clientsFilter}
         onClose={() => dashboardPage.closeModal('clientsFilter')}
-        clientNameStatus={dashboardPage.clientNameSelected}
-        clientIdStatus={dashboardPage.clientId}
+        selectedClients={dashboardPage.selectedClientFilters}
+        onClientSelected={dashboardPage.handleApplyClientFilters}
         clients={dashboardPage.clients}
-        updateClients={dashboardPage.handleApplyClientFilters}
       />
-
       <RolesModal
         isOpen={dashboardPage.modals.rolesFilter}
         onClose={() => dashboardPage.closeModal('rolesFilter')}
-        roleNameStatus={dashboardPage.roleNameSelected}
-        roleIdStatus={dashboardPage.roleId}
+        onRoleSelected={dashboardPage.handleApplyRoleFilters}
         roles={dashboardPage.roles}
-        updateRoles={dashboardPage.handleApplyRoleFilters}
       />
-
-    </div >
+    </div>
   );
 };
 

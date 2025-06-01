@@ -48,6 +48,10 @@
   background: linear-gradient(135deg, var(--btn-view-gradient-1), var(--btn-view-gradient-2));
 }
 
+.approve {
+  background: linear-gradient(135deg, var(--btn-approve-gradient-1), var(--btn-approve-gradient-2));
+}
+
 .back {
   background: var(--glass-bg);
   margin-right: 1rem;
