@@ -14,7 +14,7 @@ export const DenialReasonModal = ({ isOpen, onClose, applicant, onAccept, onAppe
     if (isOpen) {
       setIsVisible(true);
       setIsClosing(false);
-      //default reason
+      //default reason / change to fetch
       setReason("The applicant's experience level doesn't match the project requirements. The role requires a minimum of 5 years in React development, but the applicant only has 3 years. Additionally, the candidate is missing essential skills required for this position: TypeScript and GraphQL experience.");
     }
   }, [isOpen, applicant]);

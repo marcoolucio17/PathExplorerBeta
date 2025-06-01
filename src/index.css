@@ -62,6 +62,10 @@
   /* Botón alert (naranja) */
   --btn-alert-gradient-1: rgba(255, 126, 95, 0.7);
   --btn-alert-gradient-2: rgba(254, 180, 123, 0.7);
+
+  /* Botón approve (green) */
+  --btn-approve-gradient-1: rgba(42, 188, 83, 0.7);
+  --btn-approve-gradient-2: rgba(69, 208, 109, 0.7);
   
   /* Estados de botones */
   --btn-hover-brightness: 1.15;

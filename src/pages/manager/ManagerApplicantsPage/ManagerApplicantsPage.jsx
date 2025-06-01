@@ -11,6 +11,8 @@ import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
 import { DenialReasonModal } from "../../../components/Modals/DenialReasonModal";
 import { ProjectFilterModal } from "../../../components/Modals/ProjectFilterModal";
+import { CVModal } from "src/components/Modals/CVModal";
+import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 
@@ -62,8 +64,9 @@ export const ManagerApplicantsPage = () => {
               activeTab={applicantsPage.activeTab}
               isLoading={applicantsPage.isLoading}
               calculateMatchPercentage={applicantsPage.calculateMatchPercentage}
-              onViewRequest={applicantsPage.handleViewApplicant}
+              onViewRequest={applicantsPage.handleViewRequest}
               onViewReason={applicantsPage.handleViewApplicant}
+              onViewAssign={applicantsPage.handleViewApplicant}
               onClearFilters={applicantsPage.handleClearFilters}
             />
           </CustomScrollbar>
@@ -99,6 +102,21 @@ export const ManagerApplicantsPage = () => {
         applicant={applicantsPage.selectedItem}
         onAccept={applicantsPage.handleAcceptDeniedApplicant}
         onAppeal={applicantsPage.handleAppealDeniedApplicant}
+      />
+
+      <CVModal
+        isOpen={applicantsPage.modals.assign}
+        onClose={() => applicantsPage.closeModal('assign')}
+        applicant={applicantsPage.selectedItem}
+      />
+
+      <ViewApplicationModal
+        isOpen={applicantsPage.modals.viewRequest}
+        onClose={() => applicantsPage.closeModal('viewRequest')}
+        applicant={applicantsPage.selectedItem}
+        onAccept={applicantsPage.handleAcceptApplicant}
+        onDeny={applicantsPage.handleDenyApplicant}
+        onViewProfile={applicantsPage.handleViewProfile}
       />
     </div>
   );

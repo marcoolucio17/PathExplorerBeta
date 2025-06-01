@@ -22,6 +22,7 @@ const useTabbedData = (data = [], options = {}) => {
   }, [data, tabNameField]);
   
   const filteredData = useMemo(() => {
+    
     if (!data || data.length === 0) return [];
     return data.filter(item => item[tabNameField] === activeTab);
   }, [data, activeTab, tabNameField]);
@@ -48,6 +49,7 @@ const useTabbedData = (data = [], options = {}) => {
     });
     
     setTabCounts(counts);
+    
   }, [data, tabNames, tabNameField]);
   
   const handleTabChange = (tab) => {

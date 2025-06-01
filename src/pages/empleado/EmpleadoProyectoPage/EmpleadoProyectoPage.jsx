@@ -203,7 +203,7 @@ export const EmpleadoProyectoPage = () => {
                       roleId: role.id,
                       available: role.available
                     }))}
-                    onDropdownItemClick={(item) => console.log('Selected role:', item)}
+                    onDropdownItemClick={(item) => proyectoPage.handleRoleSelect(item)}
                     className={peopleStyles.halfButton}
                   >
                     All Roles ({(projectData.availableRoles || []).length})
