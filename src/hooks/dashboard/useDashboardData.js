@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import useDataFetching from "../useDataFetching";
-import useListPage from "../useListPage";
-import useModalControl from "../useModalControl";
+// import useDataFetching from "../useDataFetching"; 
+// import useListPage from "../useListPage"; 
+// import useModalControl from "../useModalControl"; 
 import useGetFetch from "../useGetFetch";
 /**
  *
@@ -29,6 +29,7 @@ export const useDashboardData = () => {
   const [roleNameSelected, setRoleNameSelected] = useState("Roles");
   //Selected the id role
   const [roleId, setRoleId] = useState(null);
+  const [filterOptions, setFilterOptions] = useState({}); // Added to manage all filter options centrally
 
   const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
 
@@ -86,29 +87,7 @@ export const useDashboardData = () => {
     }
   };
 
-  //Apply client filters
-  const handleApplyClientFilters = (clientName, clientId) => {
-    //update the Client button text based on selected clients
-    if (clientName && clientId) {
-      setClientNameSelected(clientName);
-      setClientId(clientId);
-    } else {
-      setClientNameSelected("Clients");
-      setClientId(null);
-    }
-  };
 
-  //Apply role filters
-  const handleApplyRoleFilters = (roleName, roleId) => {
-    //update the Role button text based on selected roles
-    if (roleName && roleId) {
-      setRoleNameSelected(roleName);
-      setRoleId(roleId);
-    } else {
-      setRoleNameSelected("Roles");
-      setRoleId(null);
-    }
-  };
   //Apply project name as filter
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
@@ -117,22 +96,24 @@ export const useDashboardData = () => {
         projectName: nameProject, // Update filter options with project name
       });
     } else {
+      // eslint-disable-next-line no-unused-vars
       const { projectName, ...rest } = filterOptions; // Remove project name filter
       setFilterOptions(rest);
     }
   };
   //Apply client filters
-  const handleApplyClientFilters = (clientName, clientId) => {
+  const handleApplyClientFilters = (clientName, selectedClientId) => {
     //update the Client button text based on selected clients
-    if (clientName && clientId) {
+    if (clientName && selectedClientId) {
       setClientNameSelected(clientName);
       setFilterOptions({
         ...filterOptions,
-        idcliente: clientId, // Update filter options with selected client ID
+        idcliente: selectedClientId, // Update filter options with selected client ID
       });
-      setClientId(clientId);
+      setClientId(selectedClientId);
     } else {
       setClientNameSelected("Clients");
+      // eslint-disable-next-line no-unused-vars
       const { idcliente, ...rest } = filterOptions; // Remove client filter
       setFilterOptions(rest);
       setClientId(null);
@@ -140,11 +121,11 @@ export const useDashboardData = () => {
   };
 
   //Apply role filters
-  const handleApplyRoleFilters = (roleName, roleId) => {
+  const handleApplyRoleFilters = (roleName, selectedRoleId) => {
     //update the Role button text based on selected roles
-    if (roleName && roleId) {
+    if (roleName && selectedRoleId) {
       setRoleNameSelected(roleName);
-      setRoleId(roleId);
+      setRoleId(selectedRoleId);
       setFilterOptions({
         ...filterOptions,
         nombrerol: roleName, // Update filter options with selected role ID
@@ -152,6 +133,7 @@ export const useDashboardData = () => {
     } else {
       setRoleNameSelected("Roles");
       setRoleId(null);
+      // eslint-disable-next-line no-unused-vars
       const { nombrerol, ...rest } = filterOptions; // Remove role filter
       setFilterOptions(rest);
     }
@@ -178,6 +160,14 @@ export const useDashboardData = () => {
   // Clear all skill filters
   const clearAllSkillFilters = () => {
     handleApplySkillFilters([]);
+  };
+
+  // Calculate match percentage (placeholder function, implement actual logic)
+  const calculateMatchPercentage = (project) => {
+    // Replace with actual match calculation logic
+    // This is a placeholder and will return 0 for all projects
+    console.warn("calculateMatchPercentage is a placeholder. Implement actual logic.", project);
+    return 0;
   };
 
   // Sort projects function
@@ -254,9 +244,15 @@ export const useDashboardData = () => {
     roleId,
     handleApplyRoleFilters,
     removeSkillFilter,
+    removeClientFilter, 
+    removeRoleFilter,
     clearAllSkillFilters,
     sortProjects,
     flattenProjectsForList,
+    skillSelected, 
+    handdlyApplyNameProject, 
+    filterOptions, 
+    setFilterOptions, 
   };
 };
 

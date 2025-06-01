@@ -1,10 +1,8 @@
 import React from "react";
 
-// Custom Hooks
 import useManagerDashboardPage from '../../../hooks/dashboard/useManagerDashboardPage';
 import useDashboardHeaderConfig from '../../../hooks/dashboard/useDashboardHeaderConfig';
 
-// Components
 import ProjectList from '../../../components/GridList/Project/ProjectList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
@@ -13,34 +11,17 @@ import { RolesModal } from "../../../components/Modals/RolesModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
-import { useNavigate, NavLink } from "react-router";
-// CSS
+
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
-// Modals
-import { CreateProjectModal } from "src/components/Modals/CreateProjectModal";
-
-/**
- * Dashboard component for Manager role
- */
 export const ManagerDashboardPage = () => {
-  // Use the manager-specific dashboard hook
   const dashboardPage = useManagerDashboardPage();
-
-  //get header configuration
   const headerProps = useDashboardHeaderConfig(dashboardPage);
 
-
-  //handle creating a new project
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
   };
-  console.log(dashboardPage.filterOptions);
 
-  console.log("Client name", dashboardPage.clientNameSelected);
-  console.log("Client ID", dashboardPage.clientId);
-  console.log("Role ID", dashboardPage.roleId);
-  console.log("Role name", dashboardPage.roleNameSelected);
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -48,10 +29,8 @@ export const ManagerDashboardPage = () => {
           <h1 className={styles.pageTitle}>Project Dashboard</h1>
         </div>
 
-        {/* Search header with filters */}
         <SearchHeader {...headerProps} />
 
-        {/* Tabs for different project statuses */}
         <Tabs
           tabs={dashboardPage.tabNames.map(tab => ({
             name: tab,
@@ -61,11 +40,8 @@ export const ManagerDashboardPage = () => {
           onTabClick={dashboardPage.setActiveTab}
         />
 
-        {/* Main content area with projects list */}
         <div className={styles.cardsContainer}>
-          {/* New Project button for My Projects tab */}
           {dashboardPage.activeTab === 'My Projects' && (
-
             <div className={styles.tabActionSimple}>
               <Button
                 type="primary"
@@ -76,14 +52,12 @@ export const ManagerDashboardPage = () => {
                 New Project
               </Button>
             </div>
-
           )}
 
-          <CustomScrollbar
-            fadeBackground="transparent"
-            fadeHeight={40}
+          <CustomScrollbar 
+            fadeBackground="transparent" 
+            fadeHeight={40} 
             showHorizontalScroll={false}
-            showSideFades={false}
           >
             <ProjectList
               projects={dashboardPage.displayProjects}
@@ -94,13 +68,11 @@ export const ManagerDashboardPage = () => {
               calculateMatchPercentage={dashboardPage.calculateMatchPercentage}
               onClearFilters={dashboardPage.handleClearFilters}
               isLoading={dashboardPage.isLoading}
-              dashboardShow={dashboardPage.activeTab}
             />
           </CustomScrollbar>
         </div>
       </div>
 
-      {/* Modals */}
       <SkillsModal
         isOpen={dashboardPage.modals.skillsFilter}
         onClose={() => dashboardPage.closeModal('skillsFilter')}

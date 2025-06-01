@@ -14,8 +14,6 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClient, setselectedClient] = useState('');
     const [selectedClientId, setSelectedClientId] = useState(null);
-    const [selectedClient, setselectedClient] = useState('');
-    const [selectedClientId, setSelectedClientId] = useState(null);
 
     useEffect(() => {
         if (isOpen) {

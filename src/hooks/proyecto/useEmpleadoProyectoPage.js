@@ -7,19 +7,19 @@ import useProjectApplication from './useProjectApplication';
 
 function isNonTechnicalSkill(skillName) {
   const nonTechnicalSkills = [
-    'responsabilidad', 'comunicación', 'liderazgo', 'teamwork', 
+    'responsabilidad', 'comunicación', 'liderazgo', 'teamwork',
     'leadership', 'communication', 'responsibility', 'agile',
     'scrum', 'project management', 'time management'
   ];
-  return nonTechnicalSkills.some(skill => 
+  return nonTechnicalSkills.some(skill =>
     skillName.toLowerCase().includes(skill.toLowerCase())
   );
 }
 
 
 function transformBackendProject(projectData, roleId = null) {
-  
-  
+
+
   if (!projectData) {
     console.log('projectData is not being sent or has nothing');
     return null;
@@ -41,7 +41,7 @@ function transformBackendProject(projectData, roleId = null) {
   let primaryRole = null;
 
   const isSpecificRole = roleId && project.proyecto_roles?.find(r => r.idrol == roleId);
-  
+
   if (project.proyecto_roles && Array.isArray(project.proyecto_roles)) {
     project.proyecto_roles.forEach((role, index) => {
       const roleObj = {
@@ -86,13 +86,13 @@ function transformBackendProject(projectData, roleId = null) {
         level: "",
         available: true,
       };
-      
+
       primaryRole = roleObj;
       availableRoles.push(roleObj);
     }
   }
 
-  //transform skills array 
+  //transform skills array
   if (project.habilidades && Array.isArray(project.habilidades)) {
     project.habilidades.forEach((skillName) => {
       requiredSkills.push({
@@ -173,7 +173,7 @@ function transformBackendProject(projectData, roleId = null) {
 function formatDate(dateString) {
   if (!dateString) return "";
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) return dateString; 
+  if (isNaN(date.getTime())) return dateString;
   return date.toLocaleDateString();
 }
 //calculate progress
@@ -184,13 +184,13 @@ function calculateProgress(startDate, endDate) {
   const end = new Date(endDate);
   const now = new Date();
 
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0; 
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
 
   if (now < start) return 0;
   if (now > end) return 100;
 
   const total = end.getTime() - start.getTime();
-  if (total <= 0) return 100; 
+  if (total <= 0) return 100;
   const elapsed = now.getTime() - start.getTime();
 
   return Math.round((elapsed / total) * 100);
@@ -217,7 +217,7 @@ function extractDeliverables(description) {
 function removeDuplicateSkills(skills) {
   const seen = new Set();
   return skills.filter(skill => {
-    const skillName = skill.name; 
+    const skillName = skill.name;
     if (seen.has(skillName)) {
       return false;
     }
@@ -228,7 +228,7 @@ function removeDuplicateSkills(skills) {
 
 //check if user has specific skills
 function checkUserSkills(requiredSkills, userSkills) {
-  const userSkillsSet = new Set(userSkills); 
+  const userSkillsSet = new Set(userSkills);
   return requiredSkills.map(skill => ({
     ...skill,
     isUserSkill: userSkillsSet.has(skill.name)
@@ -257,8 +257,8 @@ const useEmpleadoProyectoPage = () => {
   const peopleSectionRef = useRef(null);
 
   //get actual user ID from localStorage (replace 'user_id' with the correct key your app uses)
-  const userId = localStorage.getItem('user_id') || localStorage.getItem('userId') || '1'; 
-  
+  const userId = localStorage.getItem('user_id') || localStorage.getItem('userId') || '1';
+
   console.log('User Authentication');
   console.log('User ID from localStorage:', userId);
   console.log('Available localStorage keys:', Object.keys(localStorage));
@@ -278,7 +278,7 @@ const useEmpleadoProyectoPage = () => {
   //user skills for compatibility calculation temp only
   const [userSkills] = useState([
     "JavaScript",
-    "Agile", 
+    "Agile",
     "Figma"
   ]);
 
@@ -303,23 +303,23 @@ const useEmpleadoProyectoPage = () => {
   //actions
   const handleShowApplication = useCallback(() => {
     openModal('application');
-  };
+  }, [openModal]);
 
   const handleSubmitApplication = useCallback(async (applicationData) => {
     try {
       const result = await submitApplication(applicationData);
-      
+
       if (result.success) {
         closeModal('application');
         console.log('Application submitted successfully:', result.data);
       } else {
         console.error('Error submitting application:', result.error);
-        
+
       }
     } catch (err) {
       console.error('Unexpected error submitting application:', err);
     }
-  }, [submitApplication, closeModal]); 
+  }, [submitApplication, closeModal]);
 
   const handleShowCompatibility = () => {
     openModal('compatibility');
@@ -335,15 +335,15 @@ const useEmpleadoProyectoPage = () => {
 
   const handleMemberSelect = (member) => {
     console.log('Selected member:', member);
-  }, []);
+  };
 
   const handleRoleSelect = useCallback((roleItem) => {
-    const roleId = roleItem.roleId;
-    if (roleId) {
-      navigate(`/empleado/proyecto/${projectId}/${roleId}`);
+    const selectedRoleId = roleItem.roleId; // Changed roleId to selectedRoleId to avoid conflict with useParams roleId
+    if (selectedRoleId) {
+      navigate(`/empleado/proyecto/${projectId}/${selectedRoleId}`);
     }
   }, [navigate, projectId]);
-  
+
   //calculate compatibility percentage
   const calculateCompatibilityPercentage = useCallback(() => {
     if (!enhancedProjectData?.requiredSkills || enhancedProjectData.requiredSkills.length === 0) {
@@ -355,27 +355,27 @@ const useEmpleadoProyectoPage = () => {
     const matchingSkills = enhancedProjectData.requiredSkills.filter(skill =>
       userSkillsSet.has(skill.name)
     ).length;
-    
+
     return totalSkills > 0 ? Math.round((matchingSkills / totalSkills) * 100) : 0;
-  };
+  }, [enhancedProjectData, userSkills]);
 
   return {
     // Data
     projectData,
     userSkills,
-    
+
     // State
     isApplied,
-    isLoading: isLoadingApplication, 
+    isLoading: isLoadingApplication,
 
     // Refs
     peopleSectionRef,
-    
+
     // Modals
     modals,
     openModal,
     closeModal,
-    
+
     // Actions
     handleShowApplication,
     handleSubmitApplication,

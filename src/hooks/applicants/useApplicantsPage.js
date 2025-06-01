@@ -4,23 +4,16 @@ import useFetch from '../useFetch';
 import axios from 'axios';
 import { sortApplicants } from '../../utils/sortApplicants';
 
-/**
- * Main hook for the Applicants page, combining all functionality
- * 
- * @returns {Object} Complete state and functions for the Applicants page
- */
 export const useApplicantsPage = () => {
-  // Search term will be managed by the list page hook
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // Cache for match percentages
   const matchPercentagesRef = useRef({});
   
-  // Fetch applications data for manager ID 4
-  const managerId = 4;
+  //get actual manager id from storage instead of hardcoded value
+  const managerId = localStorage.getItem("id") || sessionStorage.getItem("id") || 4;
+  console.log("Using manager ID:", managerId); //debug log
+  
   const { data: apiData, loading: apiLoading, error: apiError } = useFetch(`creador/${managerId}/aplicaciones`);
   
-  // Map Spanish status to English tabs
   const mapStatusToTab = (estatus) => {
     const statusMap = {
       'Pendiente': 'Pending',
@@ -28,10 +21,9 @@ export const useApplicantsPage = () => {
       'Asignado': 'Accepted',
       'Rechazado': 'Denied'
     };
-    return statusMap[estatus] || 'Pending'; // Default to Pending if unknown status
+    return statusMap[estatus] || 'Pending';
   };
   
-  // Transform API data to match expected format
   const transformApiData = (rawData) => {
     if (!rawData || !Array.isArray(rawData)) return [];
     
@@ -58,9 +50,8 @@ export const useApplicantsPage = () => {
     }));
   };
   
-  //debug api response?
   useEffect(() => {
-    console.log('debug Information');
+    console.log('debug Information for manager:', managerId);
     console.log('Loading:', apiLoading);
     console.log('Error:', apiError);
     console.log('Raw API Data:', apiData);
@@ -85,14 +76,12 @@ export const useApplicantsPage = () => {
         console.log('User Name:', transformedData[0].name);
       }
       
-      //debug status distribution
       const statusCounts = transformedData.reduce((acc, item) => {
         acc[item.status] = (acc[item.status] || 0) + 1;
         return acc;
       }, {});
       console.log('Status Distribution:', statusCounts);
       
-      //debug project distribution
       const projectCounts = transformedData.reduce((acc, item) => {
         acc[item.project] = (acc[item.project] || 0) + 1;
         return acc;
@@ -101,9 +90,8 @@ export const useApplicantsPage = () => {
       console.log('Final Applicants being used:', transformedData);
     }
     console.log('=== End API Debug ===');
-  }, [apiData, apiLoading, apiError]);
+  }, [apiData, apiLoading, apiError, managerId]);
   
-  //transform the api data
   const finalApplicants = useMemo(() => {
     if (apiLoading) {
       console.log('API still loading...');
@@ -122,7 +110,6 @@ export const useApplicantsPage = () => {
     return [];
   }, [apiData, apiLoading, apiError]);
 
-  //generate project and skill options from API data
   const projectOptions = useMemo(() => {
     const projects = finalApplicants.map(app => app.project).filter(Boolean);
     const uniqueProjects = [...new Set(projects)];
@@ -134,7 +121,6 @@ export const useApplicantsPage = () => {
     return [...new Set(allSkills)];
   }, [finalApplicants]);
 
-  //calculate match percentage function
   const calculateMatchPercentage = (applicant, showCompatibility = true) => {
     if (!applicant || !showCompatibility) return 0;
     
@@ -156,12 +142,10 @@ export const useApplicantsPage = () => {
     });
   };
 
-  //dummy setApplicants function for compatibility
   const setApplicants = (updater) => {
     console.log('setApplicants called (API data is read-only):', updater);
   };
 
-  //patch application status function
   const patchApplicationStatus = async (userId, applicationId, newStatus) => {
     try {
       const url = `https://pathexplorer-backend.onrender.com/api/apps/usuario/${userId}/app/${applicationId}`;
@@ -183,10 +167,8 @@ export const useApplicantsPage = () => {
     }
   };
 
-  // Tab names for the page
   const tabNames = ['Pending', 'In Review', 'Accepted', 'Denied'];
 
-  // Setup list page logic
   const listPage = useListPage({
     data: finalApplicants,
     defaultSortOption: 'date_desc',
@@ -203,31 +185,26 @@ export const useApplicantsPage = () => {
     baseUrl: '/manager/dashboard'
   });
   
-  //update search term when ListPage updates it
   useEffect(() => {
     setSearchTerm(listPage.searchTerm);
   }, [listPage.searchTerm]);
 
-  // Compatibility effect - recalculate match percentages when enabled
   useEffect(() => {
     if (listPage.showCompatibility && !listPage.compatibilityLoading) {
       refreshMatchPercentages();
     }
   }, [listPage.showCompatibility, listPage.compatibilityLoading]);
 
-  // Additional applicant-specific handlers
   const handleAcceptDeniedApplicant = (applicant) => {
     console.log('handleAcceptDeniedApplicant called for:', applicant);
     listPage.closeModal('denialReason');
   };
   
-  //maybe theres no appeal ,get rid of it
   const handleAppealDeniedApplicant = (applicant, appealReason) => {
     console.log(`Appeal submitted for ${applicant.name}: ${appealReason}`);
     listPage.closeModal('denialReason');
   };
 
-  // Generate active filters for header
   const getActiveFilters = () => {
     const filters = {};
     
@@ -254,7 +231,6 @@ export const useApplicantsPage = () => {
     return filters;
   };
 
-  // Custom handler for viewing applicants with special handling for denied ones
   const handleViewApplicant = (applicantId) => {
     const applicant = finalApplicants.find(app => app.id === applicantId);
     if (applicant && applicant.status === 'Denied') {
@@ -270,14 +246,12 @@ export const useApplicantsPage = () => {
     }
   };
 
-  //handler for view request button
   const handleViewRequest = (applicantId) => {
     const applicant = finalApplicants.find(app => app.id === applicantId);
     listPage.setSelectedItem(applicant);
     listPage.openModal('viewRequest');
   };
 
-  //handlers for modal actions
   const handleAcceptApplicant = async (applicant) => {
     console.log('accept applicant:', applicant);
     
@@ -285,7 +259,6 @@ export const useApplicantsPage = () => {
       const result = await patchApplicationStatus(applicant.userId, applicant.id, 'Revision');
       if (result.success) {
         console.log('Application accepted successfully');
-        //refresh data by reloading
         window.location.reload();
       } else {
         console.error('Failed to accept application');
@@ -304,7 +277,6 @@ export const useApplicantsPage = () => {
       const result = await patchApplicationStatus(applicant.userId, applicant.id, 'Rechazado');
       if (result.success) {
         console.log('Application denied successfully');
-        //refresh data by reloading
         window.location.reload();
       } else {
         console.error('Failed to deny application');
@@ -320,7 +292,6 @@ export const useApplicantsPage = () => {
     console.log('view profile:', applicant);
   };
 
-  //a wrapper for calculate match percentage that includes showCompatibility
   const calculateApplicantMatchPercentage = (applicant) => {
     return calculateMatchPercentage(applicant, listPage.showCompatibility);
   };
@@ -339,7 +310,6 @@ export const useApplicantsPage = () => {
     handleDenyApplicant,
     handleViewProfile,
     tabNames,
-    //expose api state for debugging
     apiLoading,
     apiError,
     apiData
