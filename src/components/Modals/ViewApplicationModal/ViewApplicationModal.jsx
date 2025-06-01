@@ -10,7 +10,7 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
 
   //debug feedback fetching
   useEffect(() => {
-    console.log('=== Feedback Debug ===');
+    console.log('=== Fdebug ===');
     console.log('Modal isOpen:', isOpen);
     console.log('Applicant exists:', !!applicant);
     console.log('Applicant:', applicant);
@@ -19,14 +19,14 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
       console.log('Application ID (applicant.id):', applicant.id);
       console.log('User ID (applicant.userId):', applicant.userId);
       console.log('User ID type:', typeof applicant.userId);
-      console.log('User ID is truthy:', !!applicant.userId);
+      console.log('User ID isbeing returned:', !!applicant.userId);
       
       if (applicant.userId) {
         const fullUrl = `https://pathexplorer-backend.onrender.com/api/feedback/${applicant.userId}`;
         console.log('Feedback endpoint path:', `feedback/${applicant.userId}`);
         console.log('Full URL being called:', fullUrl);
       } else {
-        console.log('❌ USER ID IS MISSING - no fetch will be made');
+        console.log('user id is missing');
       }
     }
     

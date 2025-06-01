@@ -40,7 +40,6 @@ function transformBackendProject(projectData, roleId = null) {
   const availableRoles = [];
   let primaryRole = null;
 
-  // Handle role data - check if we're viewing a specific role
   const isSpecificRole = roleId && project.proyecto_roles?.find(r => r.idrol == roleId);
   
   if (project.proyecto_roles && Array.isArray(project.proyecto_roles)) {
@@ -53,7 +52,6 @@ function transformBackendProject(projectData, roleId = null) {
         available: role.estado === "Pendiente",
       };
 
-      // If viewing specific role, make it primary
       if (isSpecificRole && role.idrol == roleId) {
         primaryRole = roleObj;
       } else if (!isSpecificRole && index === 0) {
@@ -106,7 +104,7 @@ function transformBackendProject(projectData, roleId = null) {
       });
     });
   } else {
-    // Fallback skills when backend doesn't provide them
+    //fallback skills
     const fallbackSkills = ['JavaScript', 'React', 'Node.js', 'SQL', 'Git'];
     fallbackSkills.forEach((skillName) => {
       requiredSkills.push({
@@ -131,7 +129,6 @@ function transformBackendProject(projectData, roleId = null) {
       });
     });
   } else {
-    // Add some default team members when backend doesn't provide them
     members.push({
       id: 1,
       name: 'Project Manager',
@@ -245,7 +242,7 @@ const useEmpleadoProyectoPage = () => {
   const { projectId, roleId } = useParams();
   const navigate = useNavigate();
 
-  //Always use /completo to get all project data (better than por-rol)
+  //always use /completo to get all project data (better than por-rol)
   const { data, error, loading } = useFetch(`${projectId || '87'}/completo`);
 
   // Modal control
@@ -262,20 +259,19 @@ const useEmpleadoProyectoPage = () => {
   //get actual user ID from localStorage (replace 'user_id' with the correct key your app uses)
   const userId = localStorage.getItem('user_id') || localStorage.getItem('userId') || '1'; 
   
-  console.log('=== DEBUG: User Authentication ===');
+  console.log('User Authentication');
   console.log('User ID from localStorage:', userId);
   console.log('Available localStorage keys:', Object.keys(localStorage));
-  console.log('====================================='); 
 
   //transform backend data to frontend format
   const projectData = useMemo(() => {
     const transformed = transformBackendProject(data, roleId);
-    console.log('=== DEBUG: Project Data ===');
-    console.log('Raw backend data:', data);
+    console.log('DEBUG: Project Data');
+    console.log('Raw dogging backend data:', data);
     console.log('Transformed project data:', transformed);
     console.log('Project ID from params:', projectId);
     console.log('Role ID from params:', roleId);
-    console.log('=========================');
+    console.log('---------------------------------');
     return transformed;
   }, [data, roleId]);
 
@@ -296,7 +292,7 @@ const useEmpleadoProyectoPage = () => {
     };
   }, [projectData, userSkills]);
 
-  // Project application hook (after project data is ready)
+  //project data
   const {
     submitApplication,
     isLoading: isLoadingApplication,
@@ -344,7 +340,6 @@ const useEmpleadoProyectoPage = () => {
   const handleRoleSelect = useCallback((roleItem) => {
     const roleId = roleItem.roleId;
     if (roleId) {
-      // Navigate to /empleado/proyecto/{projectId}/{roleId} (not /por-rol/)
       navigate(`/empleado/proyecto/${projectId}/${roleId}`);
     }
   }, [navigate, projectId]);
@@ -356,7 +351,7 @@ const useEmpleadoProyectoPage = () => {
     }
 
     const totalSkills = enhancedProjectData.requiredSkills.length;
-    const userSkillsSet = new Set(userSkills); // Use the Set for efficient lookup
+    const userSkillsSet = new Set(userSkills); //use the set
     const matchingSkills = enhancedProjectData.requiredSkills.filter(skill =>
       userSkillsSet.has(skill.name)
     ).length;
