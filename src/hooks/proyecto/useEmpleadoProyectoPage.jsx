@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import useModalControl from "../useModalControl";
 import useFetch from "../useFetch";
 
@@ -148,7 +148,7 @@ const useEmpleadoProyectoPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  });
 
   const handleShowCompatibility = () => {
     openModal("compatibility");
@@ -201,12 +201,12 @@ const useEmpleadoProyectoPage = () => {
 
     // Actions
     handleShowApplication,
-    handleSubmitApplication,
+    //handleSubmitApplication,
     handleShowCompatibility,
     handleShowSkills,
     handleShowAllSkills,
     handleMemberSelect,
-    handleRoleSelect,
+    //handleRoleSelect,
     calculateCompatibilityPercentage,
   };
 };

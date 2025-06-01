@@ -245,7 +245,7 @@ export const EmpleadoProyectoPage = () => {
         isOpen={proyectoPage.modals.application}
         onClose={() => proyectoPage.closeModal('application')}
         projectData={projectData}
-        onSubmitApplication={proyectoPage.handleSubmitApplication}
+        onSubmitApplication={() => console.log("submitted app") }//proyectoPage.handleSubmitApplication}
         isLoading={isLoading}
       />
     </div>
