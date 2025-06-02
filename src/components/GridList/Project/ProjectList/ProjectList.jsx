@@ -1,5 +1,6 @@
 import React from "react";
 import ProjectCard from "src/components/GridList/Project/ProjectCard";
+import { ProjectLoadingState } from "src/components/LoadingSpinner";
 import styles from "src/styles/GridList/GridListContainer.module.css";
 
 import { Navigate, Link, useNavigate, NavLink } from "react-router";
@@ -29,12 +30,15 @@ const ProjectList = ({
   // Safety check for undefined/null projects array
   const safeProjects = Array.isArray(projects) ? projects : [];
 
-  // If loading, show loader
+  //if loading, show enhanced project loading state
   if (isLoading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loader}></div>
-      </div>
+      <ProjectLoadingState 
+        message="Loading projects..." 
+        viewMode={viewMode}
+        showSkeletonCards={true}
+        skeletonCount={6}
+      />
     );
   }
 

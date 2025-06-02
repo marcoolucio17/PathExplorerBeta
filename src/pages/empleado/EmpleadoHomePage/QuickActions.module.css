@@ -1,17 +1,9 @@
 /* QuickActions.module.css */
-.sectionTitle {
-  font-size: 1rem;
-  font-weight: 500;
-  color: white;
-  margin: 0 0 0.75rem 0;
-  text-align: left;
-  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
 
 .actionsContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 1rem;
 }
 
 .actionItem {
@@ -42,10 +34,10 @@
 }
 
 .actionTitle {
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
-  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Graphik Light';
 }
 
 .actionButton {

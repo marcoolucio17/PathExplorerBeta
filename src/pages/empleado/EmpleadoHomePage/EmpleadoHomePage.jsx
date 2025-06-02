@@ -120,6 +120,7 @@ export const EmpleadoHomePage = () => {
                 {recommendedProjects.map((project) => (
                   <GlassCard key={project.idproyecto} className={pageStyles.projectCard}>
                     <h4 className={pageStyles.projectName}>{project.pnombre}</h4>
+                    <div className={pageStyles.recommendationTitle}>Compatibility:</div>
                     <div className={pageStyles.matchPercentage}>{project.matchPercentage}%</div>
                     <div className={pageStyles.skillsContainer}>
                       {project.skills.map((skill, idx) => (
