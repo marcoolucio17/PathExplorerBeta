@@ -13,6 +13,7 @@ import { DenialReasonModal } from "../../../components/Modals/DenialReasonModal"
 import { ProjectFilterModal } from "../../../components/Modals/ProjectFilterModal";
 import { CVModal } from "src/components/Modals/CVModal";
 import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
+import { AssignEmployeeModal } from "../../../components/Modals/AssignEmployeeModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 
@@ -121,6 +122,15 @@ export const ManagerApplicantsPage = () => {
         onAccept={applicantsPage.handleAcceptApplicant}
         onDeny={applicantsPage.handleDenyApplicant}
         onViewProfile={applicantsPage.handleViewProfile}
+        readOnly={applicantsPage.selectedItem?.status === 'In Review'}
+      />
+
+      <AssignEmployeeModal
+        isOpen={applicantsPage.modals.assignEmployee}
+        onClose={() => applicantsPage.closeModal('assignEmployee')}
+        applicant={applicantsPage.selectedItem}
+        onDeny={applicantsPage.handleDenyApplicant}
+        onAssignSuccess={applicantsPage.handleAssignSuccess}
       />
     </div>
   );

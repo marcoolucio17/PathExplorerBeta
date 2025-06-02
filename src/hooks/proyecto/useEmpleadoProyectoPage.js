@@ -302,7 +302,7 @@ const useEmpleadoProyectoPage = () => {
   // Refs
   const peopleSectionRef = useRef(null);
 
-  //get actual user ID from localStorage (replace 'user_id' with the correct key your app uses)
+  //get actual user ID from localStorage
   const userId = localStorage.getItem('user_id') || localStorage.getItem('userId') || localStorage.getItem('id') || '1'; 
   
   console.log('User Authentication');
@@ -311,50 +311,6 @@ const useEmpleadoProyectoPage = () => {
 
   //check if user has already applied to this project
   const { data: userApplications, loading: applicationsLoading } = useFetch(`apps/usuario/${userId}`);
-
-  //check if user has applied to current project
-  const hasAppliedToProject = useMemo(() => {
-    if (!userApplications || !Array.isArray(userApplications) || !projectData?.availableRoles) {
-      return false;
-    }
-
-    //get all role IDs from current project
-    const projectRoleIds = projectData.availableRoles.map(role => role.id);
-    
-    //check if user has applied to any role in this project
-    const hasApplied = userApplications.some(application => 
-      projectRoleIds.includes(application.idrol)
-    );
-
-    console.log('=== APPLICATION CHECK ===');
-    console.log('Project role IDs:', projectRoleIds);
-    console.log('User applications:', userApplications);
-    console.log('Has applied to project:', hasApplied);
-    console.log('========================');
-
-    return hasApplied;
-  }, [userApplications, projectData?.availableRoles]);
-
-  //transform backend data to frontend format
-  const projectData = useMemo(() => {
-    const transformed = transformBackendProject(data, roleId);
-    console.log('DEBUG: Project Data');
-    console.log('Raw backend data:', data);
-    console.log('Data type:', Array.isArray(data) ? 'Array' : typeof data);
-    console.log('Data length:', Array.isArray(data) ? data.length : 'N/A');
-    console.log('Transformed project data:', transformed);
-    console.log('Project ID from params:', projectId);
-    console.log('Role ID from params:', roleId);
-    console.log('---------------------------------');
-    return transformed;
-  }, [data, roleId, projectId]);
-
-  //user skills for compatibility calculation temp only
-  const [userSkills] = useState([
-    "Python",
-    "C#",
-    "Figma"
-  ]);
 
   //transform backend data to frontend format
   const projectData = useMemo(() => {
@@ -416,20 +372,10 @@ const useEmpleadoProyectoPage = () => {
   }, [openModal]);
 
   const handleSubmitApplication = useCallback(async (applicationData) => {
-    try {
-      const result = await submitApplication(applicationData);
-      
-      if (result.success) {
-        closeModal('application');
-        console.log('Application submitted successfully:', result.data);
-      } else {
-        console.error('Error submitting application:', result.error);
-        
-      }
-    } catch (err) {
-      console.error('Unexpected error submitting application:', err);
-    }
-  }, [submitApplication, closeModal]); 
+    console.log('Application submitted:', applicationData);
+    //refresh applications after successful submission
+    //note: in a real app you might want to invalidate the cache or refetch
+  }, []);
 
   const handleShowCompatibility = useCallback(() => {
     openModal('compatibility');
@@ -465,7 +411,7 @@ const useEmpleadoProyectoPage = () => {
     }
 
     const totalSkills = enhancedProjectData.requiredSkills.length;
-    const userSkillsSet = new Set(userSkills); //use the set
+    const userSkillsSet = new Set(userSkills);
     const matchingSkills = enhancedProjectData.requiredSkills.filter(skill =>
       userSkillsSet.has(skill.name)
     ).length;
@@ -497,7 +443,7 @@ const useEmpleadoProyectoPage = () => {
 
     // State
     isApplied: hasAppliedToProject,
-    isLoading: false, //remove application loading since we're not using the old hook
+    isLoading: false,
 
     // Refs
     peopleSectionRef,

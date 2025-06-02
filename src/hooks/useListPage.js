@@ -88,7 +88,7 @@ export const useListPage = ({
     toggle: toggleCompatibility,
   } = useToggleState(false, 1500);
 
-  // Modal controls
+  //modal controls
   const { modals, openModal, closeModal } = useModalControl({
     skillsFilter: false,
     clientsFilter: false,
@@ -96,6 +96,9 @@ export const useListPage = ({
     projectFilter: false,
     denialReason: false,
     details: false,
+    viewRequest: false,
+    assign: false,
+    assignEmployee: false,
   });
 
   //selected item for modals

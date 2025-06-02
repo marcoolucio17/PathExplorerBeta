@@ -15,39 +15,86 @@ export const useApplicantsPage = () => {
   const { data: apiData, loading: apiLoading, error: apiError } = useFetch(`creador/${managerId}/aplicaciones`);
   
   const mapStatusToTab = (estatus) => {
+    console.log('mapping status:', estatus);
     const statusMap = {
       'Pendiente': 'Pending',
       'Revision': 'In Review', 
       'Asignado': 'Accepted',
-      'Rechazado': 'Denied'
+      'Rechazado': 'Denied',
+      'RolAsignado': null //dont show these in any tab - they should be filtered out
     };
-    return statusMap[estatus] || 'Pending';
+    
+    //check if the status exists in the map
+    if (statusMap.hasOwnProperty(estatus)) {
+      const mapped = statusMap[estatus];
+      console.log('mapped to:', mapped);
+      return mapped;
+    } else {
+      //unknown status, default to pending
+      console.log('unknown status, defaulting to Pending');
+      return 'Pending';
+    }
   };
   
   const transformApiData = (rawData) => {
     if (!rawData || !Array.isArray(rawData)) return [];
     
-    return rawData.map(item => ({
-      id: item.idaplicacion,
-      name: item.usuario?.nombre || 'Unknown User',
-      email: item.usuario?.correoelectronico || '',
-      avatar: item.usuario?.fotodeperfil_url || null,
-      profileImage: item.usuario?.fotodeperfil_url || null,
-      status: mapStatusToTab(item.estatus),
-      date: item.fechaaplicacion,
-      appliedDate: item.fechaaplicacion,
-      lastActive: item.fechaaplicacion,
-      message: item.message || '',
-      project: item.nombreproyecto || 'Unknown Project',
-      projectId: item.idproyecto,
-      role: item.roles?.nombrerol || 'Unknown Role',
-      roleDescription: item.roles?.descripcionrol || '',
-      userId: item.idusuario,
-      roleId: item.idrol,
-      experience: '2+ years',
-      skills: ['JavaScript', 'React'],
-      compatibility: Math.floor(Math.random() * 101)
-    }));
+    console.log('=== RAW BACKEND DATA ===');
+    rawData.forEach((item, index) => {
+      console.log(`Item ${index}:`, {
+        id: item.idaplicacion,
+        status: item.estatus,
+        user: item.usuario?.nombre,
+        project: item.nombreproyecto,
+        fullItem: item
+      });
+    });
+    console.log('=== END RAW DATA ===');
+    
+    const transformed = rawData
+      .map(item => {
+        const mappedStatus = mapStatusToTab(item.estatus);
+        console.log(`Processing item ${item.idaplicacion}: ${item.estatus} -> ${mappedStatus}`);
+        
+        //filter out items that shouldnt be shown (RolAsignado)
+        if (mappedStatus === null) {
+          console.log('FILTERING OUT item with status:', item.estatus, 'mapped to:', mappedStatus);
+          return null;
+        }
+        
+        console.log('KEEPING item with status:', item.estatus, 'mapped to:', mappedStatus);
+        
+        return {
+          id: item.idaplicacion,
+          name: item.usuario?.nombre || 'Unknown User',
+          email: item.usuario?.correoelectronico || '',
+          avatar: item.usuario?.fotodeperfil_url || null,
+          profileImage: item.usuario?.fotodeperfil_url || null,
+          status: mappedStatus,
+          date: item.fechaaplicacion,
+          appliedDate: item.fechaaplicacion,
+          lastActive: item.fechaaplicacion,
+          message: item.message || '',
+          project: item.nombreproyecto || 'Unknown Project',
+          projectId: item.idproyecto,
+          role: item.roles?.nombrerol || 'Unknown Role',
+          roleDescription: item.roles?.descripcionrol || '',
+          userId: item.idusuario,
+          roleId: item.idrol,
+          experience: '2+ years',
+          skills: ['JavaScript', 'React'],
+          compatibility: Math.floor(Math.random() * 101)
+        };
+      })
+      .filter(item => {
+        const kept = item !== null;
+        console.log('Filter result:', kept ? 'KEPT' : 'REMOVED');
+        return kept;
+      });
+      
+    console.log('FINAL TRANSFORMED ITEMS:', transformed.length);
+    console.log('FINAL ITEMS:', transformed);
+    return transformed;
   };
   
   useEffect(() => {
@@ -148,9 +195,13 @@ export const useApplicantsPage = () => {
 
   const patchApplicationStatus = async (userId, applicationId, newStatus) => {
     try {
+      const currentDate = new Date().toISOString().split('T')[0]; //format: YYYY-MM-DD
       const url = `https://pathexplorer-backend.onrender.com/api/apps/usuario/${userId}/app/${applicationId}`;
       const response = await axios.patch(url, 
-        { estatus: newStatus },
+        { 
+          estatus: newStatus,
+          fechaaplicacion: currentDate
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -232,24 +283,40 @@ export const useApplicantsPage = () => {
   };
 
   const handleViewApplicant = (applicantId) => {
+    console.log('handleViewApplicant called with id:', applicantId);
     const applicant = finalApplicants.find(app => app.id === applicantId);
+    console.log('found applicant:', applicant);
+    console.log('applicant status:', applicant?.status);
+    console.log('modals object:', listPage.modals);
+    
     if (applicant && applicant.status === 'Denied') {
+      console.log('opening denialReason modal');
       listPage.setSelectedItem(applicant);
       listPage.openModal('denialReason');
     }
     else if (applicant && applicant.status === 'Accepted') {
+      console.log('opening assignEmployee modal');
       listPage.setSelectedItem(applicant);
-      listPage.openModal('assign');
+      listPage.openModal('assignEmployee');
     } else {
+      console.log('opening viewRequest modal');
       listPage.setSelectedItem(applicant);
       listPage.openModal('viewRequest');
     }
   };
 
   const handleViewRequest = (applicantId) => {
+    console.log('handleViewRequest called with:', applicantId);
     const applicant = finalApplicants.find(app => app.id === applicantId);
+    console.log('found applicant:', applicant);
     listPage.setSelectedItem(applicant);
     listPage.openModal('viewRequest');
+  };
+
+  //override handleViewItem to prevent unwanted navigation
+  const handleViewItem = (itemId) => {
+    console.log('handleViewItem blocked for applicants page:', itemId);
+    //do nothing - we handle navigation through specific handlers
   };
 
   const handleAcceptApplicant = async (applicant) => {
@@ -292,6 +359,50 @@ export const useApplicantsPage = () => {
     console.log('view profile:', applicant);
   };
 
+  const handleAssignEmployee = async (applicant) => {
+    console.log('assign employee:', applicant);
+    
+    try {
+      const result = await patchApplicationStatus(applicant.userId, applicant.id, 'RolAsignado');
+      if (result.success) {
+        console.log('Application assigned successfully');
+        window.location.reload();
+      } else {
+        console.error('Failed to assign application');
+      }
+    } catch (error) {
+      console.error('Error assigning application:', error);
+    }
+    
+    listPage.closeModal('assignEmployee');
+  };
+
+  const handleAssignSuccess = () => {
+    console.log('=== HANDLE ASSIGN SUCCESS START ===');
+    console.log('assignment completed successfully');
+    
+    //now update the application status to RolAsignado
+    const applicant = listPage.selectedItem;
+    if (applicant) {
+      console.log('updating application status for:', applicant);
+      patchApplicationStatus(applicant.userId, applicant.id, 'RolAsignado')
+        .then(result => {
+          console.log('patch result:', result);
+          if (result.success) {
+            console.log('application status updated successfully');
+          } else {
+            console.error('failed to update application status');
+          }
+        })
+        .catch(error => {
+          console.error('error updating application status:', error);
+        });
+    }
+    
+    listPage.closeModal('assignEmployee');
+    console.log('=== HANDLE ASSIGN SUCCESS END ===');
+  };
+
   const calculateApplicantMatchPercentage = (applicant) => {
     return calculateMatchPercentage(applicant, listPage.showCompatibility);
   };
@@ -306,9 +417,12 @@ export const useApplicantsPage = () => {
     getActiveFilters,
     handleViewApplicant,
     handleViewRequest,
+    handleViewItem,
     handleAcceptApplicant,
     handleDenyApplicant,
     handleViewProfile,
+    handleAssignEmployee,
+    handleAssignSuccess,
     tabNames,
     apiLoading,
     apiError,
