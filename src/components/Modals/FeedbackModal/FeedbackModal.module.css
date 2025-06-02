@@ -1,0 +1,233 @@
+/* FeedbackModal specific styles */
+
+.feedbackContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* User info section */
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 1rem;
+  background: var(--modal-input-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid var(--modal-input-border);
+}
+
+.userAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--modal-input-bg);
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userDetails h3 {
+  margin: 0 0 5px 0;
+  color: var(--text-light);
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: var(--btn-font-family);
+}
+
+.userDetails p {
+  margin: 0 0 8px 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.userType {
+  background: var(--modal-button-primary-bg);
+  color: var(--text-light);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-family: var(--btn-font-family);
+}
+
+/* Project info */
+.projectInfo {
+  padding: 1rem;
+  background: var(--modal-input-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid var(--modal-input-border);
+}
+
+.projectInfo h4 {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: var(--btn-font-family);
+}
+
+/* Form sections */
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: var(--btn-font-family);
+}
+
+.formLabel i {
+  color: var(--modal-accent);
+}
+
+/* Rating input */
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 1rem;
+  background: var(--modal-input-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid var(--modal-input-border);
+}
+
+.ratingSlider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--modal-input-border);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ratingSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--modal-button-primary-bg);
+  cursor: pointer;
+  border: 2px solid var(--text-light);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ratingSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--modal-button-primary-bg);
+  cursor: pointer;
+  border: 2px solid var(--text-light);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ratingValue {
+  background: var(--modal-button-primary-bg);
+  color: var(--text-light);
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 30px;
+  text-align: center;
+  font-family: var(--btn-font-family);
+}
+
+/* Textarea */
+.formTextarea {
+  padding: 1rem;
+  border: 1px solid var(--modal-input-border);
+  border-radius: 12px;
+  background: var(--modal-input-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text-light);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: all 0.2s ease;
+}
+
+.formTextarea:focus {
+  outline: none;
+  border-color: var(--modal-input-focus-border);
+  background: var(--modal-input-focus-bg);
+}
+
+.formTextarea::placeholder {
+  color: var(--text-muted-darker);
+  font-style: italic;
+}
+
+.formTextarea.error {
+  border-color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+/* Character count */
+.characterCount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.errorText {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .userInfo {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .ratingContainer {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

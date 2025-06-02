@@ -16,7 +16,7 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
 /**
  * Dashboard component for Employee role
- * (Same as Manager but without "View Applicants" and "New Project" buttons)
+ * 
  */
 export const EmpleadoDashboardPage = () => {
   // Use the employee-specific dashboard hook

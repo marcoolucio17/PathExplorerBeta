@@ -26,8 +26,7 @@ export const useUsersDashboardPage = () => {
     }
   }, [usuarios]);
   
-  //user-specific tab names - only show all
-  const tabNames = ['all'];
+  const tabNames = ['All Employees'];
   
   //modal controls
   const { 
@@ -39,13 +38,12 @@ export const useUsersDashboardPage = () => {
     skillsFilter: false
   });
   
-  //toggle for compatibility view (not used for users but keeping for consistency)
   const { 
     state: showCompatibility,
     toggle: toggleCompatibility 
   } = useToggleState(false);
   
-  //setup list page logic
+
   const listPage = useListPage({
     data: usuarios || [],
     defaultSortOption: 'name_asc',
@@ -58,8 +56,7 @@ export const useUsersDashboardPage = () => {
     sortFunction: sortUsers,
     baseUrl: '/employee-dashboard'
   });
-  
-  //user sorting function
+
   function sortUsers(users, sortOption) {
     if (!users || users.length === 0) return [];
     
@@ -82,8 +79,7 @@ export const useUsersDashboardPage = () => {
         return sortedUsers;
     }
   }
-  
-  //override toggleViewMode to ensure animation works consistently
+
   const toggleViewMode = useCallback(() => {
     listPage.toggleViewMode();
     
@@ -107,7 +103,6 @@ export const useUsersDashboardPage = () => {
   
   //get filtered users for the current tab
   const getTabUsers = () => {
-    //only show all users, no filtering
     return sortUsers(usuarios || [], listPage.sortOption);
   };
   
@@ -131,14 +126,13 @@ export const useUsersDashboardPage = () => {
   //compute display users
   const displayUsers = getTabUsers();
   
-  //calculate tab counts - set to 0 to hide badges
   const tabCounts = useMemo(() => {
-    return { 'all': 0 }; //no badges
+    return { 'all': 0 }; 
   }, [usuarios]);
 
   return {
     ...listPage,
-    displayProjects: displayUsers, //keeping same property name for consistency with components
+    displayProjects: displayUsers, 
     usuarios,
     tabNames,
     showCompatibility,
@@ -155,9 +149,9 @@ export const useUsersDashboardPage = () => {
     isLoading,
     error,
     //user-specific properties
-    userSkills: [], //empty for consistency
-    selectedSkillFilters: [], //empty for consistency
-    calculateMatchPercentage: () => 0 //empty function for consistency
+    userSkills: [],
+    selectedSkillFilters: [], 
+    calculateMatchPercentage: () => 0 
   };
 };
 

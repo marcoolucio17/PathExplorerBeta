@@ -29,13 +29,11 @@ export const UsersDashboardPage = () => {
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
         <div className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>users dashboard</h1>
+          <h1 className={styles.pageTitle}>Employees Dashboard</h1>
         </div>
         
-        {/* search header with filters */}
         <SearchHeader {...headerProps} />
         
-        {/* tabs for different user statuses */}
         <Tabs 
           tabs={dashboardPage.tabNames.map(tab => ({
             name: tab,
