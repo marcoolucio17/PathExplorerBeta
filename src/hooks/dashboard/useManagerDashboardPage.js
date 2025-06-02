@@ -49,7 +49,6 @@ export const useManagerDashboardPage = () => {
   const toggleSkillsFilterModal = () => toggleModal("skillsFilter");
   const toggleClientsFilterModal = () => toggleModal("clientsFilter");
   const toggleRolesFilterModal = () => toggleModal("rolesFilter");
-  const toggleCreateProjectModal = () => toggleModal("createProject");
 
   const handleViewApplicants = useCallback(() => {
     console.log("Navigating to applicants page...");
@@ -198,7 +197,6 @@ export const useManagerDashboardPage = () => {
     openModal,
     closeModal,
     toggleSkillsFilterModal,
-    toggleCreateProjectModal,
     toggleClientsFilterModal,
     toggleRolesFilterModal,
     handleViewApplicants,

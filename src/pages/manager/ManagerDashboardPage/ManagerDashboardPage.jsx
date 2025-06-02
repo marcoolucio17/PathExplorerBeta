@@ -11,6 +11,8 @@ import { RolesModal } from "../../../components/Modals/RolesModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
+import { NavLink } from "react-router";
+
 
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
@@ -43,20 +45,20 @@ export const ManagerDashboardPage = () => {
         <div className={styles.cardsContainer}>
           {dashboardPage.activeTab === 'My Projects' && (
             <div className={styles.tabActionSimple}>
-              <Button
-                type="primary"
-                icon="bi-plus"
-                onClick={handleCreateProject}
-                className={styles.createProjectButton}
-              >
-                New Project
-              </Button>
+              <NavLink to="/manager/create-project">
+                <Button
+                  type="primary"
+                  icon="bi-plus"
+                >
+                  New Project
+                </Button>
+              </NavLink>
             </div>
           )}
 
-          <CustomScrollbar 
-            fadeBackground="transparent" 
-            fadeHeight={40} 
+          <CustomScrollbar
+            fadeBackground="transparent"
+            fadeHeight={40}
             showHorizontalScroll={false}
           >
             <ProjectList
