@@ -1,9 +1,11 @@
 /* QuickActions.module.css */
 .sectionTitle {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   color: white;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.75rem 0;
+  text-align: left;
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .actionsContainer {
@@ -43,6 +45,7 @@
   font-size: 0.8rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .actionButton {

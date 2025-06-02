@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// Import components
+//import components
 import { GlassCard } from "../../../components/shared/GlassCard";
-// Import page-specific styles
+import SkillChip from "../../../components/SkillChip/SkillChip";
+import Button from "../../../components/shared/Button/Button";
+//import page-specific styles
 import pageStyles from "./EmpleadoHomePage.module.css";
-// Import styles for specific sections
+//import styles for specific sections
 import quickActionsStyles from "./QuickActions.module.css";
-import announcementsStyles from "./Announcements.module.css";
 import useFetch from "src/hooks/useFetch";
 import { formatName } from "src/hooks/profile/useProfilePage";
 import ImageCarousel from "./ImageCarousel";
 import { TrendsCard } from "src/components/Home/TrendsCard";
 
-// Mock data - in a real app, this would come from props or API
+//mock data - in a real app, this would come from props or API
 const MOCK_RECOMMENDED_PROJECTS = [
   {
     idproyecto: 1,
@@ -41,10 +42,10 @@ export const EmpleadoHomePage = () => {
   const navigate = useNavigate();
   const [recommendedProjects] = useState(MOCK_RECOMMENDED_PROJECTS);
 
-  const [goalProgress] = useState(1); // 1/3
-  const [projectProgress] = useState(96); // 96%
+  const [goalProgress] = useState(1); //1/3
+  const [projectProgress] = useState(96); //96%
   
-  // api stuff needed for the page
+  //api stuff needed for the page
   const { data, error, loading } = useFetch(
     "usuario/" + localStorage.getItem("id")
   );
@@ -65,7 +66,7 @@ export const EmpleadoHomePage = () => {
 
   const handleApplyToProject = (projectId) => {
     console.log(`Applying to project ${projectId}`);
-    // Handle application logic here
+    //handle application logic here
   };
 
   const quickActions = [
@@ -92,16 +93,15 @@ export const EmpleadoHomePage = () => {
   return (
     <div className={pageStyles.homeLayout}>
       <div className={pageStyles.mainContentWrapper}>
-        {/* Main Content Area */}
+        {/* header section */}
+        <div className={pageStyles.headerSection}>
+          <h1 className={pageStyles.mainTitle}>{`Welcome Back, ${formatName(data?.user?.nombre) || "..."}`}</h1>
+        </div>
+
+        {/* main content area */}
         <div className={pageStyles.contentSection}>
-          {/* Header Section */}
-          <div className={pageStyles.headerSection}>
-            <h1 className={pageStyles.mainTitle}>{`Welcome Back, ${formatName(data?.user?.nombre) || "..."}`}</h1>
-            <h3 className={pageStyles.subtitle}>Ready to explore your next big project?</h3>
-          </div>
-          
           <div className={pageStyles.mainbar}>
-            {/* Progress Section*/}
+            {/* progress section*/}
             <div className={pageStyles.progressCard}>
               <div className={pageStyles.progressContent}>
                 <GlassCard className={pageStyles.mainbarAnnouncementCard}>
@@ -110,7 +110,7 @@ export const EmpleadoHomePage = () => {
               </div>
             </div>
 
-            {/* Project Recommendations Section - Fills remaining height */}
+            {/* project recommendations section */}
             <div className={pageStyles.recommendationsCard}>
               <h3 className={pageStyles.recommendationTitle}>
                 Based on your profile, you'd be a great fit for these projects:
@@ -123,18 +123,21 @@ export const EmpleadoHomePage = () => {
                     <div className={pageStyles.matchPercentage}>{project.matchPercentage}%</div>
                     <div className={pageStyles.skillsContainer}>
                       {project.skills.map((skill, idx) => (
-                        <span key={idx} className={pageStyles.skillTag}>
-                          {skill}
-                        </span>
+                        <SkillChip 
+                          key={idx}
+                          text={skill}
+                          isUserSkill={false}
+                        />
                       ))}
                     </div>
-                    <button 
-                      className={pageStyles.applyButton}
+                    <Button 
+                      type="primary"
+                      icon="bi-check-circle-fill"
                       onClick={() => handleApplyToProject(project.idproyecto)}
+                      className={pageStyles.applyButton}
                     >
-                      <i className="bi bi-check-circle-fill" />
                       Apply
-                    </button>
+                    </Button>
                   </GlassCard>
                 ))}
               </div>
@@ -142,11 +145,11 @@ export const EmpleadoHomePage = () => {
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* sidebar */}
         <div className={pageStyles.sidebar}>
-          {/* Quick Actions Card - Flexible height */}
+          {/* quick actions card */}
           <GlassCard className={pageStyles.sidebarCard}>
-            <h2 className={quickActionsStyles.sectionTitle}>Quick Actions</h2>
+            <h2 className={pageStyles.sectionTitle}>Quick Actions</h2>
             <div className={quickActionsStyles.actionsContainer}>
               {quickActions.map((action) => (
                 <div key={action.id} className={quickActionsStyles.actionItem}>
@@ -165,13 +168,13 @@ export const EmpleadoHomePage = () => {
             </div>
           </GlassCard>
 
-          {/* Announcements Card - Flexible height */}
-            <div className={announcementsStyles.announcementsContainer}>
-              <TrendsCard 
-                className={pageStyles.sidebarSection}
-                categorizedSkills={categorizedSkills}
-              />
-            </div>
+          {/* trends card at bottom */}
+          <div className={pageStyles.trendsContainer}>
+            <TrendsCard 
+              className={pageStyles.sidebarSection}
+              categorizedSkills={categorizedSkills}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -50,8 +50,8 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
     }
   };
 
-  //check if this is a read-only view (In Review or Denied status)
-  const isReadOnly = applicant.status === 'In Review' || applicant.status === 'Denied';
+  //check if this is a read-only view (In Review, Denied, or readOnly prop passed)
+  const isReadOnly = readOnly || applicant.status === 'In Review' || applicant.status === 'Denied';
 
   return (
     <div className={modalStyles.modalBackdrop} onClick={handleBackdropClick}>
@@ -60,6 +60,7 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
           <h2 className={modalStyles.title}>
             {applicant.status === 'In Review' ? 'Application Review' : 
              applicant.status === 'Denied' ? 'Denied Application' : 
+             readOnly ? 'Application Review' :
              'Application Request'}
           </h2>
           <button className={modalStyles.closeButton} onClick={onClose}>

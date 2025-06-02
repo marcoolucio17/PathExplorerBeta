@@ -9,6 +9,7 @@ import { ProgressBar } from '../../../components/ProgressBar';
 import SkillChip from '../../../components/SkillChip/SkillChip';
 import Button from '../../../components/shared/Button';
 import CustomScrollbar from '../../../components/CustomScrollbar';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 //modals
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
@@ -30,11 +31,12 @@ export const EmpleadoProyectoPage = () => {
   //loading state
   if (loading) {
     return (
-      <div className={styles.proyectoContainer}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-          <p>Loading project details...</p>
-        </div>
-      </div>
+      <LoadingSpinner 
+        overlay={true}
+        size="large"
+        message="Loading project details..."
+        variant="default"
+      />
     );
   }
 

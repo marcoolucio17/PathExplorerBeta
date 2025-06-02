@@ -29,14 +29,12 @@ export const useTFSApplicantsPage = () => {
     return counts;
   }, [pendingData, assignmentData]);
 
-  //determine which data to use based on active tab
   const apiData = activeTab === 'Pending' ? pendingData : assignmentData;
   const apiLoading = activeTab === 'Pending' ? pendingLoading : assignmentLoading;
   const apiError = activeTab === 'Pending' ? pendingError : assignmentError;
   
   const mapStatusToTab = (estatus) => {
     console.log('TFS mapping status:', estatus);
-    //since we fetch by specific status, map directly to current tab
     if (activeTab === 'Pending' && estatus === 'Revision') {
       return 'Pending';
     }
@@ -84,7 +82,7 @@ export const useTFSApplicantsPage = () => {
           appliedDate: item.fechaaplicacion,
           lastActive: item.fechaaplicacion,
           message: item.message || '',
-          project: item.nombreproyecto || 'Unknown Project',
+          project: item.proyecto?.nombre || item.nombreproyecto || 'Unknown Project',
           projectId: item.idproyecto,
           role: item.roles?.nombrerol || 'Unknown Role',
           roleDescription: item.roles?.descripcionrol || '',
@@ -223,7 +221,6 @@ export const useTFSApplicantsPage = () => {
     baseUrl: '/tfs/dashboard'
   });
 
-  //override the activeTab to use our custom one that triggers API calls
   useEffect(() => {
     if (listPage.activeTab !== activeTab) {
       setActiveTab(listPage.activeTab);
@@ -280,8 +277,7 @@ export const useTFSApplicantsPage = () => {
     console.log('TFS handleViewApplicant called with id:', applicantId);
     const applicant = finalApplicants.find(app => app.id === applicantId);
     console.log('TFS found applicant:', applicant);
-    
-    //for TFS, all applicants just show the view request modal
+
     customListPage.setSelectedItem(applicant);
     customListPage.openModal('viewRequest');
   };
@@ -294,10 +290,8 @@ export const useTFSApplicantsPage = () => {
     customListPage.openModal('viewRequest');
   };
 
-  //override handleViewItem to prevent unwanted navigation
   const handleViewItem = (itemId) => {
     console.log('TFS handleViewItem blocked for applicants page:', itemId);
-    //do nothing - we handle navigation through specific handlers
   };
 
   //TFS can approve applications in "Pending" tab (change Revision -> Asignado)
