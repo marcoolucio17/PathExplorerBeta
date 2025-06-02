@@ -53,6 +53,13 @@ function CustomNavbar() {
     }
   };
 
+  const handleLogout = () => {
+    // borramos tokens
+    localStorage.clear();
+    // salimos
+    navigate("/");
+  };
+
   return (
     <>
       {/* Sidebar */}
@@ -75,7 +82,7 @@ function CustomNavbar() {
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
-          <li onClick={() => navigate("/")}>
+          <li onClick={handleLogout}>
             <i className="bi bi-box-arrow-left"></i>
             {isSidebarOpen && <span>Logout</span>}
 

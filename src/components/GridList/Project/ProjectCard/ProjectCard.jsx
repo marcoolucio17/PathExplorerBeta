@@ -1,5 +1,6 @@
 import React from 'react';
 import { GlassCard } from 'src/components/shared/GlassCard';
+import GlassCardNavigation from 'src/components/shared/GlassCard/GlassCardNavigation'; // el import es un poquito diferente
 import { ProgressCircle } from 'src/components/ProgressCircle';
 import SkillChip from 'src/components/SkillChip/SkillChip';
 import styles from 'src/styles/GridList/GridListCard.module.css';
@@ -184,16 +185,16 @@ const ProjectCard = ({
 
   if (viewMode === 'grid') {
     return (
-      <GlassCard id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
+      <GlassCardNavigation id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
         {gridContent}
-      </GlassCard>
+      </GlassCardNavigation>
     );
   }
 
   return (
-    <GlassCard id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
+    <GlassCardNavigation id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
       {listContent}
-    </GlassCard>
+    </GlassCardNavigation>
   );
 };
 
