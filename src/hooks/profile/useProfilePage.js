@@ -33,18 +33,26 @@ function transformBackendUser(user, projects) {
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/public/fotos-perfil/";
 
   newuser.name = formatName(user.nombre);
-  newuser.pnombre = projects[0].proyecto.pnombre || "Staff";
-  newuser.finicio = projects[0].fechainicio || "-";
-  newuser.fechafin = projects[0].fechafin || "-";
   newuser.location = user.ubicacion;
   newuser.email = user.correoelectronico;
   newuser.phone = user.telefono;
   newuser.linkedin = user.linkedin;
   newuser.github = user.github;
-  newuser.title = projects[0].rol.nombrerol || "Staff";
   newuser.role = user.tipo;
   newuser.avatarUrl =
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/sign/fotos-perfil/foto-15-1748207570840.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzFkNDY3ZWNhLTk2NDgtNGRjYy05YTQyLTJhMzQyNWZmM2VhMCJ9.eyJ1cmwiOiJmb3Rvcy1wZXJmaWwvZm90by0xNS0xNzQ4MjA3NTcwODQwLmpwZyIsImlhdCI6MTc0ODI5MTkyNywiZXhwIjoxNzc5ODI3OTI3fQ.gi_C6RcvsXN_fKFsLZHFZ8cAwQ065_8AjUxnZA-ecIU";
+
+  if (typeof projects.length > 0) {
+    newuser.pnombre = projects[0].proyecto.pnombre || "Staff";
+    newuser.finicio = projects[0].fechainicio || "-";
+    newuser.fechafin = projects[0].fechafin || "-";
+    newuser.title = projects[0].rol.nombrerol || "Staff";
+  } else {
+    newuser.pnombre = "Staff";
+    newuser.finicio = "-";
+    newuser.fechafin = "-";
+    newuser.title = "Staff";
+  }
 
   return newuser;
 }
@@ -240,7 +248,7 @@ export const useProfilePage = () => {
       DB_URL + "api/goals",
       {
         idmeta: obj.id,
-        cambio: { completa : status}
+        cambio: { completa: status },
       },
       config
     );
@@ -286,9 +294,8 @@ export const useProfilePage = () => {
 
   // Handle remove certificate
   // remove cert (no alert no cap no shit no fear)
-  const handleRemoveCertificate = useCallback( async(certificateId) => {
+  const handleRemoveCertificate = useCallback(async (certificateId) => {
     // setUserCertificates(prev => prev.filter(cert => cert.id !== certificateId));
-
 
     const config = {
       headers: {

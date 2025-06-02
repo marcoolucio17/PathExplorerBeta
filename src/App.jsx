@@ -24,6 +24,7 @@ import {ManagerCreateProjectPage} from "./pages/manager/ManagerCreateProjectPage
 
 // Imports de TFS
 import { TFSDashboard } from "./pages/tfs/TFSDashboard";
+import { TFSApplicantsPage } from "./pages/tfs/TFSApplicantsPage/TFSApplicantsPage";
 import { TFSPerfil } from "./pages/tfs/TFSPerfil";
 import { TFSProyecto } from "./pages/tfs/TFSProyecto";
 import { TFSVistaPropuestas } from "./pages/tfs/TFSVistaPropuestas";
@@ -53,7 +54,7 @@ function App() {
         /> */}
         <Route path="manager/perfil" element={<ManagerPerfil />} />
         {/*<Route path="manager/vistaperfil" element={<ManagerVistaPerfil />} /> */}
-        <Route path="manager/proyecto" element={<EmpleadoProyecto />} />
+        <Route path="manager/proyecto/:projectId/:roleId" element={<EmpleadoProyecto />} />
         <Route path="manager/create-project" element={<ManagerCreateProjectPage/>}></Route>
       </Route>
 
@@ -61,6 +62,7 @@ function App() {
       <Route element={<PrivateRoutes allowedRoles={["tfs"]} />}>
         <Route path="tfs" element={<Navigate to="dashboard" />} />
         <Route path="tfs/dashboard" element={<TFSDashboard />} />
+        <Route path="tfs/applicants" element={<TFSApplicantsPage />} />
         <Route path="tfs/perfil" element={<TFSPerfil />} />
         <Route path="tfs/proyecto" element={<TFSProyecto />} />
         <Route path="tfs/vistaperfil" element={<TFSVistaPropuestas />} />
@@ -71,7 +73,7 @@ function App() {
         <Route path="empleado" element={<EmpleadoHome />} />
         <Route path="empleado/dashboard" element={<EmpleadoDashboardPage />} />
         <Route path="empleado/perfil" element={<EmpleadoPerfil />} />
-        <Route path="empleado/proyecto" element={<EmpleadoProyecto />} />
+        <Route path="empleado/proyecto/:projectId/:roleId" element={<EmpleadoProyecto />} />
       </Route>
     </Routes>
   );

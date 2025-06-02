@@ -4,7 +4,8 @@ import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import { usePost } from 'src/hooks/usePost';
 import axios from 'axios';
 import useFetch from 'src/hooks/useFetch';
-import { useNavigate} from "react-router";
+import { useNavigate } from "react-router";
+import { ButtonGroup } from 'react-bootstrap';
 
 export const ManagerCreateProjectPage = () => {
   const { triggerPost, loading, error } = usePost();
@@ -243,10 +244,6 @@ export const ManagerCreateProjectPage = () => {
   return (
     <div>
       <div>
-        <button className={styles.closeButton} onClick={() => navigate('/manager/dashboard')}>
-          <i className="bi bi-x-lg"></i>
-        </button>
-
         <div className={styles.modalHeader}>
           <h2 className={styles.title}>Create Project</h2>
           <p className={styles.subtitle}>Upload and add details for your project</p>
@@ -416,9 +413,7 @@ export const ManagerCreateProjectPage = () => {
           </div>
 
 
-          <button className={styles.closeButton} onClick={() => navigate('/manager/dashboard')}>
-            Cancel
-          </button>
+
 
           <div style={{ marginTop: '2rem' }}>
             <h3>Roles del Proyecto</h3>
@@ -523,17 +518,20 @@ export const ManagerCreateProjectPage = () => {
               </div>
             ))}
           </div>
+          <ButtonGroup>
+            <button className={styles.saveButton} onClick={() => navigate('/manager/dashboard')}>
+              Cancel
+            </button>
 
-
-          <button
-            type="submit"
-            disabled={!isFormValid()}
-            className={styles.saveButton}
-          >
-            <i className="bi bi-plus-lg"></i>
-            Create Project
-          </button>
-
+            <button
+              type="submit"
+              disabled={!isFormValid()}
+              className={styles.saveButton}
+            >
+              <i className="bi bi-plus-lg"></i>
+              Create Project
+            </button>
+          </ButtonGroup>
         </form>
       </div>
     </div>
