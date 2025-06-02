@@ -46,8 +46,6 @@ export const ManagerDashboardPage = () => {
               <Button
                 type="primary"
                 icon="bi-plus"
-                onClick={handleCreateProject}
-                className={styles.createProjectButton}
               >
                 New Project
               </Button>
