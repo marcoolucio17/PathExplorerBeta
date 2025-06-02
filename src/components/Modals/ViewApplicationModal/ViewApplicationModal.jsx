@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import useFetch from '../../../hooks/useFetch';
 import modalStyles from 'src/styles/Modals/Modal.module.css';
 
-const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, onViewProfile }) => {
+const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, onViewProfile, readOnly = false }) => {
   //fetch feedback data using user id - only when userId is properly defined
   const { data: feedbackData, loading: feedbackLoading, error: feedbackError } = useFetch(
     (applicant && applicant.userId) ? `feedback/${applicant.userId}` : null
@@ -50,11 +50,19 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
     }
   };
 
+  //check if this is a read-only view (In Review, Denied, or readOnly prop passed)
+  const isReadOnly = readOnly || applicant.status === 'In Review' || applicant.status === 'Denied';
+
   return (
     <div className={modalStyles.modalBackdrop} onClick={handleBackdropClick}>
       <div className={modalStyles.modalContent}>
         <div className={modalStyles.modalHeader}>
-          <h2 className={modalStyles.title}>Application Request</h2>
+          <h2 className={modalStyles.title}>
+            {applicant.status === 'In Review' ? 'Application Review' : 
+             applicant.status === 'Denied' ? 'Denied Application' : 
+             readOnly ? 'Application Review' :
+             'Application Request'}
+          </h2>
           <button className={modalStyles.closeButton} onClick={onClose}>
             <i className="bi bi-x"></i>
           </button>
@@ -325,28 +333,43 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
           </div>
         </div>
 
-        <div className={modalStyles.buttonGroup}>
-          <button 
-            className={modalStyles.secondaryButton}
-            onClick={() => onViewProfile(applicant)}
-          >
-            <i className="bi bi-person"></i>
-            View Profile
-          </button>
-          <button 
-            className={modalStyles.primaryButton}
-            onClick={() => onAccept(applicant)}
-          >
-            <i className="bi bi-check-circle"></i>
-            Accept
-          </button>
-          <button 
-            className={modalStyles.cancelButton}
-            onClick={() => onDeny(applicant)}
-          >
-            <i className="bi bi-x-circle"></i>
-            Deny
-          </button>
+        <div className={modalStyles.buttonGroup} style={{ borderTop: '1px solid var(--border-light)', padding: '1.5rem' }}>
+          {isReadOnly ? (
+            //read-only mode for In Review applications
+            <button 
+              className={modalStyles.primaryButton}
+              onClick={onClose}
+              style={{ width: '100%' }}
+            >
+              <i className="bi bi-x"></i>
+              Close
+            </button>
+          ) : (
+            //normal mode with action buttons
+            <>
+              <button 
+                className={modalStyles.secondaryButton}
+                onClick={() => onViewProfile(applicant)}
+              >
+                <i className="bi bi-person"></i>
+                View Profile
+              </button>
+              <button 
+                className={modalStyles.primaryButton}
+                onClick={() => onAccept(applicant)}
+              >
+                <i className="bi bi-check-circle"></i>
+                Accept
+              </button>
+              <button 
+                className={modalStyles.cancelButton}
+                onClick={() => onDeny(applicant)}
+              >
+                <i className="bi bi-x-circle"></i>
+                Deny
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
