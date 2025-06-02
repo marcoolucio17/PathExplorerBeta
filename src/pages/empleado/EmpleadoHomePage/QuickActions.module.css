@@ -1,15 +1,9 @@
 /* QuickActions.module.css */
-.sectionTitle {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: white;
-  margin: 0 0 0.5rem 0;
-}
 
 .actionsContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 1rem;
 }
 
 .actionItem {
@@ -40,9 +34,10 @@
 }
 
 .actionTitle {
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
+  font-family: 'Graphik Light';
 }
 
 .actionButton {
