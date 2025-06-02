@@ -2,9 +2,9 @@ import React, { useState, useEffect} from "react";
 import styles from "/src/pages/empleado/EmpleadoHomePage/EmpleadoHomePage.module.css";
 
 const images = [
-  "/images/software-development.jpg",
-  "/images/accenture-img1.jpg",
-  "/images/agile-methodology.jpg",
+  {src:"/images/software-development.jpg", headline: "Welcome to the Announcements Tab!"},
+  {src:"/images/accenture-img1.jpg", headline: "Accenture Stocks go up 50%"},
+  {src:"/images/agile-methodology.jpg", headline: "Take this course on the Agile Methodology."},
 ];
 
 
@@ -27,12 +27,16 @@ export default function ImageCarousel() {
           transform: `translateX(-${currentIndex * 100}%)`,
         }}
       >
-        {images.map((src, index) => (
+        {images.map((image, index) => (
           <div
             key={index}
             className={styles.carouselSlide}
-            style={{ backgroundImage: `url(${src})` }}
-          />
+            style={{ backgroundImage: `url(${image.src})` }}
+          >
+            <div className={styles.headlineOverlay}>
+              <h2>{image.headline}</h2>
+            </div>
+          </div>
         ))}
       </div>
 

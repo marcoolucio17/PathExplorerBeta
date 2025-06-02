@@ -6,13 +6,15 @@ import styles from "/src/components/Profile/ProfileSkills.module.css";
 
 /**
  * ProfileSkills component for displaying skills with categories
- * @param {Object} categorizedSkills - Object with hardSkills and softSkills arrays
+ * @param {Object} data 
  * @param {Function} onSkillsClick - Function to handle skills button click
  * @returns {JSX.Element}
  */
-export const TrendsCard = ({ categorizedSkills = { hardSkills: [], softSkills: [] }, onSkillsClick }) => {
-  const { hardSkills, softSkills } = categorizedSkills;
-  const hasNoSkills = hardSkills.length === 0 && softSkills.length === 0;
+export const TrendsCard = ({ data, onSkillsClick }) => {
+  const skills = Array.isArray(data?.result) ? data.result : [];  const hasNoSkills = skills.length === 0 ;
+
+  console.log("Raw data:", data);
+  console.log("skills:", Array.isArray(data?.result) ? data.result : []);
 
   return (
     <GlassCard className={styles.skillsCard}>
@@ -30,25 +32,13 @@ export const TrendsCard = ({ categorizedSkills = { hardSkills: [], softSkills: [
               </div>
             ) : (
               <>
-                {hardSkills.length > 0 && (
+                {skills.length > 0 && (
                   <div className={styles.skillCategory}>
-                    <h3 className={styles.categoryHeader}>Hard Skills</h3>
+                    <h3 className={styles.categoryHeader}>Most Popular Skills</h3>
                     <div className={styles.divider}></div>
                     <div className={styles.skillChipsContainer}>
-                      {hardSkills.map((skill, index) => (
+                      {skills.map((skill, index) => (
                         <SkillChip key={`hard-${skill}-${index}`} text={skill} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {softSkills.length > 0 && (
-                  <div className={styles.skillCategory}>
-                    <h3 className={styles.categoryHeader}>Soft Skills</h3>
-                    <div className={styles.divider}></div>
-                    <div className={styles.skillChipsContainer}>
-                      {softSkills.map((skill, index) => (
-                        <SkillChip key={`soft-${skill}-${index}`} text={skill} />
                       ))}
                     </div>
                   </div>
