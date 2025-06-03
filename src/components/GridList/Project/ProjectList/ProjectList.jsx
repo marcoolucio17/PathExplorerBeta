@@ -19,6 +19,7 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {boolean} props.isLoading - Whether items are currently loading
  */
 const ProjectList = ({
+  tabSelected,
   projects = [],
   viewMode,
   showCompatibility,
@@ -29,7 +30,7 @@ const ProjectList = ({
 }) => {
   // Safety check for undefined/null projects array
   const safeProjects = Array.isArray(projects) ? projects : [];
-
+  console.log("View Mode:", viewMode);
   //if loading, show enhanced project loading state
   if (isLoading) {
     return (
@@ -69,7 +70,6 @@ const ProjectList = ({
 
   // Create a unique key for the container to force re-render and animation restart
   const containerKey = `container-projects-${viewMode}`;
-  const idEmployee = localStorage.getItem("idEmployee") || 1;
   return (
     <div key={containerKey} className={containerClass}>
       {safeProjects.map((item, index) => {
@@ -99,15 +99,19 @@ const ProjectList = ({
         // Force cards to always re-render when filter changes with a unique key
         const renderKey = `${projectId}-${roleId || 'project'}-${index}`;
 
+
         return (
           <div key={renderKey} className={styles.item}>
+
             <ProjectCard
+
               id={projectId}
               idrol={roleId}
+
               project={item.project}
               proyecto_rol={item.proyecto_rol}
               viewMode={viewMode}
-              idEmployee={idEmployee}
+                compatibilityValue={item.proyecto_rol.compability}
               showCompatibility={showCompatibility}
               selectedSkillFilters={selectedSkillFilters}
               userSkills={userSkills}

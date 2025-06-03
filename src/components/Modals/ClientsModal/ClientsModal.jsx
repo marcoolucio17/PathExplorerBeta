@@ -7,7 +7,7 @@ import { ChipModalSelect } from '../ChipModalSelect';
 
 
 
-export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus, clients = [], updateClients }) => {
+export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus, clients = [], onClientSelected }) => {
 
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -60,7 +60,7 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
     };
 
     const handleSave = () => {
-        updateClients(selectedClient, selectedClientId);
+        onClientSelected(selectedClient, selectedClientId);
         handleClose();
     }
 
