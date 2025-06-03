@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 // import useListPage from "../useListPage"; 
 // import useModalControl from "../useModalControl"; 
 import useGetFetch from "../useGetFetch";
+import useGetFetchProjectsFilters from "../useGetFetchProjectsFilters";
 /**
  *
  *
@@ -29,7 +30,9 @@ export const useDashboardData = () => {
   const [roleNameSelected, setRoleNameSelected] = useState("Roles");
   //Selected the id role
   const [roleId, setRoleId] = useState(null);
-  const [filterOptions, setFilterOptions] = useState({}); // Added to manage all filter options centrally
+  const [filterOptions, setFilterOptions] = useState({
+    idCompatible: localStorage.getItem("id"),
+  }); // Added to manage all filter options centrally
 
   const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
 
@@ -67,7 +70,10 @@ export const useDashboardData = () => {
   }, [location.search]);
 */
   //fetch data
-  const { data: projectsData } = useGetFetch({ rutaApi: "projects" });
+  const { data: projectsData } = useGetFetchProjectsFilters({
+    rutaApi: "projects",
+    filters: filterOptions,
+  });
 
   const { data: clientsData } = useGetFetch({ rutaApi: "clientes" });
 
@@ -86,7 +92,6 @@ export const useDashboardData = () => {
       setSkillSelected("Skills");
     }
   };
-
 
   //Apply project name as filter
   const handdlyApplyNameProject = (nameProject) => {
@@ -166,7 +171,10 @@ export const useDashboardData = () => {
   const calculateMatchPercentage = (project) => {
     // Replace with actual match calculation logic
     // This is a placeholder and will return 0 for all projects
-    console.warn("calculateMatchPercentage is a placeholder. Implement actual logic.", project);
+    console.warn(
+      "calculateMatchPercentage is a placeholder. Implement actual logic.",
+      project
+    );
     return 0;
   };
 
@@ -244,15 +252,15 @@ export const useDashboardData = () => {
     roleId,
     handleApplyRoleFilters,
     removeSkillFilter,
-    removeClientFilter, 
+    removeClientFilter,
     removeRoleFilter,
     clearAllSkillFilters,
     sortProjects,
     flattenProjectsForList,
-    skillSelected, 
-    handdlyApplyNameProject, 
-    filterOptions, 
-    setFilterOptions, 
+    skillSelected,
+    handdlyApplyNameProject,
+    filterOptions,
+    setFilterOptions,
   };
 };
 

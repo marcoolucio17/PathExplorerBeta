@@ -12,7 +12,7 @@ const ProjectCard = ({
   project,
   proyecto_rol,
   viewMode,
-  idEmployee,
+  compatibilityValue,
   idrol,
   showCompatibility,
   onClick,
@@ -51,12 +51,9 @@ const ProjectCard = ({
   };
 
 
-  const matchPercentage = 0;/*useGetFetch({
-    rutaApi: `compability?id_rol=${idr*ol}&idusuario=${idEmployee}`
-  })*/
 
 
-  const matchPercentageValue = matchPercentageData ? matchPercentageData : 0;
+
   const roleData = ensureRoleData();
   const skillsData = ensureSkillsData();
 
@@ -91,7 +88,7 @@ const ProjectCard = ({
       {showCompatibility && (
         <div className={styles.statusCircle}>
           <ProgressCircle
-            value={matchPercentageValue}
+            value={compatibilityValue}
             size={60}
             fontSize="1.1rem"
             strokeWidth={6}
@@ -164,7 +161,7 @@ const ProjectCard = ({
         {showCompatibility && (
           <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
             <ProgressCircle
-              value={matchPercentageValue}
+              value={compatibilityValue}
               size={60}
               strokeWidth={6}
               fontSize="1rem"

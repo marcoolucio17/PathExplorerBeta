@@ -21,10 +21,7 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosRetry(axiosInstance, {
-  retries: 1, // Número de reintentos
-  retryDelay: (retryCount) => {
-    return retryCount * 2000;
-  },
+  retries: 0, // Número de reintentos
   shouldResetTimeout: false,
 });
 

@@ -25,10 +25,7 @@ axiosInstance.interceptors.request.use(
 
 //installe npm install axios-retry
 axiosRetry(axiosInstance, {
-  retries: 1, // Número de reintentos
-  retryDelay: (retryCount) => {
-    return retryCount * 2000;
-  },
+  retries: 0, // Número de reintento
   shouldResetTimeout: false,
 });
 
@@ -38,7 +35,7 @@ export const useGetFetchProjectsFilters = ({ rutaApi = "", filters = {} }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      let url = `https://pathexplorer-backend.onrender.com/api/${rutaApi}`;
+      let url = `http://localhost:8080/api/${rutaApi}`;
 
       try {
         const response = await axiosInstance.get(url);
