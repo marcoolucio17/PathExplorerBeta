@@ -25,11 +25,11 @@ axiosInstance.interceptors.request.use(
 
 //installe npm install axios-retry
 axiosRetry(axiosInstance, {
-  retries: 3, // Número de reintentos
+  retries: 1, // Número de reintentos
   retryDelay: (retryCount) => {
     return retryCount * 2000;
   },
-  shouldResetTimeout: true,
+  shouldResetTimeout: false,
 });
 
 export const useGetFetchProjectsFilters = ({ rutaApi = "", filters = {} }) => {

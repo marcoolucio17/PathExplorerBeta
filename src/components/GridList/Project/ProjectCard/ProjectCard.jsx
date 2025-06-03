@@ -66,9 +66,9 @@ const ProjectCard = ({
     }));
   };
 
-  const { data: matchPercentage } = useGetFetch({
-    rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`
-  })
+  const matchPercentage = 0;/*useGetFetch({
+    rutaApi: `compability?id_rol=${idr*ol}&idusuario=${idEmployee}`
+  })*/
 
 
   const matchPercentageValue = matchPercentage ? matchPercentage : 0;
