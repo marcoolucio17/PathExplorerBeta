@@ -5,7 +5,7 @@ import { ChipModalSelect } from '../ChipModalSelect';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
 
-export const RolesModal = ({ isOpen, onClose, roleNameStatus, roleIdStatus, roles = [], updateRoles }) => {
+export const RolesModal = ({ isOpen, onClose, roleNameStatus, roleIdStatus, roles = [], onRoleSelected }) => {
 
 
     const [isClosing, setIsClosing] = useState(false);
@@ -54,7 +54,7 @@ export const RolesModal = ({ isOpen, onClose, roleNameStatus, roleIdStatus, role
 
     const handleSave = () => {
 
-        updateRoles(selectRole, selectRoleId);
+        onRoleSelected(selectRole, selectRoleId);
         handleClose();
     }
 

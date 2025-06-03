@@ -87,12 +87,11 @@ const ProjectList = ({
         const renderKey = `${item.project.idproyecto || "unknown"}-${
           item.proyecto_rol.idrol || "unknown"
         }-${index}`;
-        console.log(item);
-        console.log(item.project.proyecto_roles)
+
 
         return (
           <div key={renderKey} className={styles.item}>
-            {tabSelected === "All" && (
+
             <ProjectCard
               id = {item.project.idproyecto}
                 idrol={item.proyecto_rol.idrol}
@@ -104,7 +103,7 @@ const ProjectList = ({
               selectedSkillFilters={selectedSkillFilters}
               userSkills={userSkills}
               index={index}
-              />)}
+            />
           </div>
         );
       })}
