@@ -1,11 +1,11 @@
 import React from "react";
 
 // Custom Hooks
-import useEmpleadoDashboardPage from '../../../hooks/dashboard/useEmpleadoDashboardPage';
-import useEmpleadoDashboardHeaderConfig from '../../../hooks/dashboard/useEmpleadoDashboardHeaderConfig';
+import useUsersDashboardPage from '../../../hooks/users/useUsersDashboardPage';
+import useUsersDashboardHeaderConfig from '../../../hooks/users/useUsersDashboardHeaderConfig';
 
 // Components
-import ProjectList from '../../../components/GridList/Project/ProjectList';
+import UserList from '../../../components/GridList/User/UserList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
 import { SearchHeader } from "../../../components/SearchHeader";
@@ -15,27 +15,25 @@ import { Tabs } from "../../../components/Tabs";
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
 /**
- * Dashboard component for Employee role
- * 
+ * dashboard component for users
+ * displays all users with filtering and search capabilities
  */
-export const EmpleadoDashboardPage = () => {
-  // Use the employee-specific dashboard hook
-  const dashboardPage = useEmpleadoDashboardPage();
+export const UsersDashboardPage = () => {
+  //use the users-specific dashboard hook
+  const dashboardPage = useUsersDashboardPage();
   
-  // Get employee-specific header configuration (excludes manager buttons)
-  const headerProps = useEmpleadoDashboardHeaderConfig(dashboardPage);
+  //get users-specific header configuration
+  const headerProps = useUsersDashboardHeaderConfig(dashboardPage);
 
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
         <div className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>Project Dashboard</h1>
+          <h1 className={styles.pageTitle}>Employees Dashboard</h1>
         </div>
         
-        {/* Search header with filters */}
         <SearchHeader {...headerProps} />
         
-        {/* Tabs for different project statuses */}
         <Tabs 
           tabs={dashboardPage.tabNames.map(tab => ({
             name: tab,
@@ -45,10 +43,10 @@ export const EmpleadoDashboardPage = () => {
           onTabClick={dashboardPage.setActiveTab}
         />
 
-        {/* Main content area with projects list */}
+        {/* main content area with users list */}
         <div className={styles.cardsContainer}>
           <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
-            <ProjectList 
+            <UserList 
               projects={dashboardPage.displayProjects}
               viewMode={dashboardPage.viewMode}
               showCompatibility={dashboardPage.showCompatibility}
@@ -62,7 +60,7 @@ export const EmpleadoDashboardPage = () => {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* modals */}
       <SkillsModal 
         isOpen={dashboardPage.modals.skillsFilter}
         onClose={() => dashboardPage.closeModal('skillsFilter')}
@@ -73,4 +71,4 @@ export const EmpleadoDashboardPage = () => {
   );
 };
 
-export default EmpleadoDashboardPage;
+export default UsersDashboardPage;
