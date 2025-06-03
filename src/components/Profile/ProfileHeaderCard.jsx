@@ -26,7 +26,7 @@ const ProfileHeaderCard = ({ user }) => {
       <div className={styles.profileHeaderMain}>
         <div className={styles.employeeSection}>
           <img
-            src={data.url}
+            src={ !error ?  data.url : "/images/3d_avatar_6.png"}
             alt={`${user.name}`}
             className={styles.avatarXl}
           />

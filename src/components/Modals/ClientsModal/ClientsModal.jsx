@@ -29,6 +29,7 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
         }
     }, [isOpen]);
 
+
     if (!isVisible) return null;
 
 
@@ -37,7 +38,11 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
         setTimeout(() => {
             onClose();
 
+            onClose();
+
             setIsVisible(false);
+            setIsClosing(false);
+
             setIsClosing(false);
 
         }, 300);

@@ -26,13 +26,14 @@ export const usePost = () => {
         };
 
         const response = await axios.post(
-        `http://localhost:8080/${ruta}`,
+        `https://pathexplorer-backend.onrender.com/api/${ruta}`,
+        //`http://localhost:8080/${ruta}`,
         body,
         config
         );
 
       setData(response.data);
-      return response.data; // optional return
+      return response.data; 
     } catch (err) {
       setError(err);
     } finally {

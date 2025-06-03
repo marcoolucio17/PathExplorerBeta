@@ -1,19 +1,16 @@
 import React from "react";
 
 // Custom Hooks
-import useApplicantsPage from '../../../hooks/applicants/useApplicantsPage';
-import useApplicantsHeaderConfig from '../../../hooks/applicants/useApplicantsHeaderConfig';
+import useTFSApplicantsPage from '../../../hooks/applicants/useTFSApplicantsPage';
+import useTFSApplicantsHeaderConfig from '../../../hooks/applicants/useTFSApplicantsHeaderConfig';
 
 // Components
 import Button from '../../../components/shared/Button';
 import ApplicantsList from "../../../components/GridList/Applicant/ApplicantsList";
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
-import { DenialReasonModal } from "../../../components/Modals/DenialReasonModal";
 import { ProjectFilterModal } from "../../../components/Modals/ProjectFilterModal";
-import { CVModal } from "src/components/Modals/CVModal";
 import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
-import { AssignEmployeeModal } from "../../../components/Modals/AssignEmployeeModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 
@@ -21,15 +18,15 @@ import { Tabs } from "../../../components/Tabs";
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
 /**
- * Applicants component for Manager role
- * Shows all applicants for the manager's projects with tabs for different application statuses
+ * TFS Applicants component
+ * Shows applications for TFS to manage assignment process
  */
-export const ManagerApplicantsPage = () => {
+export const TFSApplicantsPage = () => {
   // Use the custom hook to handle all logic
-  const applicantsPage = useApplicantsPage();
+  const applicantsPage = useTFSApplicantsPage();
   
   // Get header configuration
-  const headerProps = useApplicantsHeaderConfig(applicantsPage);
+  const headerProps = useTFSApplicantsHeaderConfig(applicantsPage);
 
   return (
     <div className={styles.dashboardContainer}>
@@ -43,7 +40,7 @@ export const ManagerApplicantsPage = () => {
           >
             Back to Dashboard
           </Button>
-          <h1 className={styles.pageTitle}>Project Applicants</h1>
+          <h1 className={styles.pageTitle}>Application Management</h1>
         </div>
         
         {/* Search header with filters */}
@@ -101,20 +98,6 @@ export const ManagerApplicantsPage = () => {
         availableSkills={applicantsPage.skillOptions}
       />
 
-      <DenialReasonModal
-        isOpen={applicantsPage.modals.denialReason}
-        onClose={() => applicantsPage.closeModal('denialReason')}
-        applicant={applicantsPage.selectedItem}
-        onAccept={applicantsPage.handleAcceptDeniedApplicant}
-        onAppeal={applicantsPage.handleAppealDeniedApplicant}
-      />
-
-      <CVModal
-        isOpen={applicantsPage.modals.assign}
-        onClose={() => applicantsPage.closeModal('assign')}
-        applicant={applicantsPage.selectedItem}
-      />
-
       <ViewApplicationModal
         isOpen={applicantsPage.modals.viewRequest}
         onClose={() => applicantsPage.closeModal('viewRequest')}
@@ -122,18 +105,10 @@ export const ManagerApplicantsPage = () => {
         onAccept={applicantsPage.handleAcceptApplicant}
         onDeny={applicantsPage.handleDenyApplicant}
         onViewProfile={applicantsPage.handleViewProfile}
-        readOnly={applicantsPage.selectedItem?.status === 'In Review'}
-      />
-
-      <AssignEmployeeModal
-        isOpen={applicantsPage.modals.assignEmployee}
-        onClose={() => applicantsPage.closeModal('assignEmployee')}
-        applicant={applicantsPage.selectedItem}
-        onDeny={applicantsPage.handleDenyApplicant}
-        onAssignSuccess={applicantsPage.handleAssignSuccess}
+        readOnly={applicantsPage.activeTab === 'Pending Assignment'}
       />
     </div>
   );
 };
 
-export default ManagerApplicantsPage;
+export default TFSApplicantsPage;

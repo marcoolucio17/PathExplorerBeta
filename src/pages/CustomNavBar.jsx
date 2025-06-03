@@ -12,6 +12,7 @@ function CustomNavbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const authState = localStorage.getItem("role");
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Define search categories
@@ -52,13 +53,25 @@ function CustomNavbar() {
     }
   };
 
+  const handleLogout = () => {
+    // borramos tokens
+    localStorage.clear();
+    // salimos
+    navigate("/");
+  };
+
   return (
     <>
       {/* Sidebar */}
       <div
-        className={`sidebar sidebar-visible ${isSidebarOpen ? "open" : ""}`}
+        className={`sidebar 
+          ${isSidebarVisible ? "sidebar-visible" : ""} 
+          ${isSidebarOpen ? "open" : ""}`}
         onMouseEnter={() => setIsSidebarOpen(true)}
-        onMouseLeave={() => setIsSidebarOpen(false)}
+        onMouseLeave={() => {
+          setIsSidebarOpen(false);
+          setIsSidebarVisible(false);
+        }}
       >
         <ul className="sidebar-menu">
           <li onClick={() => navigate(`${authState}`)}>
@@ -69,7 +82,7 @@ function CustomNavbar() {
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
-          <li onClick={() => navigate("/")}>
+          <li onClick={handleLogout}>
             <i className="bi bi-box-arrow-left"></i>
             {isSidebarOpen && <span>Logout</span>}
 
@@ -81,7 +94,10 @@ function CustomNavbar() {
       <nav className="navbar glass-navbar navbar-expand-lg">
         <div className="container-fluid d-flex align-items-center">
           {/* Logo only */}
-          <button className="navbar-brand btn btn-link p-0 nav-logo">
+          <button
+            onMouseEnter={() => setIsSidebarVisible(true)}
+            className="navbar-brand btn btn-link p-0 nav-logo"
+          >
             <img src={Logo} alt="Logo" className="logo-img" />
           </button>
 
