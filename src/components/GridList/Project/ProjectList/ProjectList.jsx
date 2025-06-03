@@ -73,6 +73,7 @@ const ProjectList = ({
   return (
     <div key={containerKey} className={containerClass}>
       {safeProjects.map((item, index) => {
+        console.log("Rendering ProjectList item:", item);
         // Check if item has the expected structure
         if (!item || !item.project) {
           console.warn("Invalid project item structure:", item);
@@ -87,6 +88,10 @@ const ProjectList = ({
         let roleId = null;
         if (!isProjectCard && item.proyecto_rol) {
           roleId = item.proyecto_rol.roles?.idrol || item.proyecto_rol.idrol || null;
+        }
+        let compatibilityValue = null;
+        if (!isProjectCard && item.proyecto_rol) {
+          compatibilityValue = item.proyecto_rol.compability || 0; // Default to 0 if not available
         }
 
         console.log("ProjectList item:", { 
