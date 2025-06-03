@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import styles from 'src/styles/Modals/Modal.module.css';
-import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
+import styles from './ManagerCreateProjectPage.module.css';
 import { usePost } from 'src/hooks/usePost';
 import axios from 'axios';
 import useFetch from 'src/hooks/useFetch';
 import { useNavigate } from "react-router";
-import { ButtonGroup } from 'react-bootstrap';
+import { GlassCard } from 'src/components/shared/GlassCard';
+import Button from 'src/components/shared/Button';
 
 export const ManagerCreateProjectPage = () => {
   const { triggerPost, loading, error } = usePost();
@@ -41,7 +41,7 @@ export const ManagerCreateProjectPage = () => {
     }
 
     const selectedCliente = clientes.find(c => c.idcliente === selectedId);
-    if (!selectedCliente) return; // por si acaso
+    if (!selectedCliente) return; //por si acaso
 
     setFormData(prev => ({
       ...prev,
@@ -68,7 +68,6 @@ export const ManagerCreateProjectPage = () => {
     }
   };
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -76,7 +75,6 @@ export const ManagerCreateProjectPage = () => {
       [name]: value
     }));
   };
-
 
   const handleRFPChange = (e) => {
     const file = e.target.files[0];
@@ -117,7 +115,6 @@ export const ManagerCreateProjectPage = () => {
     setFormData(prev => ({ ...prev, roles: updatedRoles }));
   };
 
-
   const handleAddRole = () => {
     setFormData(prev => ({
       ...prev,
@@ -131,7 +128,7 @@ export const ManagerCreateProjectPage = () => {
           requerimientos: [
             {
               tiempoexperiencia: '',
-              idhabilidad: 1 // puedes luego hacer esto dinámico
+              idhabilidad: 1 //puedes luego hacer esto dinámico
             }
           ]
         }
@@ -160,22 +157,21 @@ export const ManagerCreateProjectPage = () => {
     const formatDate = (dateString) => {
       if (!dateString) return '';
 
-      // Detecta si viene en formato DD/MM/YYYY
+      //detecta si viene en formato DD/MM/YYYY
       const parts = dateString.split('/');
       if (parts.length === 3) {
         const [day, month, year] = parts;
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
       }
 
-      // Si no es DD/MM/YYYY, intenta convertir con Date
+      //si no es DD/MM/YYYY, intenta convertir con Date
       const date = new Date(dateString);
-      if (isNaN(date)) return ''; // Fecha inválida
+      if (isNaN(date)) return ''; //fecha inválida
 
       return date.toISOString().split('T')[0];
     };
 
     const informacion = {
-
       proyect: {
         pnombre: formData.title,
         descripcion: formData.description,
@@ -188,13 +184,13 @@ export const ManagerCreateProjectPage = () => {
         nombrerol: rol.nombrerol,
         nivelrol: parseInt(rol.nivelrol),
         descripcionrol: rol.descripcionrol,
-        disponible: true, // o puedes hacer esto editable si quieres
+        disponible: true, //o puedes hacer esto editable si quieres
         requerimientos: rol.requerimientos || []
       }))
     };
 
     try {
-      // Paso 1: Crear el proyecto
+      //paso 1: crear el proyecto
       const result = await triggerPost('api/projects', { informacion });
       const idproyecto = result?.idproyecto;
       console.log(idproyecto);
@@ -205,7 +201,7 @@ export const ManagerCreateProjectPage = () => {
 
       const token = localStorage.getItem("token");
       console.log("Archivo RFP:", formData.projectRFP?.name);
-      // Paso 2: Subir el archivo RFP
+      //paso 2: subir el archivo RFP
       if (formData.projectRFP) {
         const rfpForm = new FormData();
         console.log("Archivo RFP:", formData.projectRFP);
@@ -220,7 +216,7 @@ export const ManagerCreateProjectPage = () => {
         });
       }
 
-      // Finalizar
+      //finalizar
       alert("Proyecto creado con éxito.");
       navigate('/manager/dashboard');
 
@@ -229,7 +225,6 @@ export const ManagerCreateProjectPage = () => {
       alert("Ocurrió un error al guardar el proyecto.");
     }
   };
-
 
   const isFormValid = () => {
     const hasRequiredFields =
@@ -242,104 +237,22 @@ export const ManagerCreateProjectPage = () => {
   };
 
   return (
-    <div>
-      <div>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.title}>Create Project</h2>
-          <p className={styles.subtitle}>Upload and add details for your project</p>
-        </div>
+    <div className={styles.createProjectContainer}>
+      <div className={styles.createProjectContent}>
+        {/* Left Column - Main Form */}
+        <div className={styles.formDetails}>
+          <div className={styles.pageHeader}>
+            <div>
+              <h1 className={styles.pageTitle}>Create Project</h1>
+              <p className={styles.pageSubtitle}>Upload and add details for your project</p>
+            </div>
+          </div>
 
-        <form onSubmit={handleSubmit} className={styles.form} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div className={styles.modalBody} style={{ height: 'calc(100% - 190px)' }}>
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1 }}>
-                <div className={styles.uploadSection}>
-                  <div className={styles.uploadSection}>
-                    <label className={styles.uploadLabel} htmlFor="projectoPlan">
-                      {formData.RfpPreview ? (
-                        <>
-                          {formData.projectRFP?.type === 'application/pdf' ? (
-                            <iframe
-                              src={formData.RfpPreview}
-                              style={{ width: '500px', height: '300px' }}
-                              title="RFP Preview"
-                            />
-                          ) : (
-                            <p>Archivo seleccionado: {formData.projectRFP.name}</p>
-                          )}
-
-                          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-                            <button
-                              type="button"
-                              className={styles.cancelButton}
-                              onClick={() =>
-                                setFormData(prev => ({
-                                  ...prev,
-                                  projectRFP: null,
-                                  RfpPreview: null
-                                }))
-                              }
-                            >
-                              Quitar archivo
-                            </button>
-                            <label className={styles.secondaryButton}>
-                              Cambiar archivo
-                              <input
-                                type="file"
-                                id="projectoPlan"
-                                accept=".pdf,.doc,.docx"
-                                onChange={handleRFPChange}
-                                className={styles.fileInput}
-                                style={{ display: 'none' }}
-                              />
-                            </label>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className={styles.uploadPlaceholder} style={{ width: '500px', height: '500px' }}>
-                            <i className="bi bi-cloud-upload"></i>
-                            <span>Click to upload project RFP</span>
-                          </div>
-                          <input
-                            type="file"
-                            id="projectoPlan"
-                            accept=".pdf,.doc,.docx"
-                            onChange={handleRFPChange}
-                            className={styles.fileInput}
-                          />
-                        </>
-                      )}
-                    </label>
-                  </div>
-
-                  <input
-                    type="file"
-                    id="projectoPlan"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleRFPChange}
-                    className={styles.fileInput}
-                  />
-                </div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div className={styles.uploadSection} style={{ marginBottom: '2rem' }}>
-                  <label className={styles.uploadLabel}>
-                    {clientImageUrl ? (
-                      <img
-                        src={clientImageUrl}
-                        alt="Logo del cliente"
-                        className={styles.uploadPreview}
-                        style={{ width: '150px', height: '150px' }}
-                      />
-                    ) : (
-                      <div className={styles.uploadPlaceholder} style={{ width: '150px', height: '150px' }}>
-                        <i className="bi bi-person-circle"></i>
-                        <span>Logo no disponible</span>
-                      </div>
-                    )}
-                  </label>
-                </div>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div className={styles.formContent}>
+              {/* Basic Information */}
+              <div className={styles.formSection}>
+                <h2 className={styles.sectionTitle}>Basic Information</h2>
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
                     <label htmlFor="title">Project Title *</label>
@@ -355,7 +268,7 @@ export const ManagerCreateProjectPage = () => {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="clientSelect">Cliente *</label>
+                    <label htmlFor="clientSelect">Client *</label>
                     <select
                       id="clientSelect"
                       name="idcliente"
@@ -363,176 +276,297 @@ export const ManagerCreateProjectPage = () => {
                       required
                       value={formData.idcliente || ''}
                     >
-                      <option value="">Selecciona un cliente</option>
-                      {clientes.map(cliente => (
+                      <option value="">Select a client</option>
+                      {clientes?.map(cliente => (
                         <option key={cliente.idcliente} value={cliente.idcliente}>
                           {cliente.clnombre}
                         </option>
                       ))}
                     </select>
                   </div>
+                </div>
 
+                <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
                     <label htmlFor="description">Description *</label>
-                    <input
-                      type="text"
+                    <textarea
                       id="description"
                       name="description"
                       value={formData.description}
                       onChange={handleInputChange}
                       placeholder="What is your project about?"
+                      rows="3"
                       required
                     />
                   </div>
 
-                  <div className={styles.formGroup}>
-                    <label htmlFor="startDate">Start Date *</label>
-                    <input
-                      type="date"
-                      id="startDate"
-                      name="startDate"
-                      value={formData.startDate}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="endDate">Estimated End Date</label>
-                    <input
-                      type="date"
-                      id="endDate"
-                      name="endDate"
-                      value={formData.endDate}
-                      onChange={handleInputChange}
-                    />
+                  <div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="startDate">Start Date *</label>
+                      <input
+                        type="date"
+                        id="startDate"
+                        name="startDate"
+                        value={formData.startDate}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="endDate">Estimated End Date</label>
+                      <input
+                        type="date"
+                        id="endDate"
+                        name="endDate"
+                        value={formData.endDate}
+                        onChange={handleInputChange}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-
-
-
-          <div style={{ marginTop: '2rem' }}>
-            <h3>Roles del Proyecto</h3>
-            <button type="button" onClick={handleAddRole} className={styles.secondaryButton}>
-              + Agregar Rol
-            </button>
-
-            {formData.roles.map((rol, index) => (
-              <div key={index} style={{ border: '1px solid #ccc', padding: '1rem', marginTop: '1rem', position: 'relative' }}>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveRole(index)}
-                  style={{ position: 'absolute', top: 0, right: 0 }}
-                >
-                  ❌
-                </button>
-                <div className={styles.formGroup}>
-                  <label>Nombre del Rol</label>
-                  <input
-                    type="text"
-                    value={rol.nombrerol}
-                    onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Nivel del Rol</label>
-                  <input
-                    type="number"
-                    value={rol.nivelrol}
-                    onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Descripción</label>
-                  <input
-                    type="text"
-                    value={rol.descripcionrol}
-                    onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
-                  />
-                </div>
-                <div style={{ marginTop: '1rem' }}>
-                  <h4>Habilidades requeridas</h4>
-                  {rol.requerimientos?.map((req, reqIndex) => (
-                    <div key={reqIndex} style={{ borderLeft: '2px solid #ccc', paddingLeft: '1rem', marginBottom: '1rem' }}>
-                      <div className={styles.formGroup}>
-                        <label>Habilidad</label>
-                        <select
-                          value={req.idhabilidad}
-                          onChange={(e) =>
-                            handleRequerimientoChange(index, reqIndex, 'idhabilidad', e.target.value)
-                          }
-                        >
-                          <option value="">Selecciona una habilidad</option>
-                          {[...habilidades]
-                            .sort((a, b) => a.nombre.localeCompare(b.nombre))
-                            .map((hab) => (
-                              <option key={hab.idhabilidad} value={hab.idhabilidad}>
-                                {hab.nombre}
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-
-                      <div className={styles.formGroup}>
-                        <label>Tiempo de experiencia</label>
-                        <select
-                          value={req.tiempoexperiencia}
-                          onChange={(e) =>
-                            handleRequerimientoChange(index, reqIndex, 'tiempoexperiencia', e.target.value)
-                          }
-                        >
-                          <option value="">Selecciona una opción</option>
-                          <option>3 months</option>
-                          <option>6 months</option>
-                          <option>1 year</option>
-                          <option>2 years</option>
-                          <option>3 years</option>
-                          <option>4 years</option>
-                          <option>5 years</option>
-                        </select>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveRequerimiento(index, reqIndex)}
-                        className={styles.cancelButton}
-                      >
-                        Eliminar habilidad
-                      </button>
-                    </div>
-                  ))}
-
-                  <button
-                    type="button"
-                    onClick={() => handleAddRequerimiento(index)}
-                    className={styles.secondaryButton}
+              {/* Project Roles */}
+              <div className={styles.formSection}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <h2 className={styles.sectionTitle}>Project Roles</h2>
+                  <button 
+                    type="button" 
+                    onClick={handleAddRole} 
+                    className={styles.addButton}
                   >
-                    + Agregar Habilidad
+                    <i className="bi bi-plus-lg"></i>
+                    Add Role
                   </button>
                 </div>
 
-              </div>
-            ))}
-          </div>
-          <ButtonGroup>
-            <button className={styles.saveButton} onClick={() => navigate('/manager/dashboard')}>
-              Cancel
-            </button>
+                {formData.roles.map((rol, index) => (
+                  <div key={index} className={styles.roleCard}>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveRole(index)}
+                      className={styles.removeRoleButton}
+                    >
+                      ×
+                    </button>
 
-            <button
-              type="submit"
-              disabled={!isFormValid()}
-              className={styles.saveButton}
-            >
-              <i className="bi bi-plus-lg"></i>
-              Create Project
-            </button>
-          </ButtonGroup>
-        </form>
+                    <div className={styles.formGrid}>
+                      <div className={styles.formGroup}>
+                        <label>Role Name</label>
+                        <input
+                          type="text"
+                          value={rol.nombrerol}
+                          onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
+                          placeholder="e.g. Frontend Developer"
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Role Level</label>
+                        <input
+                          type="number"
+                          value={rol.nivelrol}
+                          onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
+                          placeholder="1-5"
+                          min="1"
+                          max="5"
+                        />
+                      </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Description</label>
+                      <textarea
+                        value={rol.descripcionrol}
+                        onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
+                        placeholder="Describe the role responsibilities..."
+                        rows="2"
+                      />
+                    </div>
+
+                    {/* Skills Requirements */}
+                    <div style={{ marginTop: '1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <h4 style={{ color: 'var(--text-light)', margin: 0 }}>Required Skills</h4>
+                        <button
+                          type="button"
+                          onClick={() => handleAddRequerimiento(index)}
+                          className={styles.addButton}
+                          style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                        >
+                          <i className="bi bi-plus"></i>
+                          Add Skill
+                        </button>
+                      </div>
+
+                      {rol.requerimientos?.map((req, reqIndex) => (
+                        <div key={reqIndex} className={styles.requirementCard}>
+                          <div className={styles.formGrid}>
+                            <div className={styles.formGroup}>
+                              <label>Skill</label>
+                              <select
+                                value={req.idhabilidad}
+                                onChange={(e) =>
+                                  handleRequerimientoChange(index, reqIndex, 'idhabilidad', e.target.value)
+                                }
+                              >
+                                <option value="">Select a skill</option>
+                                {[...habilidades || []]
+                                  .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                                  .map((hab) => (
+                                    <option key={hab.idhabilidad} value={hab.idhabilidad}>
+                                      {hab.nombre}
+                                    </option>
+                                  ))}
+                              </select>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                              <label>Experience Time</label>
+                              <select
+                                value={req.tiempoexperiencia}
+                                onChange={(e) =>
+                                  handleRequerimientoChange(index, reqIndex, 'tiempoexperiencia', e.target.value)
+                                }
+                              >
+                                <option value="">Select experience</option>
+                                <option>3 months</option>
+                                <option>6 months</option>
+                                <option>1 year</option>
+                                <option>2 years</option>
+                                <option>3 years</option>
+                                <option>4 years</option>
+                                <option>5 years</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveRequerimiento(index, reqIndex)}
+                            className={styles.removeButton}
+                            style={{ marginTop: '0.5rem' }}
+                          >
+                            Remove Skill
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className={styles.formActions}>
+              <button 
+                type="button"
+                className={styles.cancelButton} 
+                onClick={() => navigate('/manager/dashboard')}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                disabled={!isFormValid()}
+                className={styles.submitButton}
+              >
+                <i className="bi bi-plus-lg"></i>
+                Create Project
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Right Column - Upload Sidebar */}
+        <div className={styles.uploadSidebar}>
+          {/* RFP Upload Card */}
+          <GlassCard className={`${styles.uploadCard} ${styles.rfpUploadCard}`}>
+            <div className={styles.uploadSection}>
+              <h3 className={styles.uploadCardTitle}>Project RFP</h3>
+              <label className={styles.uploadLabel} htmlFor="projectoPlan">
+                {formData.RfpPreview ? (
+                  <>
+                    {formData.projectRFP?.type === 'application/pdf' ? (
+                      <iframe
+                        src={formData.RfpPreview}
+                        style={{ width: '100%', height: '200px', borderRadius: '8px' }}
+                        title="RFP Preview"
+                      />
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '2rem' }}>
+                        <i className="bi bi-file-earmark-text" style={{ fontSize: '3rem', color: 'var(--primary-color)', marginBottom: '1rem' }}></i>
+                        <p style={{ color: 'var(--text-light)', margin: 0 }}>
+                          {formData.projectRFP.name}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className={styles.fileActions}>
+                      <button
+                        type="button"
+                        className={styles.removeButton}
+                        onClick={() =>
+                          setFormData(prev => ({
+                            ...prev,
+                            projectRFP: null,
+                            RfpPreview: null
+                          }))
+                        }
+                      >
+                        Remove
+                      </button>
+                      <label className={styles.addButton} style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}>
+                        Change File
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleRFPChange}
+                          className={styles.fileInput}
+                        />
+                      </label>
+                    </div>
+                  </>
+                ) : (
+                  <div className={styles.uploadPlaceholder} style={{ height: '100%', minHeight: '200px' }}>
+                    <i className="bi bi-cloud-upload"></i>
+                    <span>Click to upload project RFP</span>
+                    <small style={{ fontSize: '0.8rem', opacity: 0.7 }}>PDF, DOC, DOCX files</small>
+                  </div>
+                )}
+              </label>
+              <input
+                type="file"
+                id="projectoPlan"
+                accept=".pdf,.doc,.docx"
+                onChange={handleRFPChange}
+                className={styles.fileInput}
+              />
+            </div>
+          </GlassCard>
+
+          {/* Client Logo Card */}
+          <GlassCard className={`${styles.uploadCard} ${styles.clientUploadCard}`}>
+            <div className={styles.uploadSection}>
+              <h3 className={styles.uploadCardTitle}>Client Logo</h3>
+              <div style={{ textAlign: 'center' }}>
+                {clientImageUrl ? (
+                  <img
+                    src={clientImageUrl}
+                    alt="Client logo"
+                    className={styles.uploadPreview}
+                    style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                  />
+                ) : (
+                  <div className={styles.uploadPlaceholder} style={{ width: '120px', height: '120px', margin: '0 auto' }}>
+                    <i className="bi bi-building"></i>
+                    <span style={{ fontSize: '0.8rem' }}>No logo available</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </GlassCard>
+        </div>
       </div>
     </div>
   );
