@@ -21,11 +21,11 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosRetry(axiosInstance, {
-  retries: 3,
+  retries: 1, // Número de reintentos
   retryDelay: (retryCount) => {
     return retryCount * 2000;
   },
-  shouldResetTimeout: true,
+  shouldResetTimeout: false,
 });
 
 export const useGetFetch = ({rutaApi = ""}) => {

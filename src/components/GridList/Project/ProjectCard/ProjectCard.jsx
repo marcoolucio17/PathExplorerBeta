@@ -50,9 +50,11 @@ const ProjectCard = ({
     }));
   };
 
-  const { data: matchPercentageData } = useGetFetch({
-    rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`
-  });
+
+  const matchPercentage = 0;/*useGetFetch({
+    rutaApi: `compability?id_rol=${idr*ol}&idusuario=${idEmployee}`
+  })*/
+
 
   const matchPercentageValue = matchPercentageData ? matchPercentageData : 0;
   const roleData = ensureRoleData();
