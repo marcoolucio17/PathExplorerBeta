@@ -65,11 +65,37 @@ export const CVModal = ({ isOpen, onClose }) => {
 
       const formData = new FormData();
       formData.append("file", file); // adjust the key to match backend expectations
-      formData.append("projectId", "1")
+      formData.append("idusuario", localStorage.getItem('id'))
 
       try {
-          triggerPost("api/upload-rfp", formData)
+        triggerPost(`upload-cv/${localStorage.getItem('id')}`, formData)
 
+      }
+      catch (error) {
+        console.error("Upload failed:", error);
+        alert("Upload failed.");
+      }
+    };
+
+    input.click();
+  };
+
+  const handleCVUploadWithAI = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".pdf,.doc,.docx";
+
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("idusuario", localStorage.getItem('id'));
+
+      try {
+        const result = await triggerPost("analizar-cv", formData);
+        console.log("Resultado del análisis:", result);
       } catch (error) {
         console.error("Upload failed:", error);
         alert("Upload failed.");
@@ -78,23 +104,24 @@ export const CVModal = ({ isOpen, onClose }) => {
 
     input.click();
   };
-  
+
+
   return (
-    <div 
-      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ''}`} 
+    <div
+      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ''}`}
       onClick={handleBackdropClick}
     >
       <div className={`${styles.modalContent} ${isClosing ? styles.closing : ''}`} style={{ maxWidth: '900px' }}>
         <button className={styles.closeButton} onClick={handleClose}>
           <i className="bi bi-x-lg"></i>
         </button>
-        
+
         <div className={styles.modalHeader}>
           <h2 className={styles.title}>Curriculum Vitae</h2>
           <p className={styles.subtitle}>Professional Resume</p>
         </div>
 
-        <div className={styles.modalBody} style={{ 
+        <div className={styles.modalBody} style={{
           flex: '1',
           minHeight: '0',
           height: 'calc(100% - 200px)',
@@ -107,8 +134,8 @@ export const CVModal = ({ isOpen, onClose }) => {
             minHeight: 'min-content',
             padding: '1rem'
           }}>
-            <iframe 
-              src="/pdfs/Gabriel Ernesto Mujica Proulx.pdf" 
+            <iframe
+              src="/pdfs/Gabriel Ernesto Mujica Proulx.pdf"
               style={{
                 width: '100%',
                 height: '1000px',
@@ -123,20 +150,28 @@ export const CVModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className={styles.buttonGroup} style={{ borderTop: '1px solid var(--border-light)', padding: '1.5rem' }}>
-          <button 
-            onClick={handleDownload} 
+          <button
+            onClick={handleDownload}
             className={styles.primaryButton}
           >
             <i className="bi bi-download"></i>
             Download CV
           </button>
-          
-          <button 
-            onClick={handleCVUpload} 
+
+          <button
+            onClick={handleCVUpload}
             className={styles.secondaryButton}
           >
             <i className="bi bi-upload"></i>
             Upload New
+          </button>
+
+          <button
+            onClick={handleCVUploadWithAI}
+            className={styles.secondaryButton}
+          >
+            <i className="bi bi-upload"></i>
+            Upload New With AI
           </button>
         </div>
       </div>
