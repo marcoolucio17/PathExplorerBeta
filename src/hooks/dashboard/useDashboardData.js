@@ -75,6 +75,8 @@ export const useDashboardData = () => {
 
   const { data: rolesData } = useGetFetch({ rutaApi: "roles" });
 
+  const { data: topData } = useGetFetch({ rutaApi: `projects/top/${localStorage.getItem("id")}`});
+
   //apply skills filters
   const handleApplySkillFilters = (selectedSkills) => {
     setSelectedSkillFilters(selectedSkills);
@@ -231,6 +233,7 @@ export const useDashboardData = () => {
     clients: Array.isArray(clientsData) ? clientsData : [],
     //skills: Array.isArray(skillsData) ? skillsData : [],
     roles: Array.isArray(rolesData) ? rolesData : [],
+    top: Array.isArray(topData) ? topData : [],
     searchTerm,
     setSearchTerm,
     selectedSkillFilters,

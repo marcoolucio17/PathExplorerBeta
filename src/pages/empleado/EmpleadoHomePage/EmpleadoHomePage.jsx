@@ -46,8 +46,6 @@ export const EmpleadoHomePage = () => {
   const navigate = useNavigate();
   const [recommendedProjects] = useState(MOCK_RECOMMENDED_PROJECTS);
 
-  const [goalProgress] = useState(1); //1/3
-  const [projectProgress] = useState(96); //96%
   
   //api stuff needed for the page
   const { data, error, loading } = useFetch(
@@ -91,7 +89,7 @@ export const EmpleadoHomePage = () => {
 
   const dashboardPage = useEmpleadoDashboardPage();
   
-
+  
   return (
     <div className={pageStyles.homeLayout}>
       <div className={pageStyles.mainContentWrapper}>
@@ -121,7 +119,7 @@ export const EmpleadoHomePage = () => {
             <div className={styles.cardsContainer}>
               <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
                 <ProjectList 
-                  projects={dashboardPage.displayProjects}
+                  projects={dashboardPage.topProjects}
                   viewMode={dashboardPage.viewMode}
                   showCompatibility={dashboardPage.showCompatibility}
                   selectedSkillFilters={dashboardPage.selectedSkillFilters}
