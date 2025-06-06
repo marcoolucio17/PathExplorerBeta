@@ -12,6 +12,10 @@ import useFetch from "src/hooks/useFetch";
 import { formatName } from "src/hooks/profile/useProfilePage";
 import ImageCarousel from "./ImageCarousel";
 import { TrendsCard } from "src/components/Home/TrendsCard";
+import useEmpleadoDashboardPage from "src/hooks/dashboard/useEmpleadoDashboardPage";
+import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
+import CustomScrollbar from "src/components/CustomScrollbar";
+import { ProjectList } from "src/components/GridList/Project";
 
 //mock data - in a real app, this would come from props or API
 const MOCK_RECOMMENDED_PROJECTS = [
@@ -42,8 +46,6 @@ export const EmpleadoHomePage = () => {
   const navigate = useNavigate();
   const [recommendedProjects] = useState(MOCK_RECOMMENDED_PROJECTS);
 
-  const [goalProgress] = useState(1); //1/3
-  const [projectProgress] = useState(96); //96%
   
   //api stuff needed for the page
   const { data, error, loading } = useFetch(
@@ -57,12 +59,7 @@ export const EmpleadoHomePage = () => {
   if (loading1) return <p>Loading skills...</p>;
   if (error1) return <p>Error loading skills: {error1.message}</p>;
 
-  const skills = data1?.result || [];
-
-  const categorizedSkills = {
-    hardSkills: skills.map((skill) => skill.name), 
-    softSkills: [] 
-  };
+  console.log(data1);
 
   const handleApplyToProject = (projectId) => {
     console.log(`Applying to project ${projectId}`);
@@ -90,12 +87,15 @@ export const EmpleadoHomePage = () => {
     }
   ];
 
+  const dashboardPage = useEmpleadoDashboardPage();
+  
+  
   return (
     <div className={pageStyles.homeLayout}>
       <div className={pageStyles.mainContentWrapper}>
         {/* header section */}
         <div className={pageStyles.headerSection}>
-          <h1 className={pageStyles.mainTitle}>{`Welcome Back, ${formatName(data?.user?.nombre) || "..."}`}</h1>
+          <h1 className={pageStyles.mainTitle}>{`Welcome back, ${formatName(data?.user?.nombre) || "..."}!`}</h1>
         </div>
 
         {/* main content area */}
@@ -116,32 +116,20 @@ export const EmpleadoHomePage = () => {
                 Based on your profile, you'd be a great fit for these projects:
               </h3>
               
-              <div className={pageStyles.projectCardsWrapper}>
-                {recommendedProjects.map((project) => (
-                  <GlassCard key={project.idproyecto} className={pageStyles.projectCard}>
-                    <h4 className={pageStyles.projectName}>{project.pnombre}</h4>
-                    <div className={pageStyles.recommendationTitle}>Compatibility:</div>
-                    <div className={pageStyles.matchPercentage}>{project.matchPercentage}%</div>
-                    <div className={pageStyles.skillsContainer}>
-                      {project.skills.map((skill, idx) => (
-                        <SkillChip 
-                          key={idx}
-                          text={skill}
-                          isUserSkill={false}
-                        />
-                      ))}
-                    </div>
-                    <Button 
-                      type="primary"
-                      icon="bi-check-circle-fill"
-                      onClick={() => handleApplyToProject(project.idproyecto)}
-                      className={pageStyles.applyButton}
-                    >
-                      Apply
-                    </Button>
-                  </GlassCard>
-                ))}
-              </div>
+            <div className={styles.cardsContainer}>
+              <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
+                <ProjectList 
+                  projects={dashboardPage.topProjects}
+                  viewMode={dashboardPage.viewMode}
+                  showCompatibility={dashboardPage.showCompatibility}
+                  selectedSkillFilters={dashboardPage.selectedSkillFilters}
+                  userSkills={dashboardPage.userSkills}
+                  calculateMatchPercentage={dashboardPage.calculateMatchPercentage}
+                  onClearFilters={dashboardPage.handleClearFilters}
+                  isLoading={dashboardPage.isLoading}
+                />
+              </CustomScrollbar>
+            </div>
             </div>
           </div>
         </div>
@@ -173,7 +161,7 @@ export const EmpleadoHomePage = () => {
           <div className={pageStyles.trendsContainer}>
             <TrendsCard 
               className={pageStyles.sidebarSection}
-              categorizedSkills={categorizedSkills}
+              data={data1} 
             />
           </div>
         </div>
