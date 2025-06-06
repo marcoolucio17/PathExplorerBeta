@@ -96,7 +96,7 @@ export const SearchHeader = ({
   }, [searchTerm, inSearchBar]);
 
   // Handle click outside to close dropdown
-  useEffect(() => {
+  /*useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowResults(false);
@@ -107,7 +107,7 @@ export const SearchHeader = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, []);*/
 
   // Function to render the appropriate icon
   const renderIcon = (iconType) => {

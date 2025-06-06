@@ -1,8 +1,9 @@
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 
 import useManagerDashboardPage from '../../../hooks/dashboard/useManagerDashboardPage';
 import useDashboardHeaderConfig from '../../../hooks/dashboard/useDashboardHeaderConfig';
-
+import useGetFetch from "../../../hooks/useGetFetch";
+import useGetFetchProjectsFilters from "../../../hooks/useGetFetchProjectsFilters";
 import ProjectList from '../../../components/GridList/Project/ProjectList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
@@ -22,9 +23,8 @@ export const ManagerDashboardPage = () => {
 
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
-  };
+  };  
 
-  console.log('DashboardPage state:', dashboardPage.activeTab);
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -70,7 +70,6 @@ export const ManagerDashboardPage = () => {
               showCompatibility={dashboardPage.showCompatibility}
               selectedSkillFilters={dashboardPage.selectedSkillFilters}
               userSkills={dashboardPage.userSkills}
-              calculateMatchPercentage={dashboardPage.calculateMatchPercentage}
               onClearFilters={dashboardPage.handleClearFilters}
               isLoading={dashboardPage.isLoading}
             />
