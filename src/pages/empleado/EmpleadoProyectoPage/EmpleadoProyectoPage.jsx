@@ -1,39 +1,42 @@
 import React from 'react';
 
 // Custom Hooks
-import useEmpleadoProyectoPage from '../../../hooks/proyecto/useEmpleadoProyectoPage';
+import useEmpleadoProyectoPage from '../../../hooks/proyecto/useEmpleadoProyectoPage.js';
 
-// Components
+//components
 import { GlassCard } from '../../../components/shared/GlassCard';
 import { ProgressBar } from '../../../components/ProgressBar';
 import SkillChip from '../../../components/SkillChip/SkillChip';
 import Button from '../../../components/shared/Button';
 import CustomScrollbar from '../../../components/CustomScrollbar';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
-// Modals
+//modals
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
 import { CompatibilityModal } from "../../../components/Modals/CompatibilityModal";
 import { ApplicationModal } from "../../../components/Modals/ApplicationModal";
 import { AllSkillsModal } from "../../../components/Modals/AllSkillsModal";
+import { RFPModal } from "../../../components/Modals/RFPModal";
 
-// CSS
+//css
 import styles from "src/styles/Pages/Proyecto/EmpleadoProyectoPage.module.css";
 import peopleStyles from "src/styles/Pages/Proyecto/PeopleSection.module.css";
 import skillsStyles from "src/styles/Pages/Proyecto/SkillsSection.module.css";
 
-
+//project details page for empleado role
 export const EmpleadoProyectoPage = () => {
   const proyectoPage = useEmpleadoProyectoPage();
   const { projectData, userSkills, isApplied, isLoading, loading, error } = proyectoPage;
 
-  // Handle loading state
+  //loading state
   if (loading) {
     return (
-      <div className={styles.proyectoContainer}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-          <p>Loading project details...</p>
-        </div>
-      </div>
+      <LoadingSpinner 
+        overlay={true}
+        size="large"
+        message="Loading project details..."
+        variant="default"
+      />
     );
   }
 
@@ -57,6 +60,7 @@ export const EmpleadoProyectoPage = () => {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '50vh', justifyContent: 'center' }}>
           <h2>Project not found</h2>
           <p>The requested project could not be found.</p>
+          <p>Check browser console for API debugging info.</p>
         </div>
       </div>
     );
@@ -143,12 +147,21 @@ export const EmpleadoProyectoPage = () => {
             
             <Button 
               type="primary"
-              icon={isLoading ? "bi-arrow-clockwise" : isApplied ? "bi-check-circle-fill" : "bi-check-circle-fill"}
+              icon={isLoading ? "bi-arrow-clockwise" : isApplied ? "bi-check-circle-fill" : "bi-plus-circle"}
               onClick={proyectoPage.handleShowApplication}
               disabled={isLoading || isApplied}
               isLoading={isLoading}
             >
-              {isLoading ? "Applying..." : isApplied ? "Applied" : "Apply to Project"}
+              {isLoading ? "Checking..." : isApplied ? "Applied" : "Apply to Project"}
+            </Button>
+            
+            <Button 
+              type="secondary"
+              variant="view"
+              icon="bi-file-earmark-text"
+              onClick={proyectoPage.handleShowRFP}
+            >
+              View RFP
             </Button>
           </div>
         </div>
@@ -192,7 +205,7 @@ export const EmpleadoProyectoPage = () => {
                 </CustomScrollbar>
               </div>
               
-              <div className={peopleStyles.buttonsContainer}>
+              <div className={peopleStyles.buttonsContainer} onClick={(e) => e.stopPropagation()}>
                 <div className={peopleStyles.buttonsRow}>
                   <Button
                     type="secondary"
@@ -203,7 +216,7 @@ export const EmpleadoProyectoPage = () => {
                       roleId: role.id,
                       available: role.available
                     }))}
-                    onDropdownItemClick={(item) => console.log('Selected role:', item)}
+                    onDropdownItemClick={(item) => proyectoPage.handleRoleSelect(item)}
                     className={peopleStyles.halfButton}
                   >
                     All Roles ({(projectData.availableRoles || []).length})
@@ -285,6 +298,12 @@ export const EmpleadoProyectoPage = () => {
         projectData={projectData}
         onSubmitApplication={proyectoPage.handleSubmitApplication}
         isLoading={isLoading}
+      />
+
+      <RFPModal
+        isOpen={proyectoPage.modals.rfp}
+        onClose={() => proyectoPage.closeModal('rfp')}
+        projectData={projectData}
       />
     </div>
   );

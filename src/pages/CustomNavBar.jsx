@@ -15,13 +15,13 @@ function CustomNavbar() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  //search categories
+  // Define search categories
   const searchCategories = [
     { key: 'people', label: 'People', icon: 'people' },
     { key: 'projects', label: 'Projects', icon: 'projects' },
     { key: 'certificates', label: 'Certificates', icon: 'certificates' },
     { key: 'skills', label: 'Skills', icon: 'skills' },
-    { key: 'applicants', label: 'Applicants', icon: 'people' } //using people icon for applicants
+    { key: 'applicants', label: 'Applicants', icon: 'people' } // Using people icon for applicants
   ];
 
   const handleSearch = (value) => {
@@ -29,7 +29,7 @@ function CustomNavbar() {
   };
 
   const handleSearchResultClick = (searchValue, category) => {
-    //navigate to the appropriate search page based on the category that was chosen yurd
+    // Navigate to the appropriate search page based on the category
     switch (category) {
       case 'people':
         navigate(`/people/search?q=${encodeURIComponent(searchValue)}`);
@@ -47,10 +47,17 @@ function CustomNavbar() {
         navigate(`/manager/applicants?search=${encodeURIComponent(searchValue)}`);
         break;
       default:
-        //use a default if not
+        // If there's no matching category, use a default
         navigate(`/search?q=${encodeURIComponent(searchValue)}`);
         break;
     }
+  };
+
+  const handleLogout = () => {
+    // borramos tokens
+    localStorage.clear();
+    // salimos
+    navigate("/");
   };
 
   return (
@@ -67,25 +74,18 @@ function CustomNavbar() {
         }}
       >
         <ul className="sidebar-menu">
-          <li onClick={() => navigate("/")}>
+          <li onClick={() => navigate(`${authState}`)}>
             <i className="bi bi-house"></i>
             {isSidebarOpen && <span>Home</span>}
           </li>
-          <li onClick={() => navigate("/projects")}>
+          <li onClick={() => navigate(`${authState}/dashboard`)}>
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
-          <li onClick={() => navigate("/certificates")}>
-            <i className="bi bi-award"></i>
-            {isSidebarOpen && <span>Certificates</span>}
-          </li>
-          <li onClick={() => navigate("/settings")}>
-            <i className="bi bi-gear"></i>
-            {isSidebarOpen && <span>Settings</span>}
-          </li>
-          <li onClick={() => navigate("/about")}>
-            <i className="bi bi-info-circle"></i>
-            {isSidebarOpen && <span>About</span>}
+          <li onClick={handleLogout}>
+            <i className="bi bi-box-arrow-left"></i>
+            {isSidebarOpen && <span>Logout</span>}
+
           </li>
         </ul>
       </div>
@@ -116,12 +116,6 @@ function CustomNavbar() {
 
           {/* Icons */}
           <div className="nav-icons d-flex gap-3 align-items-center">
-            <button
-              onClick={() => navigate(`/${authState}/dashboard`)}
-              className="icon-btn"
-            >
-              <i className="bi bi-list-ul"></i>
-            </button>
 
             <div className="position-relative">
               <button
@@ -133,7 +127,7 @@ function CustomNavbar() {
               </button>
 
               <Notifications
-                userId={localStorage.getItem("idusuario")}
+                userId={localStorage.getItem("id")}
                 visible={showNotifications}
               />
             </div>

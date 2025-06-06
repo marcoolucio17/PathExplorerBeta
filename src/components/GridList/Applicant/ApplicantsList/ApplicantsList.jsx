@@ -13,6 +13,7 @@ import styles from 'src/styles/GridList/GridListContainer.module.css';
  * @param {Function} props.calculateMatchPercentage - Function to calculate match percentage
  * @param {Function} props.onViewRequest - Function called when View Request button is clicked
  * @param {Function} props.onViewReason - Function called when View Reason button is clicked
+ * @param {Function} props.onViewAssign - Function called when View Appeal button is clicked
  * @param {Function} props.onClearFilters - Function called when Clear Filters button is clicked
  */
 const ApplicantsList = ({ 
@@ -24,9 +25,10 @@ const ApplicantsList = ({
   calculateMatchPercentage,
   onViewRequest,
   onViewReason,
+  onViewAssign,
   onClearFilters
 }) => {
-  //loading, show loader
+  // If loading, show loader
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -35,7 +37,7 @@ const ApplicantsList = ({
     );
   }
 
-  //no applicants, show empty state
+  // If no applicants, show empty state
   if (applicants.length === 0) {
     return (
       <div className={styles.emptyStateContainer}>
@@ -53,10 +55,10 @@ const ApplicantsList = ({
     );
   }
 
-  //class based on viewMode
+  // Container class based on viewMode
   const containerClass = viewMode === 'grid' ? styles.gridContainer : styles.listContainer;
 
-  //create a unique key for the container to force re-render and animation restart
+  // Create a unique key for the container to force re-render and animation restart
   const containerKey = `container-${activeTab}-${viewMode}`;
 
   return (
@@ -65,10 +67,10 @@ const ApplicantsList = ({
       className={containerClass}
     >
       {applicants.map((applicant, index) => {
-        //calculate match percentage
+        // Calculate match percentage
         const matchPercentage = calculateMatchPercentage(applicant);
         
-        //force cards to always re-render when tab or filter changes with a unique key
+        // Force cards to always re-render when tab or filter changes with a unique key
         const renderKey = `${applicant.id}-${activeTab}-${index}`;
         
         return (
@@ -81,6 +83,7 @@ const ApplicantsList = ({
               activeTab={activeTab}
               onViewRequest={onViewRequest}
               onViewReason={onViewReason}
+              onViewAssign={onViewAssign}
               index={index}
             />
           </div>

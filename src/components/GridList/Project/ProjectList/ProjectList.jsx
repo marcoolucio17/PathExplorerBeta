@@ -1,10 +1,13 @@
-import React from 'react';
-import ProjectCard from 'src/components/GridList/Project/ProjectCard';
-import styles from 'src/styles/GridList/GridListContainer.module.css';
+import React, { useEffect } from "react";
+import ProjectCard from "src/components/GridList/Project/ProjectCard";
+import { ProjectLoadingState } from "src/components/LoadingSpinner";
+import styles from "src/styles/GridList/GridListContainer.module.css";
+
+import { Navigate, Link, useNavigate, NavLink } from "react-router";
 
 /**
  * ProjectList component to display projects in grid or list view
- * 
+ *
  * @param {Object} props
  * @param {Array} props.projects - Array of project objects to display
  * @param {string} props.viewMode - 'grid' or 'list' display mode
@@ -15,36 +18,43 @@ import styles from 'src/styles/GridList/GridListContainer.module.css';
  * @param {Function} props.onClearFilters - Function called when Clear Filters button is clicked
  * @param {boolean} props.isLoading - Whether items are currently loading
  */
-const ProjectList = ({ 
-  projects = [], 
-  viewMode, 
-  showCompatibility, 
+const ProjectList = ({
+  tabSelected,
+  projects = [],
+  viewMode,
+  showCompatibility,
   selectedSkillFilters = [],
   userSkills = [],
-  calculateMatchPercentage,
   onClearFilters,
-  isLoading = false
+  isLoading = false,
 }) => {
-  // Safety check
+
+  // Safety check for undefined/null projects array
   const safeProjects = Array.isArray(projects) ? projects : [];
-  
-  //loading, show loader
+  //if loading, show enhanced project loading state
   if (isLoading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loader}></div>
-      </div>
+      <ProjectLoadingState 
+        message="Loading projects..." 
+        viewMode={viewMode}
+        showSkeletonCards={true}
+        skeletonCount={6}
+      />
     );
   }
 
-  //no projects, show empty state
+  // If no projects, show empty state
+
   if (safeProjects.length === 0) {
     return (
       <div className={styles.emptyStateContainer}>
         <div className={styles.noItemsMessage}>
-          <i className="bi bi-briefcase" style={{ fontSize: '2rem', marginBottom: '1rem' }}></i>
+          <i
+            className="bi bi-briefcase"
+            style={{ fontSize: "2rem", marginBottom: "1rem" }}
+          ></i>
           <p>No projects match your selected filters</p>
-          <button 
+          <button
             className={styles.clearFiltersButton}
             onClick={onClearFilters}
           >
@@ -55,42 +65,138 @@ const ProjectList = ({
     );
   }
 
-  //container class viewMode
-  const containerClass = viewMode === 'grid' ? styles.gridContainer : styles.listContainer;
-  
-  //create a unique key for the container to force re-render and animation restart
+  // Container class based on viewMode
+  const containerClass =
+    viewMode === "grid" ? styles.gridContainer : styles.listContainer;
+  // Create a unique key for the container to force re-render and animation restart
   const containerKey = `container-projects-${viewMode}`;
-
   return (
-    <div 
-      key={containerKey}
-      className={containerClass}
-    >
+    <div key={containerKey} className={containerClass}>
       {safeProjects.map((item, index) => {
-        if (!item || !item.project || !item.proyecto_rol) {
-          console.warn('Invalid project item structure:', item);
-          return null; 
+
+        // Check if item has the expected
+        // structure
+
+        if (!item || !item.project) {
+          return null; // Skip rendering this item
         }
-        
-        const matchPercentage = calculateMatchPercentage ? 
-          calculateMatchPercentage(item.project, item.proyecto_rol) : 0;
-        
-        const renderKey = `${item.project.idproyecto || 'unknown'}-${item.proyecto_rol.idrol || 'unknown'}-${index}`;
-        
+
+        // For project cards (My Projects tab), we don't have proyecto_rol
+        const isProjectCard = item.isProjectCard || false;
+        const projectId = item.project.idproyecto || "unknown";
+        if (!isProjectCard) {
+
+          if (Array.isArray(item.proyecto_rol)) {
+            return item.proyecto_rol?.map((rol, rolindex) => {
+
+              // Fix role ID extraction - check the nested structure
+              let roleId = null;
+
+              if (!isProjectCard && rol) {
+                roleId = rol.idrol || null;
+              }
+              let compatibilityValue = null;
+              if (!isProjectCard && rol) {
+                compatibilityValue = rol.compability || 0; // Default to 0 if not available
+              }
+              // Force cards to always re-render when filter changes with a unique key
+              const renderKey = `${projectId}-${roleId || 'project'}-${index}-${rolindex}`;
+
+              return (
+                <div key={renderKey} className={styles.item}>
+
+                  <ProjectCard
+
+                    id={projectId}
+                    idrol={roleId}
+                    project={item.project}
+                    proyecto_rol={rol.roles}
+                    viewMode={viewMode}
+                    compatibilityValue={compatibilityValue}
+                    showCompatibility={showCompatibility}
+                    selectedSkillFilters={selectedSkillFilters}
+                    userSkills={userSkills}
+                    index={index}
+                    isProjectCard={isProjectCard}
+                  />
+                </div>
+              );
+
+            });
+          } else {
+            // Fix role ID extraction - check the nested structure
+            let roleId = null;
+            if (!isProjectCard && item.proyecto_rol) {
+              roleId = item.proyecto_rol.idrol || null;
+            }
+            let compatibilityValue = null;
+            if (!isProjectCard && item.proyect) {
+              compatibilityValue = item.proyect.compability || 0; // Default to 0 if not available
+            }
+            const renderKey = `${projectId}-${roleId || 'project'}`;
+            return (
+
+
+              // Force cards to always re-render when filter changes with a unique key
+
+              <div key={renderKey} className={styles.item}>
+
+                <ProjectCard
+                  id={projectId}
+                  idrol={roleId}
+                  project={item.project}
+                  proyecto_rol={item.proyecto_rol}
+                  viewMode={viewMode}
+                  compatibilityValue={compatibilityValue}
+                  showCompatibility={showCompatibility}
+                  selectedSkillFilters={selectedSkillFilters}
+                  userSkills={userSkills}
+                  index={index}
+                  isProjectCard={isProjectCard}
+                />
+              </div>
+            );
+          }
+        }
+        else if (isProjectCard) {
+          // For project cards, we only have the project object
+          return (
+            <div key={`${projectId}-${index}`} className={styles.item}>
+              <ProjectCard
+                id={projectId}
+                project={item.project}
+                viewMode={viewMode}
+                showCompatibility={showCompatibility}
+                selectedSkillFilters={selectedSkillFilters}
+                userSkills={userSkills}
+                isProjectCard={true} // Indicate this is a project-level card
+              />
+            </div>
+          );
+        }
+
+
+        // Force cards to always re-render when filter changes with a unique key
+        const renderKey = `${projectId}-${roleId || 'project'}-${index}`;
+
+
         return (
-          <div 
-            key={renderKey}
-            className={styles.item}
-          >
+          <div key={renderKey} className={styles.item}>
+
             <ProjectCard
+
+              id={projectId}
+              idrol={roleId}
+
               project={item.project}
               proyecto_rol={item.proyecto_rol}
               viewMode={viewMode}
+              compatibilityValue={compatibilityValue}
               showCompatibility={showCompatibility}
-              matchPercentage={matchPercentage}
               selectedSkillFilters={selectedSkillFilters}
               userSkills={userSkills}
               index={index}
+              isProjectCard={isProjectCard}
             />
           </div>
         );

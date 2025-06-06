@@ -2,19 +2,37 @@ import React from 'react';
 import { GlassCard } from "../shared/GlassCard";
 import styles from './ProfileHeaderCard.module.css';
 
+import useFetch from 'src/hooks/useFetch';
+
+function formatDateToMonthYear(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date)) return dateString;
+  const month = date.toLocaleString("en-US", { month: "short" });
+  const year = date.getFullYear();
+  return `${month} ${year}`;
+}
+
 const ProfileHeaderCard = ({ user }) => {
+
+  const { data, loading, error } = useFetch(
+    "profile-url/" + localStorage.getItem("id")
+  );
+
+  const userTitle = user.role == "User" ? "Employee" : user.role;
+
   return (
     <GlassCard className={styles.profileHeaderCard}>
       <div className={styles.profileHeaderMain}>
         <div className={styles.employeeSection}>
           <img
-            src={user.avatarUrl}
+            src={ !error ?  data.url : "/images/3d_avatar_6.png"}
             alt={`${user.name}`}
             className={styles.avatarXl}
           />
           <div className={styles.employeeMeta}>
             <h1>{user.name}</h1>
-            <h2>{user.title} at {user.company}</h2>
+            <h2>{userTitle} at {user.company}</h2>
             <p className={styles.location}>
               <i className="bi bi-geo-alt-fill" /> {user.location}
             </p>
@@ -23,9 +41,9 @@ const ProfileHeaderCard = ({ user }) => {
         
         <div className={styles.projectSection}>
           <div className={styles.projectMeta}>
-            <h3>Project Golf</h3>
-            <p className={styles.projectDuration}>Jun 2019 - Present</p>
-            <p className={styles.projectRole}>Sr. Software Engineer</p>
+            <h3>{user.pnombre}</h3>
+            <p className={styles.projectDuration}>{formatDateToMonthYear(user.finicio)} - {formatDateToMonthYear(user.fechafin)}</p>
+            <p className={styles.projectRole}>{user.title}</p>
           </div>
         </div>
       </div>

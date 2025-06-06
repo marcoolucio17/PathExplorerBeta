@@ -19,12 +19,21 @@ import { ManagerDashboardCreateProject } from "./pages/manager/ManagerDashboardC
 import { ManagerPerfil } from "./pages/manager/ManagerPerfil";
 import { ManagerProyecto } from "./pages/manager/ManagerProyecto";
 import { ManagerVistaPerfil } from "./pages/manager/ManagerVistaPerfil";
+import { ManagerHomePage } from "./pages/manager/ManagerHomePage/ManagerHomePage";
+import {ManagerCreateProjectPage} from "./pages/manager/ManagerCreateProjectPage/ManagerCreateProjectPage";
 
 // Imports de TFS
 import { TFSDashboard } from "./pages/tfs/TFSDashboard";
+import { TFSApplicantsPage } from "./pages/tfs/TFSApplicantsPage/TFSApplicantsPage";
 import { TFSPerfil } from "./pages/tfs/TFSPerfil";
 import { TFSProyecto } from "./pages/tfs/TFSProyecto";
 import { TFSVistaPropuestas } from "./pages/tfs/TFSVistaPropuestas";
+
+// Imports de users  
+import { UsersDashboardPage } from "./pages/users/UsersDashboardPage/UsersDashboardPage";
+
+// Imports de manager project
+import { ManagerProjectPage } from "./pages/manager/ManagerProjectPage/ManagerProjectPage";
 
 // Imports misc
 import { Unauthorized } from "./pages/Unauthorized";
@@ -41,26 +50,31 @@ function App() {
 
       {/* rutas de manager */}
       <Route element={<PrivateRoutes allowedRoles={["manager"]} />}>
-        <Route path="manager" element={<Navigate to="dashboard" />} />
+        <Route path="manager" element={<EmpleadoHome />} />
         <Route path="manager/dashboard" element={<ManagerDashboardPage />} />
         <Route path="manager/applicants" element={<ManagerApplicantsPage />} />
         <Route path="manager/applicants/view" element={<ManagerViewApplicantPage />} />
-        <Route
+        {/*<Route
           path="manager/dashboard/createproject"
           element={<ManagerDashboardCreateProject />}
-        />
+        /> */}
         <Route path="manager/perfil" element={<ManagerPerfil />} />
-        <Route path="manager/vistaperfil" element={<ManagerVistaPerfil />} />
-        <Route path="manager/proyecto" element={<EmpleadoProyecto />} />
+        {/*<Route path="manager/vistaperfil" element={<ManagerVistaPerfil />} /> */}
+        <Route path="manager/proyecto/:projectId/:roleId" element={<EmpleadoProyecto />} />
+        <Route path="manager/create-project" element={<ManagerCreateProjectPage/>}></Route>
+        <Route path="manager/employee-dashboard" element={<UsersDashboardPage />} />
+        <Route path="manager/project/:projectId" element={<ManagerProjectPage />} />
       </Route>
 
       {/* rutas de tfs */}
       <Route element={<PrivateRoutes allowedRoles={["tfs"]} />}>
         <Route path="tfs" element={<Navigate to="dashboard" />} />
         <Route path="tfs/dashboard" element={<TFSDashboard />} />
+        <Route path="tfs/applicants" element={<TFSApplicantsPage />} />
         <Route path="tfs/perfil" element={<TFSPerfil />} />
         <Route path="tfs/proyecto" element={<TFSProyecto />} />
         <Route path="tfs/vistaperfil" element={<TFSVistaPropuestas />} />
+        <Route path="tfs/employee-dashboard" element={<UsersDashboardPage />} />
       </Route>
 
       {/* rutas de empleado */}
@@ -68,7 +82,8 @@ function App() {
         <Route path="empleado" element={<EmpleadoHome />} />
         <Route path="empleado/dashboard" element={<EmpleadoDashboardPage />} />
         <Route path="empleado/perfil" element={<EmpleadoPerfil />} />
-        <Route path="empleado/proyecto/:projectId" element={<EmpleadoProyecto />} />
+        <Route path="empleado/proyecto/:projectId/:roleId" element={<EmpleadoProyecto />} />
+        <Route path="empleado/employee-dashboard" element={<UsersDashboardPage />} />
       </Route>
     </Routes>
   );

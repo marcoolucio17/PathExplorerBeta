@@ -6,18 +6,18 @@ import useModalControl from '../useModalControl';
 import useToggleState from '../useToggleState';
 
 /**
- * 
- * 
+ * Employee-specific Dashboard hook
+ * Tabs: "All" (no notification badge), "Applied to"
  * 
  * @returns {Object} Complete state and functions for the Employee Dashboard page
  */
 export const useEmpleadoDashboardPage = () => {
   const navigate = useNavigate();
   
-  //get dashboard data
+  // Get dashboard data
   const dashboardData = useDashboardData();
   
-  //employee-specific tab names
+  // Employee-specific tab names
   const tabNames = ['All', 'Applied to'];
   
   // Modal controls
@@ -30,13 +30,13 @@ export const useEmpleadoDashboardPage = () => {
     skillsFilter: false
   });
   
-  //toggle for compatibility view
+  // Toggle for compatibility view
   const { 
     state: showCompatibility,
     toggle: toggleCompatibility 
   } = useToggleState(false);
   
-  //setup list page logic
+  // Setup list page logic
   const listPage = useListPage({
     data: dashboardData.projects,
     defaultSortOption: 'date_desc',
@@ -50,19 +50,19 @@ export const useEmpleadoDashboardPage = () => {
     baseUrl: '/empleado/dashboard'
   });
   
-  //override toggleViewMode because animation wasnt really workin
+  // Override toggleViewMode to ensure animation works consistently
   const toggleViewMode = useCallback(() => {
-    //toggle view mode
+    // Toggle view mode using the original function
     listPage.toggleViewMode();
     
-    //force animation refresh for 
+    // Force animation refresh for the newly displayed items
     setTimeout(() => {
-      //reset any placeholders
+      // Reset any placeholders immediately
       if (listPage.resetAnimation) {
         listPage.resetAnimation();
       }
       
-      //trigger a full animation sequence after a short delay
+      // Trigger a full animation sequence after a short delay
       setTimeout(() => {
         if (listPage.triggerAnimationSequence) {
           listPage.triggerAnimationSequence();
@@ -71,12 +71,12 @@ export const useEmpleadoDashboardPage = () => {
     }, 50);
   }, [listPage]);
   
-  //helper to toggle skills filter modal
+  // Helper to toggle skills filter modal
   const toggleSkillsFilterModal = () => {
     toggleModal('skillsFilter');
   };
   
-  //get filtered projects for the current tab
+  // Get filtered projects for the current tab
   const getTabProjects = () => {
     let filteredProjects;
     
@@ -85,7 +85,7 @@ export const useEmpleadoDashboardPage = () => {
         filteredProjects = dashboardData.projects;
         break;
       case 'Applied to':
-        //projects where the user has applied to a role
+        // Projects where the user has applied to a role
         filteredProjects = dashboardData.projects.filter(project => 
           project.userHasApplied === true
         );
@@ -97,6 +97,7 @@ export const useEmpleadoDashboardPage = () => {
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
   };
   
+  // Generate active filters for header
   const getActiveFilters = () => {
     const filters = {};
     
@@ -112,19 +113,46 @@ export const useEmpleadoDashboardPage = () => {
     return filters;
   };
   
+  // Handle removing a specific filter
   const handleRemoveFilter = (filterType, value) => {
     if (filterType === 'skills') {
       dashboardData.removeSkillFilter(value);
     }
   };
   
+  // Handle clear filters action
   const handleClearFilters = () => {
     dashboardData.clearAllSkillFilters();
     listPage.handleClearFilters();
   };
   
+  // Compute flattened projects for display
   const displayProjects = dashboardData.flattenProjectsForList(getTabProjects());
+
+    // Get top three projects based on compatibility for HOME
+  const getTopProjects = () => {
+    let filteredProjects;
+    
+    switch (listPage.activeTab) {
+      case 'All':
+        filteredProjects = dashboardData.top;
+        break;
+      case 'Applied to':
+        // Projects where the user has applied to a role
+        filteredProjects = dashboardData.top.filter(project => 
+          project.userHasApplied === true
+        );
+        break;
+      default:
+        filteredProjects = dashboardData.top;
+    }
+    
+    return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
+  };
+
+  const topProjects = dashboardData.flattenProjectsForList(getTopProjects());
   
+  // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
       return { 'All': 0, 'Applied to': 0 };
@@ -132,12 +160,15 @@ export const useEmpleadoDashboardPage = () => {
     
     // Initial counts
     const counts = {
-      'All': 0, 
+      'All': 0, // Will be set to 0 to hide notification badge
       'Applied to': 0
     };
     
+    // Calculate flattened projects (roles) for each tab
+    // All projects - set to 0 to hide notification badge as requested
     counts['All'] = 0;
     
+    // Applied to projects
     const appliedToProjects = dashboardData.projects.filter(project => 
       project.userHasApplied === true
     );
@@ -145,11 +176,13 @@ export const useEmpleadoDashboardPage = () => {
     
     return counts;
   }, [dashboardData.projects, dashboardData.flattenProjectsForList]);
+  
 
   return {
     ...listPage,
     ...dashboardData,
     displayProjects,
+    topProjects,
     tabNames,
     showCompatibility,
     toggleCompatibility,
@@ -160,7 +193,9 @@ export const useEmpleadoDashboardPage = () => {
     getActiveFilters,
     handleRemoveFilter,
     handleClearFilters,
+    // Override toggleViewMode with our custom implementation
     toggleViewMode,
+    // Override tab counts with our corrected counts
     tabCounts: correctedTabCounts
   };
 };

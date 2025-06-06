@@ -11,7 +11,16 @@ export const useFetch = (ruta, body = null) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    //dont fetch if ruta is null or undefined
+    if (!ruta) {
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
       let url = `https://pathexplorer-backend.onrender.com/api/${ruta}`;
     try {
       let response;
@@ -31,6 +40,20 @@ export const useFetch = (ruta, body = null) => {
       setError(error);
       setLoading(false);
     }
+      try {
+        let response;
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        };
+      response = await axios.get(url, config);
+        setData(response.data);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
     };
     fetchData();
   }, [ruta]);

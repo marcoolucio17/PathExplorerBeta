@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import modalStyles from 'src/styles/Modals/Modal.module.css';
 import styles from './ApplicationModal.module.css';
 import CustomScrollbar from '../../CustomScrollbar';
+import usePost from '../../../hooks/usePost';
 
 export const ApplicationModal = ({ 
   isOpen, 
@@ -12,10 +13,10 @@ export const ApplicationModal = ({
 }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const { triggerPost, loading: postLoading, error: postError } = usePost();
   
-  // Form state
+  //form state
   const [selectedRole, setSelectedRole] = useState('');
-  const [referralEmployee, setReferralEmployee] = useState('');
   const [applicationReason, setApplicationReason] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
@@ -23,9 +24,8 @@ export const ApplicationModal = ({
     if (isOpen) {
       setIsVisible(true);
       setIsClosing(false);
-      // Reset form
+      //reset form
       setSelectedRole('');
-      setReferralEmployee('');
       setApplicationReason('');
       setFormErrors({});
     }
@@ -65,21 +65,49 @@ export const ApplicationModal = ({
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
 
+    //get user id from localStorage
+    const userId = localStorage.getItem('id') || localStorage.getItem('idusuario') || localStorage.getItem('user_id');
+    
+    //find the selected role id
+    const selectedRoleObj = projectData?.availableRoles?.find(role => 
+      (typeof role === 'object' ? role.name : role) === selectedRole
+    );
+    const roleId = selectedRoleObj?.id;
+
+    const today = new Date();
+    const fechaaplicacion = today.toISOString().split('T')[0];
+
     const applicationData = {
-      role: selectedRole,
-      referral: referralEmployee || null,
-      reason: applicationReason,
-      timestamp: new Date().toISOString()
+      idusuario: parseInt(userId),
+      idrol: parseInt(roleId),
+      estatus: "Pendiente",
+      fechaaplicacion: fechaaplicacion,
+      message: applicationReason.trim()
     };
 
-    onSubmitApplication(applicationData);
+    console.log('Sending application data:', applicationData);
+
+    try {
+      const result = await triggerPost('apps', applicationData);
+      console.log('Application response:', result);
+      
+      if (result) {
+        //call the parent callback if provided
+        if (onSubmitApplication) {
+          onSubmitApplication(applicationData);
+        }
+        handleClose();
+      }
+    } catch (error) {
+      console.error('Error submitting application:', error);
+    }
   };
 
   const availableRoles = projectData?.availableRoles || [
@@ -90,6 +118,8 @@ export const ApplicationModal = ({
     'QA Engineer',
     'DevOps Engineer'
   ];
+
+  const isSubmitting = postLoading || isLoading;
 
   return (
     <div
@@ -113,7 +143,7 @@ export const ApplicationModal = ({
           <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
             <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
               <div className={styles.applicationContent}>
-                {/* Role Selection */}
+                {/*role selection*/}
                 <div className={styles.formSection}>
                   <label className={styles.formLabel}>
                     <i className="bi bi-person-badge"></i>
@@ -126,7 +156,11 @@ export const ApplicationModal = ({
                   >
                     <option value="">Select a role...</option>
                     {availableRoles.map((role, index) => (
-                      <option key={index} value={role}>{role}</option>
+                      <option key={index} value={typeof role === 'object' ? role.name : role}>
+                        {typeof role === 'object' ? (
+                          role.available !== false ? role.name : `${role.name} (Not Available)`
+                        ) : role}
+                      </option>
                     ))}
                   </select>
                   {formErrors.role && (
@@ -134,25 +168,7 @@ export const ApplicationModal = ({
                   )}
                 </div>
 
-                {/* Referral */}
-                <div className={styles.formSection}>
-                  <label className={styles.formLabel}>
-                    <i className="bi bi-people"></i>
-                    Employee referral (optional)
-                  </label>
-                  <input 
-                    type="text"
-                    className={styles.formInput}
-                    placeholder="Enter employee name or email..."
-                    value={referralEmployee}
-                    onChange={(e) => setReferralEmployee(e.target.value)}
-                  />
-                  <span className={styles.helpText}>
-                    If you were referred by a current employee, enter their name or email
-                  </span>
-                </div>
-
-                {/* Application Reason */}
+                {/*application reason*/}
                 <div className={styles.formSection}>
                   <label className={styles.formLabel}>
                     <i className="bi bi-chat-text"></i>
@@ -173,27 +189,34 @@ export const ApplicationModal = ({
                     )}
                   </div>
                 </div>
+
+                {/*error display*/}
+                {postError && (
+                  <div className={styles.errorSection}>
+                    <i className="bi bi-exclamation-triangle"></i>
+                    <span>Failed to submit application. Please try again.</span>
+                  </div>
+                )}
               </div>
             </CustomScrollbar>
           </div>
 
-          <div className={modalStyles.buttonGroup}>
+          <div className={modalStyles.buttonGroup} style={{ borderTop: '1px solid var(--border-light)', padding: '1.5rem' }}>
             <button 
               type="button"
               onClick={handleClose}
-              disabled={isLoading}
-              className={modalStyles.cancelButton}
+              disabled={isSubmitting}
+              className={modalStyles.secondaryButton}
             >
               Cancel
             </button>
             <button 
               type="submit"
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className={modalStyles.saveButton}
+              disabled={isSubmitting}
+              className={modalStyles.primaryButton}
             >
-              {isLoading && <i className="bi bi-arrow-clockwise" style={{ animation: 'spin 1s linear infinite' }}></i>}
-              {isLoading ? 'Submitting...' : 'Apply to Project'}
+              {isSubmitting && <i className="bi bi-arrow-clockwise" style={{ animation: 'spin 1s linear infinite', marginRight: '0.5rem' }}></i>}
+              {isSubmitting ? 'Submitting...' : 'Apply to Project'}
             </button>
           </div>
         </form>
@@ -201,3 +224,5 @@ export const ApplicationModal = ({
     </div>
   );
 };
+
+export default ApplicationModal;

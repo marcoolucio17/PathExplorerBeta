@@ -74,12 +74,14 @@
   color: var(--text-light);
   border-radius: 50%;
 }
-
 .glass-popover {
   position: absolute;
-  top: 56px;
+  top: 40px;
   right: 0;
   min-width: 260px;
+  min-height: 200px;
+  max-height: 200px;
+  overflow-y: auto;  
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -117,7 +119,7 @@
   background-color: #111;
   padding-top: 120px;
   overflow-x: hidden;
-  z-index: 0;
+  z-index: 100;
   transform: translateX(-100%);
   opacity: 0;
   pointer-events: none;
@@ -131,7 +133,7 @@
 }
 
 .sidebar.open {
-  width: 200px;
+  width: 130px;
 }
 
 .sidebar-menu {

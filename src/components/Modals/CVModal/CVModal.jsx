@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from 'src/styles/Modals/Modal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
+import axios from 'axios';
+import usePost from 'src/hooks/usePost';
 
 export const CVModal = ({ isOpen, onClose }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const { triggerPost, loading, error } = usePost();
 
   useEffect(() => {
     if (isOpen) {
@@ -21,8 +24,20 @@ export const CVModal = ({ isOpen, onClose }) => {
       onClose();
       setIsVisible(false);
       setIsClosing(false);
-    }, 300); 
+    }, 300); // Match animation duration
   };
+
+  //const [cvFile, setCvFile] = useState(null);
+  //const [fotoFile, setFotoFile] = useState(null);
+
+  const toBase64 = file =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]); // Solo base64
+      reader.onerror = reject;
+    });
+
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -39,35 +54,74 @@ export const CVModal = ({ isOpen, onClose }) => {
     document.body.removeChild(link);
   };
 
-  const handleUpload = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.pdf,.doc,.docx';
-    input.onchange = (e) => {
+  const handleCVUpload = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".pdf,.doc,.docx";
+
+    input.onchange = async (e) => {
       const file = e.target.files[0];
-      if (file) {
-        console.log('File selected:', file.name);
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file); // adjust the key to match backend expectations
+      formData.append("idusuario", localStorage.getItem('id'))
+
+      try {
+        triggerPost(`upload-cv/${localStorage.getItem('id')}`, formData)
+
+      }
+      catch (error) {
+        console.error("Upload failed:", error);
+        alert("Upload failed.");
       }
     };
+
     input.click();
   };
 
+  const handleCVUploadWithAI = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".pdf,.doc,.docx";
+
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("idusuario", localStorage.getItem('id'));
+
+      try {
+        const result = await triggerPost("analizar-cv", formData);
+        console.log("Resultado del análisis:", result);
+      } catch (error) {
+        console.error("Upload failed:", error);
+        alert("Upload failed.");
+      }
+    };
+
+    input.click();
+  };
+
+
   return (
-    <div 
-      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ''}`} 
+    <div
+      className={`${styles.modalBackdrop} ${isClosing ? styles.closing : ''}`}
       onClick={handleBackdropClick}
     >
       <div className={`${styles.modalContent} ${isClosing ? styles.closing : ''}`} style={{ maxWidth: '900px' }}>
         <button className={styles.closeButton} onClick={handleClose}>
           <i className="bi bi-x-lg"></i>
         </button>
-        
+
         <div className={styles.modalHeader}>
           <h2 className={styles.title}>Curriculum Vitae</h2>
           <p className={styles.subtitle}>Professional Resume</p>
         </div>
 
-        <div className={styles.modalBody} style={{ 
+        <div className={styles.modalBody} style={{
           flex: '1',
           minHeight: '0',
           height: 'calc(100% - 200px)',
@@ -80,11 +134,11 @@ export const CVModal = ({ isOpen, onClose }) => {
             minHeight: 'min-content',
             padding: '1rem'
           }}>
-            <img 
-              src="/imagesUser/Computer-Science-Resume-Example.png" 
+            <iframe
+              src="/pdfs/Gabriel Ernesto Mujica Proulx.pdf"
               style={{
-                maxWidth: '100%',
-                height: 'auto',
+                width: '100%',
+                height: '1000px',
                 border: '1px solid var(--border-light)',
                 borderRadius: '8px',
                 background: 'var(--modal-input-bg)',
@@ -96,20 +150,28 @@ export const CVModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className={styles.buttonGroup} style={{ borderTop: '1px solid var(--border-light)', padding: '1.5rem' }}>
-          <button 
-            onClick={handleDownload} 
+          <button
+            onClick={handleDownload}
             className={styles.primaryButton}
           >
             <i className="bi bi-download"></i>
             Download CV
           </button>
-          
-          <button 
-            onClick={handleUpload} 
+
+          <button
+            onClick={handleCVUpload}
             className={styles.secondaryButton}
           >
             <i className="bi bi-upload"></i>
             Upload New
+          </button>
+
+          <button
+            onClick={handleCVUploadWithAI}
+            className={styles.secondaryButton}
+          >
+            <i className="bi bi-upload"></i>
+            Upload New With AI
           </button>
         </div>
       </div>

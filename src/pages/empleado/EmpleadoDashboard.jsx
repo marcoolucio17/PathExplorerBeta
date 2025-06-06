@@ -1,11 +1,11 @@
-import React, {useState,useEffect, useRef, use} from "react";
+import React, { useState, useEffect, useRef, use } from "react";
 import { Link } from "react-router";
 
 import { DashboardProjectInfo } from '../../components/Dashboard/DashboardProjectInfo'
 import { DashboardSkillsCategory } from "../../components/Dashboard/DashboardSkillsCategory";
 
 import "../../styles/EmpleadoDashboard.css";
-import "../../styles/EmpleadoDashboardFixes.css"; 
+import "../../styles/EmpleadoDashboardFixes.css"; // Import the fixes
 
 import { useGetFetch } from '../../hooks/useGetFetch';
 
@@ -15,18 +15,18 @@ import { useGetFetch } from '../../hooks/useGetFetch';
  */
 export const EmpleadoDashboard = () => {
   const authState = localStorage.getItem("role");
-
+  //Agregar el error y el loading de cada uno
   const [searchProjects, setSearchProjects] = useState('');
   const [skillSelected, setSkillSelected] = useState('Skills');
-  
-  const {data: data_projects, error}= useGetFetch({rutaApi: `projects`,nombre: searchProjects,condicion1: 'Skills'});
-  const {data: data_skills, error2}= useGetFetch({rutaApi: `skills`,nombre: '',condicion1: 'Skills'});
+
+  const { data: data_projects, error } = useGetFetch({ rutaApi: `projects`, nombre: searchProjects, condicion1: 'Skills' });
+  const { data: data_skills, error2 } = useGetFetch({ rutaApi: `skills`, nombre: '', condicion1: 'Skills' });
   const [skillModalOpen, setSkillModalOpen] = useState(false);
- 
+
   const toggleSkillModal = () => {
     setSkillModalOpen(!skillModalOpen);
   }
- 
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
@@ -51,11 +51,11 @@ export const EmpleadoDashboard = () => {
           </button>
         </div>
       </div>
-    
-      <DashboardSkillsCategory 
-        data_skills={data_skills} 
+
+      <DashboardSkillsCategory
+        data_skills={data_skills}
         skillModalOpen={skillModalOpen}
-        setSkillSelected={setSkillSelected} 
+        setSkillSelected={setSkillSelected}
         toggleSkillModal={toggleSkillModal}
       />
 

@@ -1,7 +1,7 @@
 import useHeaderConfig from '../useHeaderConfig';
 
 /**
- *
+ * Hook for configuring the SearchHeader for the Dashboard page
  * 
  * @param {Object} props - Props from the dashboard page
  * @returns {Object} Header configuration for SearchHeader component
@@ -15,11 +15,14 @@ export const useDashboardHeaderConfig = (props) => {
     getActiveFilters,
     handleClearFilters,
     toggleSkillsFilterModal,
+    toggleClientsFilterModal,
+    toggleRolesFilterModal,
     setSortOption,
     toggleCompatibility,
     showCompatibility,
     handleViewApplicants,
-    handleRemoveFilter
+    handleRemoveFilter,
+    activeTab //add activeTab to check current tab
   } = props;
 
   const customButtons = [
@@ -40,11 +43,26 @@ export const useDashboardHeaderConfig = (props) => {
           label: 'Skills', 
           action: 'skills', 
           icon: 'bi-tools'
+        },
+        { 
+          label: 'Clients', 
+          action: 'clients', 
+          icon: 'bi bi-person-circle' 
+        },
+        { 
+          label: 'Roles', 
+          action: 'roles', 
+          icon: 'bi bi-person-workspace' 
         }
       ],
       onDropdownItemClick: (item) => {
         if (item.action === 'skills') {
           toggleSkillsFilterModal();
+        }
+        else if (item.action === 'clients') {
+          toggleClientsFilterModal();
+        } else if (item.action === 'roles') {
+          toggleRolesFilterModal();
         }
       }
     },
@@ -68,15 +86,18 @@ export const useDashboardHeaderConfig = (props) => {
     }
   ];
 
-  const filterButtons = [
-    {
+  const filterButtons = [];
+  
+  //only show compatibility button if not on my projects tab
+  if (activeTab !== "My Projects") {
+    filterButtons.push({
       label: "Compatibility",
       onClick: toggleCompatibility,
       type: 'primary',
       variant: 'compatibility',
       isActive: showCompatibility
-    }
-  ];
+    });
+  }
 
   return useHeaderConfig({
     viewMode,

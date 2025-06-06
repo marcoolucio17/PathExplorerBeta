@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 // Custom Hooks
 import useProfilePage from '../../../hooks/profile/useProfilePage';
@@ -7,11 +7,11 @@ import useProfilePage from '../../../hooks/profile/useProfilePage';
 import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
 import CustomScrollbar from "../../../components/CustomScrollbar";
-import { 
-  ProfileExperience, 
-  ProfileContactInfo, 
-  ProfileObjectives, 
-  ProfileSkills, 
+import {
+  ProfileExperience,
+  ProfileContactInfo,
+  ProfileObjectives,
+  ProfileSkills,
   ProfileCertificates,
   ProfileHeaderCard
 } from "../../../components/Profile";
@@ -30,11 +30,13 @@ import { EditProfileDetailsModal } from "../../../components/Modals/EditProfileD
 // CSS
 import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
 
-
+/**
+ * Profile page component for Employee role
+ */
 export const EmpleadoPerfilPage = () => {
-  //use the custom hook to handle all logic
+  // Use the custom hook to handle all logic
   const profilePage = useProfilePage();
-
+  console.log('Hola');
   const renderTabContent = () => {
     switch (profilePage.activeTab) {
       case "Experience":
@@ -42,17 +44,20 @@ export const EmpleadoPerfilPage = () => {
       case "Contact Information":
         return <ProfileContactInfo userProfile={profilePage.userProfile} />;
       case "Objectives":
-        return <ProfileObjectives 
-          objectives={profilePage.objectives} 
-          onObjectiveToggle={profilePage.handleObjectiveToggle} 
+        return <ProfileObjectives
+          objectives={profilePage.objectives}
+          onObjectiveToggle={profilePage.handleObjectiveToggle}
+          isLoading={profilePage.isLoading}
         />;
       default:
         return <ProfileContactInfo userProfile={profilePage.userProfile} />;
     }
   };
 
+  useEffect(() => { }, [profilePage.isLoading]);
+
   const handleEditSection = (section) => {
-    //handle editing specific sections
+    // Handle editing specific sections
     console.log('Edit section:', section);
     console.log('Current modals state:', profilePage.modals);
     switch (section) {
@@ -77,7 +82,7 @@ export const EmpleadoPerfilPage = () => {
     }
   };
 
-  //save handlers for edit modals
+  // Save handlers for edit modals
   const handleSaveContact = (contactData) => {
     profilePage.setUserProfile(prev => ({
       ...prev,
@@ -100,10 +105,14 @@ export const EmpleadoPerfilPage = () => {
     }));
   };
 
-  //certificate removal handler
+  // Certificate removal handler
   const handleRemoveCertificate = (certificateId) => {
     profilePage.handleRemoveCertificate(certificateId);
   };
+
+  if (profilePage.loading) {
+    return <>loading..</>;
+  }
 
   return (
     <div className={styles.profileContainer}>
@@ -121,16 +130,16 @@ export const EmpleadoPerfilPage = () => {
             borderStyle='tab-only'
             actionButtons={
               <>
-                <Button 
-                  type="secondary" 
+                <Button
+                  type="secondary"
                   icon="bi-file-earmark-text"
                   onClick={profilePage.handleCVClick}
                   title="View CV"
                 >
                   CV
                 </Button>
-                <Button 
-                  type="primary" 
+                <Button
+                  type="primary"
                   icon="bi-pencil-fill"
                   onClick={profilePage.handleEditClick}
                   title="Edit Profile"
@@ -150,13 +159,13 @@ export const EmpleadoPerfilPage = () => {
 
         {/* Right Column - Sidebar */}
         <div className={styles.profileSidebar}>
-          <ProfileSkills 
+          <ProfileSkills
             className={styles.sidebarSection}
             categorizedSkills={profilePage.categorizedSkills}
             onSkillsClick={profilePage.handleSkillsClick}
           />
-          
-          <ProfileCertificates 
+
+          <ProfileCertificates
             className={styles.sidebarSection}
             certificates={profilePage.userCertificates}
             onCertificateClick={profilePage.handleCertificateClick}
@@ -167,25 +176,25 @@ export const EmpleadoPerfilPage = () => {
       </div>
 
       {/* Modals */}
-      <CertificateModal 
+      <CertificateModal
         certificate={profilePage.selectedCertificate}
         isOpen={profilePage.modals.certificate}
         onClose={profilePage.closeCertificateModal}
         onAnimationComplete={() => profilePage.setSelectedCertificate(null)}
       />
-      
-      <CVModal 
+
+      <CVModal
         isOpen={profilePage.modals.cv}
         onClose={() => profilePage.closeModal('cv')}
       />
-      
+
       <SkillsModal
         isOpen={profilePage.modals.skills}
         onClose={() => profilePage.closeModal('skills')}
         userSkills={profilePage.userSkills}
         onUpdateSkills={profilePage.handleUpdateSkills}
       />
-      
+
       <AddCertificateModal
         isOpen={profilePage.modals.addCertificate}
         onClose={() => profilePage.closeModal('addCertificate')}

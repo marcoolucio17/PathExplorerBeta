@@ -43,13 +43,13 @@
 .item:nth-child(19) { animation-delay: 2.85s; }
 .item:nth-child(20) { animation-delay: 3.0s; }
 
-/*beyond 20 */
+/* Handle any items beyond 20 */
 .item:nth-child(n+21) { animation-delay: 3.0s; }
 
-/* Gridcontainer animation */
+/* Grid layout with consistent card widths */
 .gridContainer {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
   padding: 20px;
 }
@@ -60,6 +60,29 @@
   flex-direction: column;
   gap: 15px;
   padding: 20px;
+}
+
+/* Loading container */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  padding: 2rem;
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--purple-btn-primary-1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Empty state with fade in animation */
@@ -82,7 +105,7 @@
   }
 }
 
-/* show 0 items message */
+/* No items message */
 .noItemsMessage {
   display: flex;
   flex-direction: column;
@@ -136,12 +159,12 @@
 /* Responsive styles */
 @media (max-width: 1200px) {
   .gridContainer {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
   .gridContainer {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

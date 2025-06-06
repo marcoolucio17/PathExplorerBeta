@@ -1,79 +1,99 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GlassCard } from 'src/components/shared/GlassCard';
+import GlassCardNavigation from 'src/components/shared/GlassCard/GlassCardNavigation'; // el import es un poquito diferente
 import { ProgressCircle } from 'src/components/ProgressCircle';
 import SkillChip from 'src/components/SkillChip/SkillChip';
 import styles from 'src/styles/GridList/GridListCard.module.css';
-import customStyles from 'src/styles/GridList/ProjectCard.module.css'; // Import our custom override styles
+import customStyles from 'src/styles/GridList/ProjectCard.module.css';
+import useGetFetch from 'src/hooks/useGetFetch';
 
-/**
- * ProjectCard component for displaying project information in grid or list view
- * 
- * @param {Object} props
- * @param {Object} props.project - Project data
- * @param {Object} props.proyecto_rol - Project role data
- * @param {string} props.viewMode - Display mode: 'grid' or 'list'
- * @param {boolean} props.showCompatibility - Whether to show compatibility circle
- * @param {number} props.matchPercentage - Compatibility match percentage
- * @param {Array} props.selectedSkillFilters - Array of selected skill filters to highlight
- * @param {Array} props.userSkills - Array of skills that the current user has
- */
 const ProjectCard = ({
+  id,
+  idrol,
   project,
   proyecto_rol,
   viewMode,
+  compatibilityValue,
   showCompatibility,
-  matchPercentage,
+  onClick,
   selectedSkillFilters = [],
-  userSkills = []
+  userSkills = [],
+  isProjectCard = false //new prop to indicate project-level card
 }) => {
-  //deteermine class
-  const cardClass = viewMode === 'grid' 
+
+  const navigate = useNavigate();
+  const cardClass = viewMode === 'grid'
     ? styles.cardGrid
     : `${styles.cardList} ${customStyles.cardList}`;
-  
-  //prepare sample data to ensure visualization
+
+  //custom navigation for project cards
+  const handleProjectCardClick = (e) => {
+    if (isProjectCard) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("navigating to:", `/manager/project/${id}`);
+      navigate(`/manager/project/${id}`);
+    }
+  };
+
+
+
+  //stable duration calculation based on project id to prevent fluctuation
   const ensureRoleData = () => {
-    //current role data
+    if (isProjectCard) {
+      //for project cards, show project name as title
+      return {
+        roleName: project.pnombre || 'Project',
+        projectName: '', //no subtitle for project cards
+        duration: project.duracionMes ? project.duracionMes : "TBD",
+        roleCount: project.proyecto_roles ? project.proyecto_roles.length : 0
+      };
+    }
+    
+    //proyecto_rol.nombrerol ||
     return {
-      roleName: proyecto_rol.roles?.nombrerol || 'Developer',
+      roleName: proyecto_rol.nombrerol || 'Developer',
       projectName: project.pnombre || 'Project',
-      //random duration for nwo
-      duration: project.duracionMes || 'TBD'
+      duration: project.duracionMes ? project.duracionMes : "TBD"
     };
   };
-  
-  // Prepare sample skills to ensure visualization
+
   const ensureSkillsData = () => {
-    // Every card should have at least 2 skills for demo
-    /*if (!proyecto_rol.roles?.requerimientos_roles || proyecto_rol.roles.requerimientos_roles.length === 0) {
-      // Generate demo skills if none exist
+    //for project cards, don't show skills
+    if (isProjectCard) {
+      return [];
+    }
+    
+    if (!proyecto_rol?.requerimientos_roles || proyecto_rol.requerimientos_roles.length === 0) {
       return [
-        { id: 'demo-1', name: 'JavaScript', isUser: true },
+        /*{ id: 'demo-1', name: 'JavaScript', isUser: true },
         { id: 'demo-2', name: 'React', isUser: false },
         { id: 'demo-3', name: 'Python', isUser: false },
-        { id: 'demo-4', name: 'Node.js', isUser: true }
+        { id: 'demo-4', name: 'Node.js', isUser: true }*/
       ];
-    }*/    // Use real skills data
-    return proyecto_rol.roles.requerimientos_roles.map(req_rol => ({
+    }
+    return proyecto_rol.requerimientos_roles.map(req_rol => ({
       id: req_rol.requerimientos.habilidades.idhabilidad,
       name: req_rol.requerimientos.habilidades.nombre,
-      isUser: userSkills.includes(req_rol.requerimientos.habilidades.nombre) || 
-              selectedSkillFilters.includes(req_rol.requerimientos.habilidades.nombre)
+      isUser: userSkills.includes(req_rol.requerimientos.habilidades.nombre) ||
+        selectedSkillFilters.includes(req_rol.requerimientos.habilidades.nombre)
     }));
   };
-  
-  // Get role data
+
   const roleData = ensureRoleData();
-  
-  // Get skills data
   const skillsData = ensureSkillsData();
-  
-  // Render skills with consistent display
+
+
   const renderSkills = () => {
-    // Always show 2 skills maximum, and a "+ more" button if there are more
+    //don't render skills for project cards
+    if (isProjectCard || skillsData.length === 0) {
+      return null;
+    }
+    
     const showMoreButton = skillsData.length > 2;
     const visibleSkills = skillsData.slice(0, showMoreButton ? 2 : Math.min(3, skillsData.length));
-    
+
     return (
       <>
         {visibleSkills.map((skill) => (
@@ -84,7 +104,7 @@ const ProjectCard = ({
             iconClass={skill.isUser ? "bi bi-check" : null}
           />
         ))}
-        
+
         {showMoreButton && (
           <SkillChip
             key="more-skills"
@@ -95,44 +115,43 @@ const ProjectCard = ({
       </>
     );
   };
-  
-  // Grid view
+
   const gridContent = (
     <>
-      {/*match percentage when enabled */}
-      {showCompatibility && (
+      {showCompatibility && !isProjectCard && (
         <div className={styles.statusCircle}>
-          <ProgressCircle 
-            value={matchPercentage}
+          <ProgressCircle
+            value={compatibilityValue}
             size={60}
-            fontSize="1.1rem" 
+            fontSize="1.1rem"
             strokeWidth={6}
             fontWeight="light"
           />
         </div>
       )}
-      
+
       <div className={styles.cardHeader}>
-        {/*<img 
-          className={styles.cardAvatar} 
-          src={project.imagen || "/images/ImagenProyectoDefault.png"} 
+        <img
+          className={styles.cardAvatar}
+          src={project.imagen || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
-        />*/}
+        />
         <div className={styles.cardInfo}>
           <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
-          <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
+          {roleData.projectName && <p className={styles.cardSubtitle}>for {roleData.projectName}</p>}
+          {isProjectCard && roleData.roleCount > 0 && (
+            <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
+          )}
         </div>
       </div>
-      
-      {/* Project Description */}
+
       <div className={`${styles.cardDescription} ${styles.reducedMargin}`}>
         <p className={styles.descriptionText}>
           {project.descripcion || 'This project aims to develop a comprehensive solution that meets client requirements while leveraging modern technologies...'}
         </p>
       </div>
-      
+
       <div className={styles.cardDetails}>
-        {/* Show estimated duration instead of roles */}
         <div className={styles.detailRow}>
           <span className={styles.detailLabel}>
             <i className="bi bi-clock"></i> Duration:
@@ -142,60 +161,62 @@ const ProjectCard = ({
           </span>
         </div>
       </div>
-      
-      <div className={styles.cardSkills}>
-        {renderSkills()}
-      </div>
+
+      {!isProjectCard && (
+        <div className={styles.cardSkills}>
+          {renderSkills()}
+        </div>
+      )}
     </>
   );
-  
-  //List view 
+
   const listContent = (
     <>
-      {/* Avatar area */}
       <div className={styles.cardHeader}>
-        <img 
-          className={styles.cardAvatar} 
-          src={project.imagen || "/images/ImagenProyectoDefault.png"} 
+        <img
+          className={styles.cardAvatar}
+          src={project.imagen || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
       </div>
-      
-      {/*Title and project name only */}
+
       <div className={customStyles.titleContainer}>
         <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
-        <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
+        {roleData.projectName && <p className={styles.cardSubtitle}>for {roleData.projectName}</p>}
+        {isProjectCard && roleData.roleCount > 0 && (
+          <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
+        )}
+
       </div>
-      
-      {/*description in the middle */}
+
       <div className={customStyles.floatingDescription}>
         <p className={styles.descriptionText}>
-          Description for Project {project.pnombre || '5'}
+          {isProjectCard ? project.descripcion : `Description for Project ${project.pnombre || '5'}`}
         </p>
       </div>
-      
-      {/* Skills and Circle container */}
-      <div className={customStyles.skillsCircleContainer}>
-        {/* Skills */}
-        <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
-          {renderSkills()}
-        </div>
-        
-        {/* Compatibility Circle */}
-        {showCompatibility && (
-          <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
-            <ProgressCircle 
-              value={matchPercentage}
-              size={60} 
-              strokeWidth={6}
-              fontSize="1rem"
-              fontWeight="light"
-            />
+
+
+      {isProjectCard && (
+        <div className={customStyles.skillsCircleContainer}>
+          <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
+            {renderSkills()}
+
           </div>
-        )}
-      </div>
-      
-      {/*hardcoded styles because its not being consistent */}
+
+          {!showCompatibility && (
+            <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
+              <ProgressCircle
+                value={compatibilityValue}
+                size={60}
+                strokeWidth={6}
+                fontSize="1rem"
+                fontWeight="light"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       <div className={customStyles.durationColumn}>
         <span className={styles.detailLabel}>
           <i className="bi bi-clock"></i> Duration
@@ -206,21 +227,51 @@ const ProjectCard = ({
       </div>
     </>
   );
-  
-  // Grid view
+
   if (viewMode === 'grid') {
+    if (isProjectCard) {
+      return (
+        <div 
+          onClick={handleProjectCardClick}
+          style={{ 
+            cursor: 'pointer',
+            pointerEvents: 'auto'
+          }}
+        >
+          <GlassCard className={cardClass}>
+            {gridContent}
+          </GlassCard>
+        </div>
+      );
+    }
+    
     return (
-      <GlassCard className={cardClass}>
+      <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
         {gridContent}
-      </GlassCard>
+      </GlassCardNavigation>
     );
   }
-  
-  // List view
+
+  if (isProjectCard) {
+    return (
+      <div 
+        onClick={handleProjectCardClick}
+        style={{ 
+          cursor: 'pointer',
+          pointerEvents: 'auto'
+        }}
+      >
+        <GlassCard className={cardClass}>
+          {listContent}
+        </GlassCard>
+      </div>
+    );
+  }
+
   return (
-    <GlassCard className={cardClass}>
+    <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
       {listContent}
-    </GlassCard>
+    </GlassCardNavigation>
   );
 };
 

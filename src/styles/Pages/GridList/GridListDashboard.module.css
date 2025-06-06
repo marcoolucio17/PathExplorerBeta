@@ -13,8 +13,8 @@ display: flex;
 align-items: center;
 justify-content: center;
 padding: var(--container-padding);
-overflow-x: hidden;
-overflow-y: auto; 
+overflow-x: hidden; /* Only hide horizontal overflow */
+overflow-y: auto; /* Allow vertical scrolling if needed */
 }
 
 /* Content container */
@@ -25,7 +25,7 @@ max-width: 1200px;
 width: 100%;
 height: var(--container-height);
 min-height: 500px;
-overflow: visible; 
+overflow: visible; /* Allow shadows and hover effects to show */
 position: relative;
 }
 
@@ -34,8 +34,8 @@ position: relative;
 display: flex;
 align-items: center;
 margin-bottom: 20px;
-flex-shrink: 0; 
-overflow: visible; 
+flex-shrink: 0; /* Prevent shrinking */
+overflow: visible; /* Allow button hover effects */
 }
 
 .pageTitle {
@@ -53,26 +53,26 @@ align-items: center;
 justify-content: space-between;
 margin-bottom: 1.5rem;
 gap: 1rem;
-flex-shrink: 0; 
-overflow: visible;
+flex-shrink: 0; /* Prevent shrinking */
+overflow: visible; /* Allow button hover effects */
 }
 
 /* Applicants container */
 .cardsContainer {
 flex: 1;
-overflow: visible; /* Allow shadows & hgover effects */
+overflow: visible; /* Allow shadows and hover effects */
 position: relative;
-min-height: 0; 
+min-height: 0; /* Allow flexbox to shrink */
 }
 
 /* Only hide scrollbars on the actual scrollable content, not the whole container */
 .dashboardContainer {
-scrollbar-width: thin; 
+scrollbar-width: thin; /* Firefox - allow thin scrollbar if needed */
 }
 
 /* Hide only unwanted scrollbars on the main dashboard container */
 .dashboardContainer::-webkit-scrollbar {
-width: 6px; 
+width: 6px; /* Thin scrollbar instead of completely hidden */
 }
 
 .dashboardContainer::-webkit-scrollbar-track {
@@ -93,8 +93,8 @@ background: rgba(255, 255, 255, 0.2);
 display: flex;
 justify-content: flex-end;
 margin-bottom: 1rem;
-padding: 0 8px 0 0; 
-overflow: visible; 
+padding: 0 8px 0 0; /* Add right padding to prevent button hover clipping */
+overflow: visible; /* Allow button hover effects to show */
 }
 
 .createProjectButton {
