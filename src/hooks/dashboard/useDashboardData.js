@@ -73,21 +73,33 @@ export const useDashboardData = () => {
     }
   }, [location.search]);
 
-  //fetch data
+  //fetch data All
   const { data: projectsData, loading: projectsLoading } =
     useGetFetchProjectsFilters({
       rutaApi: "projects",
       filters: filterOptions,
     });
 
+  //fetch data of clients
   const { data: clientsData } = useGetFetch({ rutaApi: "clientes" });
 
   //const { data: skillsData } = useGetFetch({ rutaApi: 'habilidades' });
 
+  //fetch data of roles
   const { data: rolesData } = useGetFetch({ rutaApi: "roles" });
 
-  const { data: topData } = useGetFetch({ rutaApi: `projects/top/${localStorage.getItem("id")}`});
+  //fetch data of top projects
+  const { data: topData } = useGetFetch({
+    rutaApi: `projects/top/${localStorage.getItem("id")}`,
+  });
 
+  //fetch data of my applications
+
+  const { data: myApplicationsData } = useGetFetchProjectsFilters({
+    rutaApi: `apps/usuario/${localStorage.getItem("id")}`,
+  });
+
+  console.log("Projects Data:", myApplicationsData);
   //apply skills filters
   const handleApplySkillFilters = (selectedSkills) => {
     setSelectedSkillFilters(selectedSkills);
