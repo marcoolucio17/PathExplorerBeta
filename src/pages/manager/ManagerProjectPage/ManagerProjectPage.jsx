@@ -18,10 +18,6 @@ import { EditProjectModal } from "../../../components/Modals/EditProjectModal";
 import styles from "../../../styles/Pages/Proyecto/ManagerProjectPage.module.css";
 import peopleStyles from "../../../styles/Pages/Proyecto/PeopleSection.module.css";
 
-/**
- * project management page for manager role
- * allows viewing project details and assigning feedback to team members
- */
 export const ManagerProjectPage = () => {
   console.log("ManagerProjectPage component loaded");
   
@@ -30,10 +26,8 @@ export const ManagerProjectPage = () => {
 
   console.log("ManagerProjectPage state:", { projectData, projectUsers, isLoading, error });
   
-  //debug project data from completo endpoint
   if (projectData) console.log("NEW PROJECT DATA FROM /COMPLETO:", projectData);
 
-  //loading state
   if (isLoading) {
     return (
       <LoadingSpinner 
@@ -45,7 +39,6 @@ export const ManagerProjectPage = () => {
     );
   }
 
-  //error state  
   if (error) {
     return (
       <div className={styles.projectContainer}>
@@ -58,7 +51,6 @@ export const ManagerProjectPage = () => {
     );
   }
 
-  //if project data is not found
   if (!projectData) {
     return (
       <div className={styles.projectContainer}>
@@ -74,59 +66,51 @@ export const ManagerProjectPage = () => {
   return (
     <div className={styles.projectContainer}>
       <div className={styles.projectContent}>
-        {/* Left Column - Project Details */}
         <div className={styles.projectDetails}>
           <div className={styles.pageHeader}>
             <div className={styles.titleContainer}>
               <h1 className={styles.pageTitle}>
                 {projectData.pnombre || 'Project Management'}
               </h1>
-              <p className={styles.pageSubtitle}>
-                Manage team members and assign feedback
-              </p>
             </div>
           </div>
           
           <div className={styles.projectDates}>
-            <span>Start: {projectData.fechainicio || 'N/A'}</span>
-            <span>End: {projectData.fechafin || 'N/A'}</span>
-            <span>Progress: {projectData.progreso || 0}%</span>
+            <span>Start Date: {projectData.fechainicio || 'N/A'}</span>
+            <span>Est. Finish Date: {projectData.fechafin || 'N/A'}</span>
           </div>
           
           <div className={styles.projectProgress}>
             <ProgressBar percentage={projectData.progreso || 0} />
           </div>
 
-          {/* Description Section */}
           <div className={styles.projectDescription}>
             <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
               <div className={styles.projectDescriptionContent}>
-                {/* Project Description */}
                 <div className={styles.descriptionSection}>
                   <div className={styles.sectionHeader}>
                     <div className={styles.iconContainer}>
-                      <i className="bi bi-file-text"></i>
+                      <i className="bi bi-bullseye"></i>
                     </div>
-                    <h2 className={styles.sectionTitle}>Project Description</h2>
+                    <h2 className={styles.sectionTitle}>Project Goal</h2>
                   </div>
                   <p className={styles.sectionText}>
                     {projectData.descripcion || 'No description available for this project.'}
                   </p>
                 </div>
 
-                {/* Project Deliverables */}
                 {projectData.deliverables && projectData.deliverables.length > 0 && (
                   <div className={styles.descriptionSection}>
                     <div className={styles.sectionHeader}>
                       <div className={styles.iconContainer}>
                         <i className="bi bi-box-seam"></i>
                       </div>
-                      <h2 className={styles.sectionTitle}>Project Deliverables</h2>
+                      <h2 className={styles.sectionTitle}>Deliverables</h2>
                     </div>
-                    <ul className={styles.sectionText}>
+                    <ul className={styles.deliverablesList}>
                       {projectData.deliverables.map((deliverable, index) => (
-                        <li key={index} style={{ marginBottom: '0.5rem' }}>
-                          <i className="bi bi-check-lg" style={{ color: 'var(--primary-color)', marginRight: '0.5rem' }}></i>
+                        <li key={index}>
+                          <i className={`bi bi-check-lg ${styles.checkmarkIcon}`}></i>
                           {deliverable}
                         </li>
                       ))}
@@ -134,7 +118,6 @@ export const ManagerProjectPage = () => {
                   </div>
                 )}
 
-                {/* Client Information */}
                 {projectData.cliente && (
                   <div className={styles.descriptionSection}>
                     <div className={styles.sectionHeader}>
@@ -155,48 +138,30 @@ export const ManagerProjectPage = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Project Status */}
-                <div className={styles.descriptionSection}>
-                  <div className={styles.sectionHeader}>
-                    <div className={styles.iconContainer}>
-                      <i className="bi bi-info-circle"></i>
-                    </div>
-                    <h2 className={styles.sectionTitle}>Project Status</h2>
-                  </div>
-                  <p className={styles.sectionText}>
-                    This project currently has {projectUsers?.length || 0} team members assigned.
-                    Use the team section to review member performance and assign feedback.
-                  </p>
-                </div>
               </div>
             </CustomScrollbar>
           </div>
 
-          {/* Action buttons */}
           <div className={styles.projectActions}>
             <Button 
               type="secondary"
-              icon="bi-arrow-left"
-              onClick={projectPage.handleBackToDashboard}
+              onClick={projectPage.handleRefreshData}
+              disabled={isLoading}
             >
-              Back to Dashboard
+              {isLoading ? "Refreshing..." : "Refresh Data"}
             </Button>
             
             <Button 
               type="primary"
-              icon="bi-people"
-              onClick={projectPage.handleRefreshData}
-              disabled={isLoading}
+              icon="bi-pencil"
+              onClick={() => projectPage.openModal('editProject')}
             >
-              {isLoading ? "Refreshing..." : "Refresh Team Data"}
+              Edit Project
             </Button>
           </div>
         </div>
 
-        {/* Right Column - Team Members and Roles */}
         <div className={styles.projectSidebar}>
-          {/* Team Members Section */}
           <GlassCard className={styles.sidebarSection}>
             <div className={peopleStyles.peopleSection}>
               <h2 className={peopleStyles.peopleTitle}>Team Members</h2>
@@ -205,21 +170,22 @@ export const ManagerProjectPage = () => {
                   {projectUsers && projectUsers.length > 0 ? (
                     projectUsers.map((userProject, index) => (
                       <div key={`${userProject.usuario.idusuario}-${userProject.idutp}-${index}`} className={peopleStyles.person}>
-                        <div className={peopleStyles.personAvatar}>
-                          {userProject.usuario.fotodeperfil_url ? (
+                        {userProject.usuario.fotodeperfil_url ? (
+                          <div className={peopleStyles.personAvatar}>
                             <img 
                               src={userProject.usuario.fotodeperfil_url} 
                               alt={userProject.usuario.nombre} 
                               className={peopleStyles.personAvatarImg}
                             />
-                          ) : (
-                            <i className="bi bi-person-circle" style={{ fontSize: '2rem', color: '#6c757d' }}></i>
-                          )}
-                        </div>
+                          </div>
+                        ) : (
+                          <div className={peopleStyles.personAvatarPlaceholder}>
+                            <i className="bi bi-person-fill"></i>
+                          </div>
+                        )}
                         <div className={peopleStyles.personInfo}>
                           <div className={peopleStyles.personName}>{userProject.usuario.nombre}</div>
                           <div className={peopleStyles.personRole}>{userProject.aplicacion.roles.nombrerol || 'Role'}</div>
-                          <div className={peopleStyles.personEmail}>{userProject.usuario.correoelectronico}</div>
                         </div>
                         <div className={peopleStyles.personActions}>
                           <Button
@@ -236,7 +202,7 @@ export const ManagerProjectPage = () => {
                   ) : (
                     <div className={peopleStyles.emptyState}>
                       <i className="bi bi-people" style={{ fontSize: '2rem', color: '#6c757d', marginBottom: '1rem' }}></i>
-                      <p>No team members assigned to this project yet.</p>
+                      <p>This project has no members yet.</p>
                     </div>
                   )}
                 </CustomScrollbar>
@@ -244,27 +210,16 @@ export const ManagerProjectPage = () => {
             </div>
           </GlassCard>
 
-          {/* Available Roles Section */}
           <GlassCard className={styles.sidebarSection}>
             <div className={peopleStyles.peopleSection}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 className={peopleStyles.peopleTitle}>Available Roles</h2>
-                <Button
-                  type="primary"
-                  size="small"
-                  icon="bi-pencil"
-                  onClick={() => projectPage.openModal('editProject')}
-                >
-                  Edit Project
-                </Button>
-              </div>
+              <h2 className={peopleStyles.peopleTitle}>Available Roles</h2>
               <div className={peopleStyles.peopleContent}>
                 <CustomScrollbar fadeBackground="transparent" fadeHeight={30} showHorizontalScroll={false}>
                   {projectData && projectData.roles && projectData.roles.length > 0 ? (
                     projectData.roles.map((proyectoRole, index) => (
                       <div key={`${proyectoRole.idrol}-${index}`} className={peopleStyles.person}>
                         <div className={peopleStyles.personAvatar}>
-                          <i className="bi bi-person-workspace" style={{ fontSize: '1.5rem', color: '#6c757d' }}></i>
+                          <i className="bi bi-person-workspace" style={{ fontSize: '1.5rem', color: 'var(--primary-color)' }}></i>
                         </div>
                         <div className={peopleStyles.personInfo}>
                           <div className={peopleStyles.personName}>
@@ -273,23 +228,15 @@ export const ManagerProjectPage = () => {
                           <div className={peopleStyles.personRole}>
                             Level {proyectoRole.roles?.nivelrol || 'N/A'}
                           </div>
-                          <div className={peopleStyles.personEmail} style={{ fontSize: '0.75rem', opacity: 0.8 }}>
-                            Status: {proyectoRole.estado || 'Unknown'}
-                          </div>
                         </div>
                         <div className={peopleStyles.personActions}>
                           <Button
-                            type="danger"
+                            type="secondary"
                             size="small"
                             icon="bi-x"
                             onClick={() => projectPage.handleDeleteRole(proyectoRole.idrol)}
-                            style={{ 
-                              padding: '0.25rem 0.5rem',
-                              fontSize: '0.75rem',
-                              minWidth: 'auto'
-                            }}
                           >
-                            
+                            Remove
                           </Button>
                         </div>
                       </div>
@@ -297,7 +244,7 @@ export const ManagerProjectPage = () => {
                   ) : (
                     <div className={peopleStyles.emptyState}>
                       <i className="bi bi-person-workspace" style={{ fontSize: '2rem', color: '#6c757d', marginBottom: '1rem' }}></i>
-                      <p>No roles defined for this project yet.</p>
+                      <p>This project has no roles defined yet.</p>
                     </div>
                   )}
                 </CustomScrollbar>
@@ -307,7 +254,6 @@ export const ManagerProjectPage = () => {
         </div>
       </div>
 
-      {/* Feedback Modal */}
       <FeedbackModal
         isOpen={projectPage.modals.feedback}
         onClose={() => projectPage.closeModal('feedback')}
@@ -317,7 +263,6 @@ export const ManagerProjectPage = () => {
         isLoading={projectPage.feedbackLoading}
       />
 
-      {/* Edit Project Modal */}
       {projectData && (
         <EditProjectModal
           isOpen={projectPage.modals.editProject}

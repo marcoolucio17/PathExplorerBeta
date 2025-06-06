@@ -13,8 +13,7 @@ export const ManagerCreateProjectPage = () => {
   const [clientImageUrl, setClientImageUrl] = useState(null);
   const { data: habilidades } = useFetch("habilidades");
   const navigate = useNavigate();
-
-  //debug backend data when it loads
+  
   useEffect(() => {
     if (clientes) {
       console.log('clientes data from backend:', clientes);
@@ -58,9 +57,8 @@ export const ManagerCreateProjectPage = () => {
     }
 
     const selectedCliente = clientes.find(c => c.idcliente === selectedId);
-    if (!selectedCliente) return; //por si acaso
+    if (!selectedCliente) return;
 
-    //debug selected client data
     console.log('selected client data:', selectedCliente);
 
     setFormData(prev => ({
@@ -77,7 +75,6 @@ export const ManagerCreateProjectPage = () => {
         },
       });
 
-      //debug response from client photo endpoint
       console.log('client photo response:', res.data);
 
       if (res.data.fotodecliente_url) {
@@ -106,8 +103,7 @@ export const ManagerCreateProjectPage = () => {
     if (file) {
       console.log("RFP seleccionado:", file.name);
       console.log("RFP file details:", file);
-
-      //debug available backend data when user interacts
+      
       console.log("available clients:", clientes?.length || 0);
       console.log("available skills:", habilidades?.length || 0);
 
@@ -158,7 +154,7 @@ export const ManagerCreateProjectPage = () => {
           requerimientos: [
             {
               tiempoexperiencia: '',
-              idhabilidad: 1 //puedes luego hacer esto dinámico
+              idhabilidad: 1
             }
           ]
         }
@@ -182,7 +178,6 @@ export const ManagerCreateProjectPage = () => {
     }));
   };
 
-  //deliverables management functions
   const handleAddDeliverable = () => {
     setFormData(prev => ({
       ...prev,
@@ -206,44 +201,18 @@ export const ManagerCreateProjectPage = () => {
     }));
   };
 
-  const handleEnhance = async () => {
-    if (!formData.description) return;
-
-    try {
-
-
-      const res = await axios.post(`https://pathexplorer-backend.onrender.com/api/mejorar-texto`, {
-        texto: formData.description,
-      });
-
-      if (res.data && res.data.mejorado) {
-        setFormData((prev) => ({
-          ...prev,
-          description: res.data.mejorado,
-        }));
-      } else {
-        console.error("Respuesta inesperada:", res.data);
-      }
-    } catch (err) {
-      console.error("Error al mejorar el texto:", err);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const formatDate = (dateString) => {
       if (!dateString) return '';
 
-      //detecta si viene en formato DD/MM/YYYY
       const parts = dateString.split('/');
       if (parts.length === 3) {
         const [day, month, year] = parts;
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
       }
 
-      //si no es DD/MM/YYYY, intenta convertir con Date
       const date = new Date(dateString);
-      if (isNaN(date)) return ''; //fecha inválida
+      if (isNaN(date)) return '';
 
       return date.toISOString().split('T')[0];
     };
@@ -262,13 +231,12 @@ export const ManagerCreateProjectPage = () => {
         nombrerol: rol.nombrerol,
         nivelrol: parseInt(rol.nivelrol),
         descripcionrol: rol.descripcionrol,
-        disponible: true, //o puedes hacer esto editable si quieres
+        disponible: true,
         requerimientos: rol.requerimientos || []
       }))
     };
 
     try {
-      //paso 1: crear el proyecto
       const result = await triggerPost('projects', { informacion });
       console.log('full project creation response:', result);
       const idproyecto = result?.idproyecto;
@@ -280,7 +248,6 @@ export const ManagerCreateProjectPage = () => {
 
       const token = localStorage.getItem("token");
       console.log("Archivo RFP:", formData.projectRFP?.name);
-      //paso 2: subir el archivo RFP
       if (formData.projectRFP) {
         const rfpForm = new FormData();
         console.log("Archivo RFP:", formData.projectRFP);
@@ -295,7 +262,6 @@ export const ManagerCreateProjectPage = () => {
         });
       }
 
-      //finalizar
       alert("Proyecto creado con éxito.");
       navigate('/manager/dashboard');
 
@@ -320,313 +286,274 @@ export const ManagerCreateProjectPage = () => {
   return (
     <div className={styles.createProjectContainer}>
       <div className={styles.createProjectContent}>
-        {/* Left Column - Main Form */}
-        <div className={styles.formDetails} style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          maxHeight: '100vh',
-          overflow: 'hidden'
-        }}>
-          <div className={styles.pageHeader} style={{ flexShrink: 0, marginBottom: '1rem' }}>
+        <div className={styles.formDetails}>
+          <div className={styles.pageHeader}>
             <div>
               <h1 className={styles.pageTitle}>Create Project</h1>
               <p className={styles.pageSubtitle}>Upload and add details for your project</p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {/* Scrollable Form Content */}
-            <div className={styles.formContent} style={{
-              flex: 1,
-              overflowY: 'auto',
-              paddingBottom: '1rem',
-              maxHeight: 'calc(100vh - 250px)',
-              minHeight: '0'
-            }}>
-              {/* Basic Information */}
-              <div className={styles.formSection}>
-                <h2 className={styles.sectionTitle}>Basic Information</h2>
-                <div className={styles.formGrid}>
+          <div className={styles.formContent}>
+            <div className={styles.formSection}>
+              <h2 className={styles.sectionTitle}>Basic Information</h2>
+              <div className={styles.formGrid}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="title">Project Title *</label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    placeholder="e.g. Whirlpool Quality Assurance"
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="clientSelect">Client *</label>
+                  <select
+                    id="clientSelect"
+                    name="idcliente"
+                    onChange={handleClientSelect}
+                    required
+                    value={formData.idcliente || ''}
+                  >
+                    <option value="">Select a client</option>
+                    {clientes?.map(cliente => (
+                      <option key={cliente.idcliente} value={cliente.idcliente}>
+                        {cliente.clnombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles.formGrid}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="description">Description *</label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    placeholder="What is your project about?"
+                    rows="3"
+                    required
+                  />
+                </div>
+
+                <div>
                   <div className={styles.formGroup}>
-                    <label htmlFor="title">Project Title *</label>
+                    <label htmlFor="startDate">Start Date *</label>
+                    <input
+                      type="date"
+                      id="startDate"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="endDate">Estimated End Date</label>
+                    <input
+                      type="date"
+                      id="endDate"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.formSection}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h2 className={styles.sectionTitle}>Project Deliverables</h2>
+                <button 
+                  type="button" 
+                  onClick={handleAddDeliverable}
+                  className={styles.addButton}
+                >
+                  <i className="bi bi-plus-lg"></i>
+                  Add Deliverable
+                </button>
+              </div>
+
+              {(formData.deliverables || []).map((deliverable, index) => (
+                <div key={index} className={styles.roleCard} style={{ padding: '1rem' }}>
+                  <div className={styles.formGroup}>
+                    <label>Deliverable {index + 1}</label>
                     <input
                       type="text"
-                      id="title"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      placeholder="e.g. Whirlpool Quality Assurance"
-                      required
+                      value={deliverable}
+                      onChange={(e) => handleDeliverableChange(index, e.target.value)}
+                      placeholder="e.g. MVP funcional"
                     />
                   </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="clientSelect">Client *</label>
-                    <select
-                      id="clientSelect"
-                      name="idcliente"
-                      onChange={handleClientSelect}
-                      required
-                      value={formData.idcliente || ''}
-                    >
-                      <option value="">Select a client</option>
-                      {clientes?.map(cliente => (
-                        <option key={cliente.idcliente} value={cliente.idcliente}>
-                          {cliente.clnombre}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="description">Description *</label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      placeholder="What is your project about?"
-                      rows="3"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={handleEnhance}
-                      className={styles.cancelButton}
-                    >
-                      Enhance Description
-                    </button>
-                  </div>
-
-                  <div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="startDate">Start Date *</label>
-                      <input
-                        type="date"
-                        id="startDate"
-                        name="startDate"
-                        value={formData.startDate}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="endDate">Estimated End Date</label>
-                      <input
-                        type="date"
-                        id="endDate"
-                        name="endDate"
-                        value={formData.endDate}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Project Deliverables */}
-              <div className={styles.formSection}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h2 className={styles.sectionTitle}>Project Deliverables</h2>
                   <button
                     type="button"
-                    onClick={handleAddDeliverable}
-                    className={styles.addButton}
+                    onClick={() => handleRemoveDeliverable(index)}
+                    className={styles.removeButton}
+                    style={{ marginTop: '0.5rem' }}
                   >
-                    <i className="bi bi-plus-lg"></i>
-                    Add Deliverable
+                    Remove Deliverable
                   </button>
                 </div>
+              ))}
+            </div>
 
-                {(formData.deliverables || []).map((deliverable, index) => (
-                  <div key={index} className={styles.roleCard} style={{ padding: '1rem' }}>
+            <div className={styles.formSection}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h2 className={styles.sectionTitle}>Project Roles</h2>
+                <button 
+                  type="button" 
+                  onClick={handleAddRole} 
+                  className={styles.addButton}
+                >
+                  <i className="bi bi-plus-lg"></i>
+                  Add Role
+                </button>
+              </div>
+
+              {formData.roles.map((rol, index) => (
+                <div key={index} className={styles.roleCard}>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRole(index)}
+                    className={styles.removeRoleButton}
+                  >
+                    ×
+                  </button>
+
+                  <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
-                      <label>Deliverable {index + 1}</label>
+                      <label>Role Name</label>
                       <input
                         type="text"
-                        value={deliverable}
-                        onChange={(e) => handleDeliverableChange(index, e.target.value)}
-                        placeholder="e.g. MVP funcional"
+                        value={rol.nombrerol}
+                        onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
+                        placeholder="e.g. Frontend Developer"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveDeliverable(index)}
-                      className={styles.removeButton}
-                      style={{ marginTop: '0.5rem' }}
-                    >
-                      Remove Deliverable
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Project Roles */}
-              <div className={styles.formSection}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h2 className={styles.sectionTitle}>Project Roles</h2>
-                  <button
-                    type="button"
-                    onClick={handleAddRole}
-                    className={styles.addButton}
-                  >
-                    <i className="bi bi-plus-lg"></i>
-                    Add Role
-                  </button>
-                </div>
-
-                {formData.roles.map((rol, index) => (
-                  <div key={index} className={styles.roleCard}>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveRole(index)}
-                      className={styles.removeRoleButton}
-                    >
-                      ×
-                    </button>
-
-                    <div className={styles.formGrid}>
-                      <div className={styles.formGroup}>
-                        <label>Role Name</label>
-                        <input
-                          type="text"
-                          value={rol.nombrerol}
-                          onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
-                          placeholder="e.g. Frontend Developer"
-                        />
-                      </div>
-                      <div className={styles.formGroup}>
-                        <label>Role Level</label>
-                        <input
-                          type="number"
-                          value={rol.nivelrol}
-                          onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
-                          placeholder="1-5"
-                          min="1"
-                          max="5"
-                        />
-                      </div>
-                    </div>
-
                     <div className={styles.formGroup}>
-                      <label>Description</label>
-                      <textarea
-                        value={rol.descripcionrol}
-                        onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
-                        placeholder="Describe the role responsibilities..."
-                        rows="2"
+                      <label>Role Level</label>
+                      <input
+                        type="number"
+                        value={rol.nivelrol}
+                        onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
+                        placeholder="1-5"
+                        min="1"
+                        max="5"
                       />
                     </div>
+                  </div>
 
-                    {/* Skills Requirements */}
-                    <div style={{ marginTop: '1rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                        <h4 style={{ color: 'var(--text-light)', margin: 0 }}>Required Skills</h4>
-                        <button
-                          type="button"
-                          onClick={() => handleAddRequerimiento(index)}
-                          className={styles.addButton}
-                          style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
-                        >
-                          <i className="bi bi-plus"></i>
-                          Add Skill
-                        </button>
-                      </div>
+                  <div className={styles.formGroup}>
+                    <label>Description</label>
+                    <textarea
+                      value={rol.descripcionrol}
+                      onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
+                      placeholder="Describe the role responsibilities..."
+                      rows="2"
+                    />
+                  </div>
 
-                      {rol.requerimientos?.map((req, reqIndex) => (
-                        <div key={reqIndex} className={styles.requirementCard}>
-                          <div className={styles.formGrid}>
-                            <div className={styles.formGroup}>
-                              <label>Skill</label>
-                              <select
-                                value={req.idhabilidad}
-                                onChange={(e) =>
-                                  handleRequerimientoChange(index, reqIndex, 'idhabilidad', e.target.value)
-                                }
-                              >
-                                <option value="">Select a skill</option>
-                                {[...habilidades || []]
-                                  .sort((a, b) => a.nombre.localeCompare(b.nombre))
-                                  .map((hab) => (
-                                    <option key={hab.idhabilidad} value={hab.idhabilidad}>
-                                      {hab.nombre}
-                                    </option>
-                                  ))}
-                              </select>
-                            </div>
+                  <div style={{ marginTop: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <h4 style={{ color: 'var(--text-light)', margin: 0 }}>Required Skills</h4>
+                      <button
+                        type="button"
+                        onClick={() => handleAddRequerimiento(index)}
+                        className={styles.addButton}
+                        style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                      >
+                        <i className="bi bi-plus"></i>
+                        Add Skill
+                      </button>
+                    </div>
 
-                            <div className={styles.formGroup}>
-                              <label>Experience Time</label>
-                              <select
-                                value={req.tiempoexperiencia}
-                                onChange={(e) =>
-                                  handleRequerimientoChange(index, reqIndex, 'tiempoexperiencia', e.target.value)
-                                }
-                              >
-                                <option value="">Select experience</option>
-                                <option>3 months</option>
-                                <option>6 months</option>
-                                <option>1 year</option>
-                                <option>2 years</option>
-                                <option>3 years</option>
-                                <option>4 years</option>
-                                <option>5 years</option>
-                              </select>
-                            </div>
+                    {rol.requerimientos?.map((req, reqIndex) => (
+                      <div key={reqIndex} className={styles.requirementCard}>
+                        <div className={styles.formGrid}>
+                          <div className={styles.formGroup}>
+                            <label>Skill</label>
+                            <select
+                              value={req.idhabilidad}
+                              onChange={(e) =>
+                                handleRequerimientoChange(index, reqIndex, 'idhabilidad', e.target.value)
+                              }
+                            >
+                              <option value="">Select a skill</option>
+                              {[...habilidades || []]
+                                .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                                .map((hab) => (
+                                  <option key={hab.idhabilidad} value={hab.idhabilidad}>
+                                    {hab.nombre}
+                                  </option>
+                                ))}
+                            </select>
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveRequerimiento(index, reqIndex)}
-                            className={styles.removeButton}
-                            style={{ marginTop: '0.5rem' }}
-                          >
-                            Remove Skill
-                          </button>
+                          <div className={styles.formGroup}>
+                            <label>Experience Time</label>
+                            <select
+                              value={req.tiempoexperiencia}
+                              onChange={(e) =>
+                                handleRequerimientoChange(index, reqIndex, 'tiempoexperiencia', e.target.value)
+                              }
+                            >
+                              <option value="">Select experience</option>
+                              <option>3 months</option>
+                              <option>6 months</option>
+                              <option>1 year</option>
+                              <option>2 years</option>
+                              <option>3 years</option>
+                              <option>4 years</option>
+                              <option>5 years</option>
+                            </select>
+                          </div>
                         </div>
-                      ))}
-                    </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRequerimiento(index, reqIndex)}
+                          className={styles.removeButton}
+                          style={{ marginTop: '0.5rem' }}
+                        >
+                          Remove Skill
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Fixed Form Actions Footer */}
-            <div className={styles.formActions} style={{
-              position: 'sticky',
-              bottom: 0,
-              backgroundColor: 'var(--bg-primary, #1a1a1a)',
-              borderTop: '1px solid var(--border-color, #333)',
-              padding: '1rem',
-              marginTop: 'auto',
-              zIndex: 10
-            }}>
-              <button
-                type="button"
-                className={styles.cancelButton}
-                onClick={() => navigate('/manager/dashboard')}
-              >
-                Cancel
-              </button>
+          <div className={styles.formActions}>
+            <Button 
+              type="secondary"
+              onClick={() => navigate('/manager/dashboard')}
+            >
+              Cancel
+            </Button>
 
-              <button
-                type="submit"
-                disabled={!isFormValid()}
-                className={styles.submitButton}
-              >
-                <i className="bi bi-plus-lg"></i>
-                Create Project
-              </button>
-            </div>
-          </form>
+            <Button
+              type="primary"
+              icon="bi-plus-lg"
+              onClick={handleSubmit}
+              disabled={!isFormValid()}
+            >
+              Create Project
+            </Button>
+          </div>
         </div>
 
-        {/* Right Column - Upload Sidebar */}
         <div className={styles.uploadSidebar}>
-          {/* RFP Upload Card */}
           <GlassCard className={`${styles.uploadCard} ${styles.rfpUploadCard}`}>
             <div className={styles.uploadSection}>
               <h3 className={styles.uploadCardTitle}>Project RFP</h3>
@@ -691,7 +618,6 @@ export const ManagerCreateProjectPage = () => {
             </div>
           </GlassCard>
 
-          {/* Client Logo Card */}
           <GlassCard className={`${styles.uploadCard} ${styles.clientUploadCard}`}>
             <div className={styles.uploadSection}>
               <h3 className={styles.uploadCardTitle}>Client Logo</h3>
