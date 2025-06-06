@@ -128,6 +128,29 @@ export const useEmpleadoDashboardPage = () => {
   
   // Compute flattened projects for display
   const displayProjects = dashboardData.flattenProjectsForList(getTabProjects());
+
+    // Get top three projects based on compatibility for HOME
+  const getTopProjects = () => {
+    let filteredProjects;
+    
+    switch (listPage.activeTab) {
+      case 'All':
+        filteredProjects = dashboardData.top;
+        break;
+      case 'Applied to':
+        // Projects where the user has applied to a role
+        filteredProjects = dashboardData.top.filter(project => 
+          project.userHasApplied === true
+        );
+        break;
+      default:
+        filteredProjects = dashboardData.top;
+    }
+    
+    return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
+  };
+
+  const topProjects = dashboardData.flattenProjectsForList(getTopProjects());
   
   // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
@@ -153,11 +176,13 @@ export const useEmpleadoDashboardPage = () => {
     
     return counts;
   }, [dashboardData.projects, dashboardData.flattenProjectsForList]);
+  
 
   return {
     ...listPage,
     ...dashboardData,
     displayProjects,
+    topProjects,
     tabNames,
     showCompatibility,
     toggleCompatibility,
