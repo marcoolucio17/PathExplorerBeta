@@ -7,6 +7,10 @@ import "./../index.css";
 const Login = () => {
   return (
     <div id="login-main-div" className="loginMainDiv">
+      <div className="wave"></div>
+      <div className="wave"></div>
+      <div className="wave"></div>
+      
       <div id="image-background" className="imageBackground">
         <div id="image-header-main-div" className="imageHeaderMainDiv">
           <div id="image-header-div">
