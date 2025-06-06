@@ -22,8 +22,6 @@ const ProjectCard = ({
   isProjectCard = false //new prop to indicate project-level card
 }) => {
 
-
-
   const navigate = useNavigate();
   const cardClass = viewMode === 'grid'
     ? styles.cardGrid

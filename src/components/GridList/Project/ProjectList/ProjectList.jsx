@@ -85,30 +85,67 @@ const ProjectList = ({
         const isProjectCard = item.isProjectCard || false;
         const projectId = item.project.idproyecto || "unknown";
         if (!isProjectCard) {
-          return item.proyecto_rol.map((rol, rolindex) => {
 
+          if (Array.isArray(item.proyecto_rol)) {
+            return item.proyecto_rol?.map((rol, rolindex) => {
+
+              // Fix role ID extraction - check the nested structure
+              let roleId = null;
+
+              if (!isProjectCard && rol) {
+                roleId = rol.idrol || null;
+              }
+              let compatibilityValue = null;
+              if (!isProjectCard && rol) {
+                compatibilityValue = rol.compability || 0; // Default to 0 if not available
+              }
+              // Force cards to always re-render when filter changes with a unique key
+              const renderKey = `${projectId}-${roleId || 'project'}-${index}-${rolindex}`;
+
+              return (
+                <div key={renderKey} className={styles.item}>
+
+                  <ProjectCard
+
+                    id={projectId}
+                    idrol={roleId}
+                    project={item.project}
+                    proyecto_rol={rol.roles}
+                    viewMode={viewMode}
+                    compatibilityValue={compatibilityValue}
+                    showCompatibility={showCompatibility}
+                    selectedSkillFilters={selectedSkillFilters}
+                    userSkills={userSkills}
+                    index={index}
+                    isProjectCard={isProjectCard}
+                  />
+                </div>
+              );
+
+            });
+          } else {
             // Fix role ID extraction - check the nested structure
             let roleId = null;
-
-            if (!isProjectCard && rol) {
-              roleId = rol.idrol || null;
+            if (!isProjectCard && item.proyecto_rol) {
+              roleId = item.proyecto_rol.idrol || null;
             }
             let compatibilityValue = null;
-            if (!isProjectCard && rol) {
-              compatibilityValue = rol.compability || 0; // Default to 0 if not available
+            if (!isProjectCard && item.proyect) {
+              compatibilityValue = item.proyect.compability || 0; // Default to 0 if not available
             }
-            // Force cards to always re-render when filter changes with a unique key
-            const renderKey = `${projectId}-${roleId || 'project'}-${index}-${rolindex}`;
-
+            const renderKey = `${projectId}-${roleId || 'project'}`;
             return (
+
+
+              // Force cards to always re-render when filter changes with a unique key
+
               <div key={renderKey} className={styles.item}>
 
                 <ProjectCard
-
                   id={projectId}
                   idrol={roleId}
                   project={item.project}
-                  proyecto_rol={rol.roles}
+                  proyecto_rol={item.proyecto_rol}
                   viewMode={viewMode}
                   compatibilityValue={compatibilityValue}
                   showCompatibility={showCompatibility}
@@ -119,8 +156,7 @@ const ProjectList = ({
                 />
               </div>
             );
-
-          })
+          }
         }
         else if (isProjectCard) {
           // For project cards, we only have the project object
