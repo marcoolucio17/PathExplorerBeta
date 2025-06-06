@@ -22,6 +22,24 @@ export const useFetch = (ruta, body = null) => {
       setError(null);
       
       let url = `https://pathexplorer-backend.onrender.com/api/${ruta}`;
+    try {
+      let response;
+      const config = {
+        headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      if (body && typeof body === "string") {
+        response = await axios.get(url, body, config);
+      } else {
+        response = await axios.get(url, config);
+      }
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
       try {
         let response;
         const config = {
@@ -29,11 +47,7 @@ export const useFetch = (ruta, body = null) => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         };
-        if (body && typeof body === "string") {
-          response = await axios.get(url, body, config);
-        } else {
-          response = await axios.get(url, config);
-        }
+      response = await axios.get(url, config);
         setData(response.data);
         setLoading(false);
       } catch (error) {

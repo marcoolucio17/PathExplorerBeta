@@ -10,17 +10,18 @@ import useGetFetch from 'src/hooks/useGetFetch';
 
 const ProjectCard = ({
   id,
+  idrol,
   project,
   proyecto_rol,
   viewMode,
   compatibilityValue,
-  idrol,
   showCompatibility,
   onClick,
   selectedSkillFilters = [],
   userSkills = [],
   isProjectCard = false //new prop to indicate project-level card
 }) => {
+
   const navigate = useNavigate();
   const cardClass = viewMode === 'grid'
     ? styles.cardGrid
@@ -28,7 +29,6 @@ const ProjectCard = ({
 
   //custom navigation for project cards
   const handleProjectCardClick = (e) => {
-    console.log("project card clicked:", { id, isProjectCard, event: e });
     if (isProjectCard) {
       e.preventDefault();
       e.stopPropagation();
@@ -37,14 +37,7 @@ const ProjectCard = ({
     }
   };
 
-  //debugging: log props to see what we're getting
-  console.log("ProjectCard render:", { 
-    id, 
-    idrol, 
-    isProjectCard, 
-    project: project?.pnombre,
-    proyecto_rol: proyecto_rol?.roles?.idrol 
-  });
+
 
   //stable duration calculation based on project id to prevent fluctuation
   const ensureRoleData = () => {
@@ -53,15 +46,16 @@ const ProjectCard = ({
       return {
         roleName: project.pnombre || 'Project',
         projectName: '', //no subtitle for project cards
-        duration: project.idproyecto ? ((project.idproyecto % 16) + 3) : 8,
+        duration: project.duracionMes ? project.duracionMes : "TBD",
         roleCount: project.proyecto_roles ? project.proyecto_roles.length : 0
       };
     }
     
+    //proyecto_rol.nombrerol ||
     return {
-      roleName: proyecto_rol.roles?.nombrerol || 'Developer',
+      roleName: proyecto_rol.nombrerol || 'Developer',
       projectName: project.pnombre || 'Project',
-      duration: project.idproyecto ? ((project.idproyecto % 16) + 3) : 8
+      duration: project.duracionMes ? project.duracionMes : "TBD"
     };
   };
 
@@ -71,16 +65,15 @@ const ProjectCard = ({
       return [];
     }
     
-    if (!proyecto_rol.roles?.requerimientos_roles || proyecto_rol.roles.requerimientos_roles.length === 0) {
+    if (!proyecto_rol?.requerimientos_roles || proyecto_rol.requerimientos_roles.length === 0) {
       return [
-        { id: 'demo-1', name: 'JavaScript', isUser: true },
+        /*{ id: 'demo-1', name: 'JavaScript', isUser: true },
         { id: 'demo-2', name: 'React', isUser: false },
         { id: 'demo-3', name: 'Python', isUser: false },
-        { id: 'demo-4', name: 'Node.js', isUser: true }
+        { id: 'demo-4', name: 'Node.js', isUser: true }*/
       ];
     }
-
-    return proyecto_rol.roles.requerimientos_roles.map(req_rol => ({
+    return proyecto_rol.requerimientos_roles.map(req_rol => ({
       id: req_rol.requerimientos.habilidades.idhabilidad,
       name: req_rol.requerimientos.habilidades.nombre,
       isUser: userSkills.includes(req_rol.requerimientos.habilidades.nombre) ||
@@ -88,12 +81,9 @@ const ProjectCard = ({
     }));
   };
 
-
-
-
-
   const roleData = ensureRoleData();
   const skillsData = ensureSkillsData();
+
 
   const renderSkills = () => {
     //don't render skills for project cards
@@ -196,6 +186,7 @@ const ProjectCard = ({
         {isProjectCard && roleData.roleCount > 0 && (
           <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
         )}
+
       </div>
 
       <div className={customStyles.floatingDescription}>
@@ -205,14 +196,14 @@ const ProjectCard = ({
       </div>
 
 
-      {!isProjectCard && (
+      {isProjectCard && (
         <div className={customStyles.skillsCircleContainer}>
           <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
             {renderSkills()}
 
           </div>
 
-          {showCompatibility && (
+          {!showCompatibility && (
             <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
               <ProgressCircle
                 value={compatibilityValue}
