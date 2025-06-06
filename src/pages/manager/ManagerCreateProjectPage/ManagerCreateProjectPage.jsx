@@ -13,7 +13,7 @@ export const ManagerCreateProjectPage = () => {
   const [clientImageUrl, setClientImageUrl] = useState(null);
   const { data: habilidades } = useFetch("habilidades");
   const navigate = useNavigate();
-  
+
   //debug backend data when it loads
   useEffect(() => {
     if (clientes) {
@@ -106,7 +106,7 @@ export const ManagerCreateProjectPage = () => {
     if (file) {
       console.log("RFP seleccionado:", file.name);
       console.log("RFP file details:", file);
-      
+
       //debug available backend data when user interacts
       console.log("available clients:", clientes?.length || 0);
       console.log("available skills:", habilidades?.length || 0);
@@ -206,6 +206,29 @@ export const ManagerCreateProjectPage = () => {
     }));
   };
 
+  const handleEnhance = async () => {
+    if (!formData.description) return;
+
+    try {
+
+
+      const res = await axios.post(`https://pathexplorer-backend.onrender.com/api/mejorar-texto`, {
+        texto: formData.description,
+      });
+
+      if (res.data && res.data.mejorado) {
+        setFormData((prev) => ({
+          ...prev,
+          description: res.data.mejorado,
+        }));
+      } else {
+        console.error("Respuesta inesperada:", res.data);
+      }
+    } catch (err) {
+      console.error("Error al mejorar el texto:", err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formatDate = (dateString) => {
@@ -298,9 +321,9 @@ export const ManagerCreateProjectPage = () => {
     <div className={styles.createProjectContainer}>
       <div className={styles.createProjectContent}>
         {/* Left Column - Main Form */}
-        <div className={styles.formDetails} style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
+        <div className={styles.formDetails} style={{
+          display: 'flex',
+          flexDirection: 'column',
           height: '100%',
           maxHeight: '100vh',
           overflow: 'hidden'
@@ -314,9 +337,9 @@ export const ManagerCreateProjectPage = () => {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* Scrollable Form Content */}
-            <div className={styles.formContent} style={{ 
-              flex: 1, 
-              overflowY: 'auto', 
+            <div className={styles.formContent} style={{
+              flex: 1,
+              overflowY: 'auto',
               paddingBottom: '1rem',
               maxHeight: 'calc(100vh - 250px)',
               minHeight: '0'
@@ -369,6 +392,13 @@ export const ManagerCreateProjectPage = () => {
                       rows="3"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={handleEnhance}
+                      className={styles.cancelButton}
+                    >
+                      Enhance Description
+                    </button>
                   </div>
 
                   <div>
@@ -401,8 +431,8 @@ export const ManagerCreateProjectPage = () => {
               <div className={styles.formSection}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <h2 className={styles.sectionTitle}>Project Deliverables</h2>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={handleAddDeliverable}
                     className={styles.addButton}
                   >
@@ -438,9 +468,9 @@ export const ManagerCreateProjectPage = () => {
               <div className={styles.formSection}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <h2 className={styles.sectionTitle}>Project Roles</h2>
-                  <button 
-                    type="button" 
-                    onClick={handleAddRole} 
+                  <button
+                    type="button"
+                    onClick={handleAddRole}
                     className={styles.addButton}
                   >
                     <i className="bi bi-plus-lg"></i>
@@ -574,9 +604,9 @@ export const ManagerCreateProjectPage = () => {
               marginTop: 'auto',
               zIndex: 10
             }}>
-              <button 
+              <button
                 type="button"
-                className={styles.cancelButton} 
+                className={styles.cancelButton}
                 onClick={() => navigate('/manager/dashboard')}
               >
                 Cancel
