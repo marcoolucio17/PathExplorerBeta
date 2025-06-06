@@ -24,6 +24,7 @@ export const ManagerDashboardPage = () => {
     dashboardPage.toggleCreateProjectModal()
   };
 
+  console.log('DashboardPage state:', dashboardPage.activeTab);
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -61,7 +62,9 @@ export const ManagerDashboardPage = () => {
             fadeHeight={40}
             showHorizontalScroll={false}
           >
+
             <ProjectList
+              tabSelected={dashboardPage.activeTab}
               projects={dashboardPage.displayProjects}
               viewMode={dashboardPage.viewMode}
               showCompatibility={dashboardPage.showCompatibility}

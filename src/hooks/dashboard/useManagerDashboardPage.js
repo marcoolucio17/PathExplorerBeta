@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useFetch } from "../useFetch";
 import useDashboardData from "./useDashboardData";
 import useListPage from "../useListPage";
 import useModalControl from "../useModalControl";
@@ -9,6 +10,27 @@ export const useManagerDashboardPage = () => {
   const navigate = useNavigate();
   const dashboardData = useDashboardData();
   const tabNames = ["All", "Applied To", "My Projects"];
+
+  //get current user id from localStorage
+  const currentUserId = useMemo(() => 
+    localStorage.getItem("id") || sessionStorage.getItem("id"), 
+    []
+  );
+
+  //fetch user's created projects for my projects tab
+  const { data: myProjectsData, loading: myProjectsLoading, error: myProjectsError } = useFetch(
+    currentUserId ? `creador/${currentUserId}` : null
+  );
+
+  //debugging: log my projects data
+  useEffect(() => {
+    if (myProjectsData) {
+      console.log("my projects data from /creador endpoint:", myProjectsData);
+    }
+    if (myProjectsError) {
+      console.error("error fetching my projects:", myProjectsError);
+    }
+  }, [myProjectsData, myProjectsError]);
 
   const { modals, openModal, closeModal, toggleModal } = useModalControl({
     skillsFilter: false,
@@ -60,26 +82,6 @@ export const useManagerDashboardPage = () => {
     }
   }, [navigate]);
 
-  const idusuarioActual = useMemo(() => 
-    localStorage.getItem("id") || sessionStorage.getItem("id"), 
-    []
-  );
-
-  //stable effect that won't cause infinite loops
-  useEffect(() => {
-    const currentTab = listPage.activeTab;
-    
-    if (currentTab === "All") {
-      const { idusuario, ...rest } = dashboardData.filterOptions;
-      dashboardData.setFilterOptions(rest);
-    } else if (currentTab === "My Projects") {
-      dashboardData.setFilterOptions({
-        ...dashboardData.filterOptions,
-        idusuario: idusuarioActual,
-      });
-    }
-  }, [listPage.activeTab, idusuarioActual]); //removed unstable dependencies
-
   const getTabProjects = useCallback(() => {
     let filteredProjects;
 
@@ -93,14 +95,15 @@ export const useManagerDashboardPage = () => {
         );
         break;
       case "My Projects":
-        filteredProjects = dashboardData.projects;
+        //use projects from /creador endpoint
+        filteredProjects = Array.isArray(myProjectsData) ? myProjectsData : [];
         break;
       default:
         filteredProjects = dashboardData.projects;
     }
 
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
-  }, [dashboardData.projects, listPage.activeTab, listPage.sortOption, dashboardData.sortProjects]);
+  }, [dashboardData.projects, myProjectsData, listPage.activeTab, listPage.sortOption, dashboardData.sortProjects]);
 
   const getActiveFilters = useCallback(() => {
     const filters = {};
@@ -159,10 +162,30 @@ export const useManagerDashboardPage = () => {
     //add project creation logic
   }, []);
 
-  const displayProjects = useMemo(() => 
-    dashboardData.flattenProjectsForList(getTabProjects()),
-    [dashboardData, getTabProjects]
-  );
+  const displayProjects = useMemo(() => {
+    const tabProjects = getTabProjects();
+    
+    //for my projects tab, don't flatten - show each project as one card
+    if (listPage.activeTab === "My Projects") {
+      //create project cards without flattening roles
+      return tabProjects.map(project => ({
+        project,
+        proyecto_rol: null, //no specific role for project-level cards
+        isProjectCard: true //flag to indicate this is a project card, not role card
+      }));
+    }
+    
+    //for other tabs, use normal flattening
+    return dashboardData.flattenProjectsForList(tabProjects);
+  }, [dashboardData, getTabProjects, listPage.activeTab]);
+
+  //determine loading state based on active tab
+  const isLoading = useMemo(() => {
+    if (listPage.activeTab === "My Projects") {
+      return myProjectsLoading;
+    }
+    return dashboardData.isLoading || false;
+  }, [listPage.activeTab, myProjectsLoading, dashboardData.isLoading]);
 
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
@@ -176,15 +199,13 @@ export const useManagerDashboardPage = () => {
     );
     counts["Applied To"] = dashboardData.flattenProjectsForList(appliedToProjects).length;
 
-    const myProjects = dashboardData.projects.filter(
-      (project) =>
-        project.managerId === dashboardData.currentUserId ||
-        project.ownerId === dashboardData.currentUserId
-    );
-    counts["My Projects"] = dashboardData.flattenProjectsForList(myProjects).length;
+    //for my projects, count actual projects (not flattened roles)
+    if (Array.isArray(myProjectsData)) {
+      counts["My Projects"] = myProjectsData.length;
+    }
 
     return counts;
-  }, [dashboardData.projects, dashboardData.flattenProjectsForList, dashboardData.currentUserId]);
+  }, [dashboardData.projects, dashboardData.flattenProjectsForList, myProjectsData]);
 
   return {
     ...listPage,
@@ -206,8 +227,11 @@ export const useManagerDashboardPage = () => {
     handleCreateProject,
     toggleViewMode,
     tabCounts: correctedTabCounts,
-    setTabActual: dashboardData.setTabActual,
-    tabActual: dashboardData.tabActual,
+    isLoading,
+    //expose my projects data for debugging
+    myProjectsData,
+    myProjectsError,
+    currentUserId
   };
 };
 

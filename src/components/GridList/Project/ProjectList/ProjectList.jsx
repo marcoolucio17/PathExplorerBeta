@@ -19,6 +19,7 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {boolean} props.isLoading - Whether items are currently loading
  */
 const ProjectList = ({
+  tabSelected,
   projects = [],
   viewMode,
   showCompatibility,
@@ -29,7 +30,7 @@ const ProjectList = ({
 }) => {
   // Safety check for undefined/null projects array
   const safeProjects = Array.isArray(projects) ? projects : [];
-
+  console.log("View Mode:", viewMode);
   //if loading, show enhanced project loading state
   if (isLoading) {
     return (
@@ -69,38 +70,58 @@ const ProjectList = ({
 
   // Create a unique key for the container to force re-render and animation restart
   const containerKey = `container-projects-${viewMode}`;
-  const idEmployee = localStorage.getItem("idEmployee") || 1;
   return (
     <div key={containerKey} className={containerClass}>
       {safeProjects.map((item, index) => {
+        console.log("Rendering ProjectList item:", item);
         // Check if item has the expected structure
-        if (!item || !item.project || !item.proyecto_rol) {
+        if (!item || !item.project) {
           console.warn("Invalid project item structure:", item);
           return null; // Skip rendering this item
         }
 
-        // Calculate match percentage if function is provided
-        /*const matchPercentage = calculateMatchPercentage ? 
-          calculateMatchPercentage(item.project, item.proyecto_rol) : 0;*/
+        // For project cards (My Projects tab), we don't have proyecto_rol
+        const isProjectCard = item.isProjectCard || false;
+        const projectId = item.project.idproyecto || "unknown";
+        
+        // Fix role ID extraction - check the nested structure
+        let roleId = null;
+        if (!isProjectCard && item.proyecto_rol) {
+          roleId = item.proyecto_rol.roles?.idrol || item.proyecto_rol.idrol || null;
+        }
+        let compatibilityValue = null;
+        if (!isProjectCard && item.proyecto_rol) {
+          compatibilityValue = item.proyecto_rol.compability || 0; // Default to 0 if not available
+        }
+
+        console.log("ProjectList item:", { 
+          isProjectCard, 
+          projectId, 
+          roleId, 
+          proyecto_rol: item.proyecto_rol 
+        });
 
         // Force cards to always re-render when filter changes with a unique key
-        const renderKey = `${item.project.idproyecto || "unknown"}-${
-          item.proyecto_rol.idrol || "unknown"
-        }-${index}`;
+        const renderKey = `${projectId}-${roleId || 'project'}-${index}`;
+
 
         return (
           <div key={renderKey} className={styles.item}>
+
             <ProjectCard
-              id = {item.project.idproyecto}
-              idrol = {item.proyecto_rol.roles.idrol}
+
+              id={projectId}
+              idrol={roleId}
+
               project={item.project}
               proyecto_rol={item.proyecto_rol}
               viewMode={viewMode}
-              idEmployee={idEmployee}
+                compatibilityValue={item.proyecto_rol.compability}
               showCompatibility={showCompatibility}
               selectedSkillFilters={selectedSkillFilters}
               userSkills={userSkills}
               index={index}
+              isProjectCard={isProjectCard}
             />
           </div>
         );

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GlassCard } from 'src/components/shared/GlassCard';
 import GlassCardNavigation from 'src/components/shared/GlassCard/GlassCardNavigation'; // el import es un poquito diferente
 import { ProgressCircle } from 'src/components/ProgressCircle';
@@ -12,19 +13,51 @@ const ProjectCard = ({
   project,
   proyecto_rol,
   viewMode,
-  idEmployee,
+  compatibilityValue,
   idrol,
   showCompatibility,
   onClick,
   selectedSkillFilters = [],
-  userSkills = []
+  userSkills = [],
+  isProjectCard = false //new prop to indicate project-level card
 }) => {
+  const navigate = useNavigate();
   const cardClass = viewMode === 'grid'
     ? styles.cardGrid
     : `${styles.cardList} ${customStyles.cardList}`;
 
+  //custom navigation for project cards
+  const handleProjectCardClick = (e) => {
+    console.log("project card clicked:", { id, isProjectCard, event: e });
+    if (isProjectCard) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("navigating to:", `/manager/project/${id}`);
+      navigate(`/manager/project/${id}`);
+    }
+  };
+
+  //debugging: log props to see what we're getting
+  console.log("ProjectCard render:", { 
+    id, 
+    idrol, 
+    isProjectCard, 
+    project: project?.pnombre,
+    proyecto_rol: proyecto_rol?.roles?.idrol 
+  });
+
   //stable duration calculation based on project id to prevent fluctuation
   const ensureRoleData = () => {
+    if (isProjectCard) {
+      //for project cards, show project name as title
+      return {
+        roleName: project.pnombre || 'Project',
+        projectName: '', //no subtitle for project cards
+        duration: project.idproyecto ? ((project.idproyecto % 16) + 3) : 8,
+        roleCount: project.proyecto_roles ? project.proyecto_roles.length : 0
+      };
+    }
+    
     return {
       roleName: proyecto_rol.roles?.nombrerol || 'Developer',
       projectName: project.pnombre || 'Project',
@@ -33,6 +66,11 @@ const ProjectCard = ({
   };
 
   const ensureSkillsData = () => {
+    //for project cards, don't show skills
+    if (isProjectCard) {
+      return [];
+    }
+    
     if (!proyecto_rol.roles?.requerimientos_roles || proyecto_rol.roles.requerimientos_roles.length === 0) {
       return [
         { id: 'demo-1', name: 'JavaScript', isUser: true },
@@ -50,15 +88,19 @@ const ProjectCard = ({
     }));
   };
 
-  const { data: matchPercentageData } = useGetFetch({
-    rutaApi: `compability?id_rol=${idrol}&idusuario=${idEmployee}`
-  });
 
-  const matchPercentageValue = matchPercentageData ? matchPercentageData : 0;
+
+
+
   const roleData = ensureRoleData();
   const skillsData = ensureSkillsData();
 
   const renderSkills = () => {
+    //don't render skills for project cards
+    if (isProjectCard || skillsData.length === 0) {
+      return null;
+    }
+    
     const showMoreButton = skillsData.length > 2;
     const visibleSkills = skillsData.slice(0, showMoreButton ? 2 : Math.min(3, skillsData.length));
 
@@ -86,10 +128,10 @@ const ProjectCard = ({
 
   const gridContent = (
     <>
-      {showCompatibility && (
+      {showCompatibility && !isProjectCard && (
         <div className={styles.statusCircle}>
           <ProgressCircle
-            value={matchPercentageValue}
+            value={compatibilityValue}
             size={60}
             fontSize="1.1rem"
             strokeWidth={6}
@@ -106,7 +148,10 @@ const ProjectCard = ({
         />
         <div className={styles.cardInfo}>
           <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
-          <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
+          {roleData.projectName && <p className={styles.cardSubtitle}>for {roleData.projectName}</p>}
+          {isProjectCard && roleData.roleCount > 0 && (
+            <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
+          )}
         </div>
       </div>
 
@@ -127,9 +172,11 @@ const ProjectCard = ({
         </div>
       </div>
 
-      <div className={styles.cardSkills}>
-        {renderSkills()}
-      </div>
+      {!isProjectCard && (
+        <div className={styles.cardSkills}>
+          {renderSkills()}
+        </div>
+      )}
     </>
   );
 
@@ -145,32 +192,39 @@ const ProjectCard = ({
 
       <div className={customStyles.titleContainer}>
         <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
-        <p className={styles.cardSubtitle}>for {roleData.projectName}</p>
+        {roleData.projectName && <p className={styles.cardSubtitle}>for {roleData.projectName}</p>}
+        {isProjectCard && roleData.roleCount > 0 && (
+          <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
+        )}
       </div>
 
       <div className={customStyles.floatingDescription}>
         <p className={styles.descriptionText}>
-          Description for Project {project.pnombre || '5'}
+          {isProjectCard ? project.descripcion : `Description for Project ${project.pnombre || '5'}`}
         </p>
       </div>
 
-      <div className={customStyles.skillsCircleContainer}>
-        <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
-          {renderSkills()}
-        </div>
 
-        {showCompatibility && (
-          <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
-            <ProgressCircle
-              value={matchPercentageValue}
-              size={60}
-              strokeWidth={6}
-              fontSize="1rem"
-              fontWeight="light"
-            />
+      {!isProjectCard && (
+        <div className={customStyles.skillsCircleContainer}>
+          <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
+            {renderSkills()}
+
           </div>
-        )}
-      </div>
+
+          {showCompatibility && (
+            <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
+              <ProgressCircle
+                value={compatibilityValue}
+                size={60}
+                strokeWidth={6}
+                fontSize="1rem"
+                fontWeight="light"
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={customStyles.durationColumn}>
         <span className={styles.detailLabel}>
@@ -184,15 +238,47 @@ const ProjectCard = ({
   );
 
   if (viewMode === 'grid') {
+    if (isProjectCard) {
+      return (
+        <div 
+          onClick={handleProjectCardClick}
+          style={{ 
+            cursor: 'pointer',
+            pointerEvents: 'auto'
+          }}
+        >
+          <GlassCard className={cardClass}>
+            {gridContent}
+          </GlassCard>
+        </div>
+      );
+    }
+    
     return (
-      <GlassCardNavigation id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
+      <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
         {gridContent}
       </GlassCardNavigation>
     );
   }
 
+  if (isProjectCard) {
+    return (
+      <div 
+        onClick={handleProjectCardClick}
+        style={{ 
+          cursor: 'pointer',
+          pointerEvents: 'auto'
+        }}
+      >
+        <GlassCard className={cardClass}>
+          {listContent}
+        </GlassCard>
+      </div>
+    );
+  }
+
   return (
-    <GlassCardNavigation id = {id} idrol = {idrol} className={cardClass} onClick={onClick}>
+    <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
       {listContent}
     </GlassCardNavigation>
   );

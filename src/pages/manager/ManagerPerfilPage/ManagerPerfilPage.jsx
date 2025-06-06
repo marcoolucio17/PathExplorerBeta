@@ -36,7 +36,7 @@ import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
 export const ManagerPerfilPage = () => {
   // Use the custom hook to handle all logic
   const profilePage = useProfilePage();
-
+  console.log('ProfilePage state:', profilePage);
   const renderTabContent = () => {
     switch (profilePage.activeTab) {
       case "Experience":

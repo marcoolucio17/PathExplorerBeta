@@ -4,8 +4,8 @@ import modalStyles from "./EditObjectivesModal.module.css";
 
 import axios from "axios";
 
-const DB_URL = "https://pathexplorer-backend.onrender.com/";
-// const DB_URL = "http://localhost:8080/";
+const DB_URL = "https://pathexplorer-backend.onrender.com/api/";
+//const DB_URL = "http://localhost:8080/api/";
 
 export const EditObjectivesModal = ({
   isOpen,
@@ -158,6 +158,32 @@ export const EditObjectivesModal = ({
     }
   };
 
+  const handleEnhance = async () => {
+    if (!formData.description) return;
+
+    try {
+      setIsLoading(true);
+
+      const res = await axios.post(`${DB_URL}mejorar-texto`, {
+        texto: formData.description,
+      });
+
+      if (res.data && res.data.mejorado) {
+        setFormData((prev) => ({
+          ...prev,
+          description: res.data.mejorado,
+        }));
+      } else {
+        console.error("Respuesta inesperada:", res.data);
+      }
+    } catch (err) {
+      console.error("Error al mejorar el texto:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   const handleCancel = () => {
     //resetForm();
     setEditingIndex(null);
@@ -190,7 +216,7 @@ export const EditObjectivesModal = ({
     console.log(req);
 
     const res = await axios.put(
-      DB_URL + "api/update-goals/" + localStorage.getItem("id"),
+      DB_URL + "update-goals/" + localStorage.getItem("id"),
       { goals: req },
       config
     );
@@ -257,9 +283,8 @@ export const EditObjectivesModal = ({
               {objectivesList.map((obj, index) => (
                 <div
                   key={obj.id}
-                  className={`${modalStyles.objectiveItem} ${
-                    editingIndex === index ? modalStyles.editing : ""
-                  } ${obj.completed ? modalStyles.completed : ""}`}
+                  className={`${modalStyles.objectiveItem} ${editingIndex === index ? modalStyles.editing : ""
+                    } ${obj.completed ? modalStyles.completed : ""}`}
                 >
                   <div className={modalStyles.objectiveInfo}>
                     <div className={modalStyles.objectiveHeader}>
@@ -326,6 +351,13 @@ export const EditObjectivesModal = ({
 
               <div className={styles.formGroup}>
                 <label htmlFor="description">Description *</label>
+                <button
+                  type="button"
+                  onClick={handleEnhance}
+                  className={styles.primaryButton}
+                >
+                  Enhance Description
+                </button>
                 <textarea
                   id="description"
                   name="description"
