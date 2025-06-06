@@ -34,13 +34,17 @@ export const useDashboardData = () => {
     idCompatible: localStorage.getItem("id"),
   }); // Added to manage all filter options centrally
 
+  const [filterOptionsMyProjects, setFilterOptionsMyProjects] = useState({
+    idCompatible: localStorage.getItem("id"),
+    idusuario: localStorage.getItem("id"),
+  });
   const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
 
   //mock current user ID (this would come from authentication context in real app)
   const currentUserId = 1;
 
   //URL management for search
-  /*useEffect(() => {
+  useEffect(() => {
     if (searchTerm) {
       const params = new URLSearchParams(location.search);
       params.set("search", searchTerm);
@@ -68,12 +72,13 @@ export const useDashboardData = () => {
       setSearchTerm(searchParam);
     }
   }, [location.search]);
-*/
+
   //fetch data
-  const { data: projectsData } = useGetFetchProjectsFilters({
-    rutaApi: "projects",
-    filters: filterOptions,
-  });
+  const { data: projectsData, loading: projectsLoading } =
+    useGetFetchProjectsFilters({
+      rutaApi: "projects",
+      filters: filterOptions,
+    });
 
   const { data: clientsData } = useGetFetch({ rutaApi: "clientes" });
 
@@ -102,10 +107,17 @@ export const useDashboardData = () => {
         ...filterOptions,
         projectName: nameProject, // Update filter options with project name
       });
+      setFilterOptionsMyProjects({
+        ...filterOptionsMyProjects,
+        projectName: nameProject, // Update filter options for My Projects with project name
+      });
     } else {
       // eslint-disable-next-line no-unused-vars
       const { projectName, ...rest } = filterOptions; // Remove project name filter
       setFilterOptions(rest);
+      const { projectName: myProjectName, ...restMyProjects } =
+        filterOptionsMyProjects;
+      setFilterOptionsMyProjects(restMyProjects); // Remove project name filter for My Projects
     }
   };
   //Apply client filters
@@ -118,11 +130,18 @@ export const useDashboardData = () => {
         idcliente: selectedClientId, // Update filter options with selected client ID
       });
       setClientId(selectedClientId);
+      setFilterOptionsMyProjects({
+        ...filterOptionsMyProjects,
+        idcliente: selectedClientId, // Update filter options for My Projects with selected client ID
+      });
     } else {
       setClientNameSelected("Clients");
       // eslint-disable-next-line no-unused-vars
       const { idcliente, ...rest } = filterOptions; // Remove client filter
       setFilterOptions(rest);
+      const { idcliente: myClientId, ...restMyProjects } =
+        filterOptionsMyProjects; // Remove client filter for My Projects
+      setFilterOptionsMyProjects(restMyProjects);
       setClientId(null);
     }
   };
@@ -169,17 +188,6 @@ export const useDashboardData = () => {
     handleApplySkillFilters([]);
   };
 
-  // Calculate match percentage (placeholder function, implement actual logic)
-  const calculateMatchPercentage = (project) => {
-    // Replace with actual match calculation logic
-    // This is a placeholder and will return 0 for all projects
-    console.warn(
-      "calculateMatchPercentage is a placeholder. Implement actual logic.",
-      project
-    );
-    return 0;
-  };
-
   // Sort projects function
   const sortProjects = (projects, option) => {
     if (!Array.isArray(projects)) return [];
@@ -197,20 +205,6 @@ export const useDashboardData = () => {
 
       case "date_asc": // Oldest First
         return sorted.sort((a, b) => a.idproyecto - b.idproyecto);
-
-      case "match_desc": // Compatibility: High to Low
-        return sorted.sort((a, b) => {
-          const matchA = calculateMatchPercentage(a);
-          const matchB = calculateMatchPercentage(b);
-          return matchB - matchA;
-        });
-
-      case "match_asc": // Compatibility: Low to High
-        return sorted.sort((a, b) => {
-          const matchA = calculateMatchPercentage(a);
-          const matchB = calculateMatchPercentage(b);
-          return matchA - matchB;
-        });
 
       default:
         return sorted;
@@ -264,6 +258,9 @@ export const useDashboardData = () => {
     handdlyApplyNameProject,
     filterOptions,
     setFilterOptions,
+    filterOptionsMyProjects,
+    setFilterOptionsMyProjects,
+    projectsLoading,
   };
 };
 
