@@ -11,7 +11,7 @@ import styles from "/src/components/Profile/ProfileSkills.module.css";
  * @returns {JSX.Element}
  */
 export const TrendsCard = ({ data, onSkillsClick }) => {
-  const skills = Array.isArray(data?.result) ? data.result : [];  const hasNoSkills = skills.length === 0 ;
+  const skills = Array.isArray(data) ? data : [];  const hasNoSkills = skills.length === 0 ;
 
   console.log("Raw data:", data);
   console.log("skills:", Array.isArray(data?.result) ? data.result : []);
@@ -38,7 +38,7 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
                     <div className={styles.divider}></div>
                     <div className={styles.skillChipsContainer}>
                       {skills.map((skill, index) => (
-                        <SkillChip key={`hard-${skill}-${index}`} text={skill} />
+                        <SkillChip key={`hard-${skill}-${index}`} text={`${skill.name} (${skill.percentage}%)`} />
                       ))}
                     </div>
                   </div>

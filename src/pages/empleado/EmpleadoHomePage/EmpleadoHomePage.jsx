@@ -17,35 +17,19 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 import CustomScrollbar from "src/components/CustomScrollbar";
 import { ProjectList } from "src/components/GridList/Project";
 
-//mock data - in a real app, this would come from props or API
-const MOCK_RECOMMENDED_PROJECTS = [
-  {
-    idproyecto: 1,
-    pnombre: "Project Pepsi",
-    matchPercentage: 98,
-    skills: ["Figma", "Figma", "Figma"],
-    status: "open"
-  },
-  {
-    idproyecto: 2,
-    pnombre: "Project Pepsi",
-    matchPercentage: 98,
-    skills: ["Figma", "Figma", "Figma"],
-    status: "open"
-  },
-  {
-    idproyecto: 3,
-    pnombre: "Project Pepsi",
-    matchPercentage: 98,
-    skills: ["Figma", "Figma", "Figma"],
-    status: "open"
-  }
-];
+const hardcodedSkillsData = {
+  message: "Habilidades conseguidas fácilmente",
+  result: [
+    { id: 1, name: "Python", percentage: "11.95" },
+    { id: 4, name: "JavaScript", percentage: "8.18" },
+    { id: 2, name: "Comunicación", percentage: "6.92" },
+    { id: 6, name: "C#", percentage: "4.40" },
+    { id: 31, name: "CI/CD", percentage: "3.14" }
+  ]
+};
 
 export const EmpleadoHomePage = () => {
   const navigate = useNavigate();
-  const [recommendedProjects] = useState(MOCK_RECOMMENDED_PROJECTS);
-
   
   //api stuff needed for the page
   const { data, error, loading } = useFetch(
@@ -117,7 +101,6 @@ export const EmpleadoHomePage = () => {
               </h3>
               
             <div className={styles.cardsContainer}>
-              <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
                 <ProjectList 
                   projects={dashboardPage.topProjects}
                   viewMode={dashboardPage.viewMode}
@@ -128,7 +111,6 @@ export const EmpleadoHomePage = () => {
                   onClearFilters={dashboardPage.handleClearFilters}
                   isLoading={dashboardPage.isLoading}
                 />
-              </CustomScrollbar>
             </div>
             </div>
           </div>
@@ -161,7 +143,7 @@ export const EmpleadoHomePage = () => {
           <div className={pageStyles.trendsContainer}>
             <TrendsCard 
               className={pageStyles.sidebarSection}
-              data={data1} 
+              data={hardcodedSkillsData.result} 
             />
           </div>
         </div>

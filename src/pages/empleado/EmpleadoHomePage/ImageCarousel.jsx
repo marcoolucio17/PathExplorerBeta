@@ -33,9 +33,6 @@ export default function ImageCarousel() {
             className={styles.carouselSlide}
             style={{ backgroundImage: `url(${image.src})` }}
           >
-            <div className={styles.headlineOverlay}>
-              <h2>{image.headline}</h2>
-            </div>
           </div>
         ))}
       </div>
