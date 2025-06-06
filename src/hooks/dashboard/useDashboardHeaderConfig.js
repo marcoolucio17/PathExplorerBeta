@@ -21,7 +21,8 @@ export const useDashboardHeaderConfig = (props) => {
     toggleCompatibility,
     showCompatibility,
     handleViewApplicants,
-    handleRemoveFilter
+    handleRemoveFilter,
+    activeTab //add activeTab to check current tab
   } = props;
 
   const customButtons = [
@@ -85,15 +86,18 @@ export const useDashboardHeaderConfig = (props) => {
     }
   ];
 
-  const filterButtons = [
-    {
+  const filterButtons = [];
+  
+  //only show compatibility button if not on my projects tab
+  if (activeTab !== "My Projects") {
+    filterButtons.push({
       label: "Compatibility",
       onClick: toggleCompatibility,
       type: 'primary',
       variant: 'compatibility',
       isActive: showCompatibility
-    }
-  ];
+    });
+  }
 
   return useHeaderConfig({
     viewMode,

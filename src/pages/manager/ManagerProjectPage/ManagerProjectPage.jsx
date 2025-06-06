@@ -12,6 +12,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 
 //modals
 import { FeedbackModal } from "../../../components/Modals/FeedbackModal";
+import { EditProjectModal } from "../../../components/Modals/EditProjectModal";
 
 //css
 import styles from "../../../styles/Pages/Proyecto/ManagerProjectPage.module.css";
@@ -28,6 +29,9 @@ export const ManagerProjectPage = () => {
   const { projectData, projectUsers, isLoading, error } = projectPage;
 
   console.log("ManagerProjectPage state:", { projectData, projectUsers, isLoading, error });
+  
+  //debug project data from completo endpoint
+  if (projectData) console.log("NEW PROJECT DATA FROM /COMPLETO:", projectData);
 
   //loading state
   if (isLoading) {
@@ -84,7 +88,8 @@ export const ManagerProjectPage = () => {
           </div>
           
           <div className={styles.projectDates}>
-            <span>Created: {projectData.fechacreacion || 'N/A'}</span>
+            <span>Start: {projectData.fechainicio || 'N/A'}</span>
+            <span>End: {projectData.fechafin || 'N/A'}</span>
             <span>Progress: {projectData.progreso || 0}%</span>
           </div>
           
@@ -108,6 +113,48 @@ export const ManagerProjectPage = () => {
                     {projectData.descripcion || 'No description available for this project.'}
                   </p>
                 </div>
+
+                {/* Project Deliverables */}
+                {projectData.deliverables && projectData.deliverables.length > 0 && (
+                  <div className={styles.descriptionSection}>
+                    <div className={styles.sectionHeader}>
+                      <div className={styles.iconContainer}>
+                        <i className="bi bi-box-seam"></i>
+                      </div>
+                      <h2 className={styles.sectionTitle}>Project Deliverables</h2>
+                    </div>
+                    <ul className={styles.sectionText}>
+                      {projectData.deliverables.map((deliverable, index) => (
+                        <li key={index} style={{ marginBottom: '0.5rem' }}>
+                          <i className="bi bi-check-lg" style={{ color: 'var(--primary-color)', marginRight: '0.5rem' }}></i>
+                          {deliverable}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Client Information */}
+                {projectData.cliente && (
+                  <div className={styles.descriptionSection}>
+                    <div className={styles.sectionHeader}>
+                      <div className={styles.iconContainer}>
+                        <i className="bi bi-building"></i>
+                      </div>
+                      <h2 className={styles.sectionTitle}>Client</h2>
+                    </div>
+                    <div className={styles.sectionText} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      {projectData.cliente.logo && (
+                        <img 
+                          src={projectData.cliente.logo} 
+                          alt={projectData.cliente.nombre}
+                          style={{ width: '48px', height: '48px', objectFit: 'contain', borderRadius: '8px' }}
+                        />
+                      )}
+                      <span>{projectData.cliente.nombre}</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Project Status */}
                 <div className={styles.descriptionSection}>
@@ -147,7 +194,7 @@ export const ManagerProjectPage = () => {
           </div>
         </div>
 
-        {/* Right Column - Team Members */}
+        {/* Right Column - Team Members and Roles */}
         <div className={styles.projectSidebar}>
           {/* Team Members Section */}
           <GlassCard className={styles.sidebarSection}>
@@ -196,6 +243,67 @@ export const ManagerProjectPage = () => {
               </div>
             </div>
           </GlassCard>
+
+          {/* Available Roles Section */}
+          <GlassCard className={styles.sidebarSection}>
+            <div className={peopleStyles.peopleSection}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h2 className={peopleStyles.peopleTitle}>Available Roles</h2>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon="bi-pencil"
+                  onClick={() => projectPage.openModal('editProject')}
+                >
+                  Edit Project
+                </Button>
+              </div>
+              <div className={peopleStyles.peopleContent}>
+                <CustomScrollbar fadeBackground="transparent" fadeHeight={30} showHorizontalScroll={false}>
+                  {projectData && projectData.roles && projectData.roles.length > 0 ? (
+                    projectData.roles.map((proyectoRole, index) => (
+                      <div key={`${proyectoRole.idrol}-${index}`} className={peopleStyles.person}>
+                        <div className={peopleStyles.personAvatar}>
+                          <i className="bi bi-person-workspace" style={{ fontSize: '1.5rem', color: '#6c757d' }}></i>
+                        </div>
+                        <div className={peopleStyles.personInfo}>
+                          <div className={peopleStyles.personName}>
+                            {proyectoRole.roles?.nombrerol || `Role ${proyectoRole.idrol}`}
+                          </div>
+                          <div className={peopleStyles.personRole}>
+                            Level {proyectoRole.roles?.nivelrol || 'N/A'}
+                          </div>
+                          <div className={peopleStyles.personEmail} style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                            Status: {proyectoRole.estado || 'Unknown'}
+                          </div>
+                        </div>
+                        <div className={peopleStyles.personActions}>
+                          <Button
+                            type="danger"
+                            size="small"
+                            icon="bi-x"
+                            onClick={() => projectPage.handleDeleteRole(proyectoRole.idrol)}
+                            style={{ 
+                              padding: '0.25rem 0.5rem',
+                              fontSize: '0.75rem',
+                              minWidth: 'auto'
+                            }}
+                          >
+                            
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className={peopleStyles.emptyState}>
+                      <i className="bi bi-person-workspace" style={{ fontSize: '2rem', color: '#6c757d', marginBottom: '1rem' }}></i>
+                      <p>No roles defined for this project yet.</p>
+                    </div>
+                  )}
+                </CustomScrollbar>
+              </div>
+            </div>
+          </GlassCard>
         </div>
       </div>
 
@@ -208,6 +316,16 @@ export const ManagerProjectPage = () => {
         onSubmitFeedback={projectPage.handleSubmitFeedback}
         isLoading={projectPage.feedbackLoading}
       />
+
+      {/* Edit Project Modal */}
+      {projectData && (
+        <EditProjectModal
+          isOpen={projectPage.modals.editProject}
+          onClose={() => projectPage.closeModal('editProject')}
+          projectData={projectData}
+          onUpdateProject={projectPage.handleUpdateProject}
+        />
+      )}
     </div>
   );
 };

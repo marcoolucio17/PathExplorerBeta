@@ -13,6 +13,22 @@ export const ManagerCreateProjectPage = () => {
   const [clientImageUrl, setClientImageUrl] = useState(null);
   const { data: habilidades } = useFetch("habilidades");
   const navigate = useNavigate();
+  
+  //debug backend data when it loads
+  useEffect(() => {
+    if (clientes) {
+      console.log('clientes data from backend:', clientes);
+      console.log('number of clients:', clientes.length);
+    }
+  }, [clientes]);
+
+  useEffect(() => {
+    if (habilidades) {
+      console.log('habilidades data from backend:', habilidades);
+      console.log('number of skills:', habilidades.length);
+    }
+  }, [habilidades]);
+
   const [formData, setFormData] = useState({
     title: '',
     clientName: '',
@@ -21,6 +37,7 @@ export const ManagerCreateProjectPage = () => {
     startDate: '',
     endDate: '',
     roles: [],
+    deliverables: [],
     clientImage: null,
     RfpPreview: null,
     imagePreview: null,
@@ -43,6 +60,9 @@ export const ManagerCreateProjectPage = () => {
     const selectedCliente = clientes.find(c => c.idcliente === selectedId);
     if (!selectedCliente) return; //por si acaso
 
+    //debug selected client data
+    console.log('selected client data:', selectedCliente);
+
     setFormData(prev => ({
       ...prev,
       clientName: selectedCliente.clnombre,
@@ -51,11 +71,14 @@ export const ManagerCreateProjectPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:8080/api/clientes/${selectedId}/foto`, {
+      const res = await axios.get(`https://pathexplorer-backend.onrender.com/api/clientes/${selectedId}/foto`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      //debug response from client photo endpoint
+      console.log('client photo response:', res.data);
 
       if (res.data.fotodecliente_url) {
         setClientImageUrl(res.data.fotodecliente_url);
@@ -64,6 +87,8 @@ export const ManagerCreateProjectPage = () => {
       }
     } catch (err) {
       console.error("Error cargando imagen del cliente:", err);
+      console.log("error response data:", err.response?.data);
+      console.log("error status:", err.response?.status);
       setClientImageUrl(null);
     }
   };
@@ -80,6 +105,11 @@ export const ManagerCreateProjectPage = () => {
     const file = e.target.files[0];
     if (file) {
       console.log("RFP seleccionado:", file.name);
+      console.log("RFP file details:", file);
+      
+      //debug available backend data when user interacts
+      console.log("available clients:", clientes?.length || 0);
+      console.log("available skills:", habilidades?.length || 0);
 
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -152,6 +182,30 @@ export const ManagerCreateProjectPage = () => {
     }));
   };
 
+  //deliverables management functions
+  const handleAddDeliverable = () => {
+    setFormData(prev => ({
+      ...prev,
+      deliverables: [...(prev.deliverables || []), '']
+    }));
+  };
+
+  const handleRemoveDeliverable = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      deliverables: (prev.deliverables || []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleDeliverableChange = (index, value) => {
+    const updatedDeliverables = [...(formData.deliverables || [])];
+    updatedDeliverables[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      deliverables: updatedDeliverables
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formatDate = (dateString) => {
@@ -177,6 +231,7 @@ export const ManagerCreateProjectPage = () => {
         descripcion: formData.description,
         fechainicio: formatDate(formData.startDate),
         fechafin: formatDate(formData.endDate),
+        projectdeliverables: (formData.deliverables || []).filter(d => d.trim()).join(', '),
         idcliente: formData.idcliente,
         idusuario: localStorage.getItem("id")
       },
@@ -191,9 +246,10 @@ export const ManagerCreateProjectPage = () => {
 
     try {
       //paso 1: crear el proyecto
-      const result = await triggerPost('api/projects', { informacion });
+      const result = await triggerPost('projects', { informacion });
+      console.log('full project creation response:', result);
       const idproyecto = result?.idproyecto;
-      console.log(idproyecto);
+      console.log('extracted project id:', idproyecto);
       if (!idproyecto) {
         alert("El proyecto fue creado pero no se recibió un ID.");
         return;
@@ -208,7 +264,7 @@ export const ManagerCreateProjectPage = () => {
         rfpForm.append('file', formData.projectRFP);
         rfpForm.append('projectId', idproyecto);
 
-        await axios.post('http://localhost:8080/api/upload-rfp', rfpForm, {
+        await axios.post('https://pathexplorer-backend.onrender.com/api/upload-rfp', rfpForm, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
@@ -222,6 +278,8 @@ export const ManagerCreateProjectPage = () => {
 
     } catch (err) {
       console.error("Error al crear proyecto o subir archivos:", err);
+      console.log("error details:", err.response?.data);
+      console.log("error status:", err.response?.status);
       alert("Ocurrió un error al guardar el proyecto.");
     }
   };
@@ -240,8 +298,14 @@ export const ManagerCreateProjectPage = () => {
     <div className={styles.createProjectContainer}>
       <div className={styles.createProjectContent}>
         {/* Left Column - Main Form */}
-        <div className={styles.formDetails}>
-          <div className={styles.pageHeader}>
+        <div className={styles.formDetails} style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          height: '100%',
+          maxHeight: '100vh',
+          overflow: 'hidden'
+        }}>
+          <div className={styles.pageHeader} style={{ flexShrink: 0, marginBottom: '1rem' }}>
             <div>
               <h1 className={styles.pageTitle}>Create Project</h1>
               <p className={styles.pageSubtitle}>Upload and add details for your project</p>
@@ -249,7 +313,14 @@ export const ManagerCreateProjectPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className={styles.formContent}>
+            {/* Scrollable Form Content */}
+            <div className={styles.formContent} style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              paddingBottom: '1rem',
+              maxHeight: 'calc(100vh - 250px)',
+              minHeight: '0'
+            }}>
               {/* Basic Information */}
               <div className={styles.formSection}>
                 <h2 className={styles.sectionTitle}>Basic Information</h2>
@@ -324,6 +395,43 @@ export const ManagerCreateProjectPage = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Project Deliverables */}
+              <div className={styles.formSection}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <h2 className={styles.sectionTitle}>Project Deliverables</h2>
+                  <button 
+                    type="button" 
+                    onClick={handleAddDeliverable}
+                    className={styles.addButton}
+                  >
+                    <i className="bi bi-plus-lg"></i>
+                    Add Deliverable
+                  </button>
+                </div>
+
+                {(formData.deliverables || []).map((deliverable, index) => (
+                  <div key={index} className={styles.roleCard} style={{ padding: '1rem' }}>
+                    <div className={styles.formGroup}>
+                      <label>Deliverable {index + 1}</label>
+                      <input
+                        type="text"
+                        value={deliverable}
+                        onChange={(e) => handleDeliverableChange(index, e.target.value)}
+                        placeholder="e.g. MVP funcional"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveDeliverable(index)}
+                      className={styles.removeButton}
+                      style={{ marginTop: '0.5rem' }}
+                    >
+                      Remove Deliverable
+                    </button>
+                  </div>
+                ))}
               </div>
 
               {/* Project Roles */}
@@ -456,8 +564,16 @@ export const ManagerCreateProjectPage = () => {
               </div>
             </div>
 
-            {/* Form Actions */}
-            <div className={styles.formActions}>
+            {/* Fixed Form Actions Footer */}
+            <div className={styles.formActions} style={{
+              position: 'sticky',
+              bottom: 0,
+              backgroundColor: 'var(--bg-primary, #1a1a1a)',
+              borderTop: '1px solid var(--border-color, #333)',
+              padding: '1rem',
+              marginTop: 'auto',
+              zIndex: 10
+            }}>
               <button 
                 type="button"
                 className={styles.cancelButton} 

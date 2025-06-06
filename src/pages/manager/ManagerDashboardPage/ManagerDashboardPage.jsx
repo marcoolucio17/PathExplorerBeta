@@ -18,7 +18,7 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
 export const ManagerDashboardPage = () => {
   const dashboardPage = useManagerDashboardPage();
-  const headerProps = useDashboardHeaderConfig(dashboardPage);
+  const headerProps = useDashboardHeaderConfig({...dashboardPage, activeTab: dashboardPage.activeTab});
 
   const handleCreateProject = () => {
     dashboardPage.toggleCreateProjectModal()
