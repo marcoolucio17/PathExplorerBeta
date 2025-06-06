@@ -107,21 +107,6 @@ const ProjectList = ({
 
                   <ProjectCard
 
-              id={projectId}
-              idrol={roleId}
-
-              project={item.project}
-              proyecto_rol={item.proyecto_rol}
-              viewMode={viewMode}
-              compatibilityValue={compatibilityValue}
-              showCompatibility={showCompatibility}
-              selectedSkillFilters={selectedSkillFilters}
-              userSkills={userSkills}
-              index={index}
-              isProjectCard={isProjectCard}
-            />
-          </div>
-        );
                     id={projectId}
                     idrol={roleId}
                     project={item.project}
@@ -191,6 +176,30 @@ const ProjectList = ({
         }
 
 
+        // Force cards to always re-render when filter changes with a unique key
+        const renderKey = `${projectId}-${roleId || 'project'}-${index}`;
+
+
+        return (
+          <div key={renderKey} className={styles.item}>
+
+            <ProjectCard
+
+              id={projectId}
+              idrol={roleId}
+
+              project={item.project}
+              proyecto_rol={item.proyecto_rol}
+              viewMode={viewMode}
+              compatibilityValue={compatibilityValue}
+              showCompatibility={showCompatibility}
+              selectedSkillFilters={selectedSkillFilters}
+              userSkills={userSkills}
+              index={index}
+              isProjectCard={isProjectCard}
+            />
+          </div>
+        );
       })}
     </div>
   );
