@@ -2,9 +2,9 @@ import React, { useState, useEffect} from "react";
 import styles from "/src/pages/empleado/EmpleadoHomePage/EmpleadoHomePage.module.css";
 
 const images = [
-  {src:"/images/software-development.png", headline: "Welcome to the Announcements Tab!"},
-  {src:"/images/accenture-img1.png", headline: "Accenture Stocks go up 50%"},
-  {src:"/images/agile-methodology.png", headline: "Take this course on the Agile Methodology."},
+  {src:"/images/software-development.jpg", headline: "Welcome to the Announcements Tab!"},
+  {src:"/images/accenture-img1.jpg", headline: "Accenture Stocks go up 50%"},
+  {src:"/images/agile-methodology.jpg", headline: "Take this course on the Agile Methodology."},
 ];
 
 
