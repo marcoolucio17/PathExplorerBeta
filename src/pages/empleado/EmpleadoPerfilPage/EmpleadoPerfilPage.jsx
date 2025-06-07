@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 // Custom Hooks
 import useProfilePage from '../../../hooks/profile/useProfilePage';
@@ -27,6 +27,8 @@ import { EditExperienceModal } from "../../../components/Modals/EditExperienceMo
 import { EditObjectivesModal } from "../../../components/Modals/EditObjectivesModal";
 import { EditProfileDetailsModal } from "../../../components/Modals/EditProfileDetailsModal";
 
+import LoadingSpinner from "src/components/LoadingSpinner";
+
 // CSS
 import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
 
@@ -36,7 +38,20 @@ import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
 export const EmpleadoPerfilPage = () => {
   // Use the custom hook to handle all logic
   const profilePage = useProfilePage();
-  console.log('Hola');
+
+  //loading state
+  if (profilePage.loading || profilePage.isLoading || profilePage.pic == null) {
+
+    return (
+      <LoadingSpinner 
+        overlay={true}
+        size="large"
+        message="Loading profile details..."
+        variant="default"
+      />
+    );
+  }
+
   const renderTabContent = () => {
     switch (profilePage.activeTab) {
       case "Experience":
@@ -54,7 +69,17 @@ export const EmpleadoPerfilPage = () => {
     }
   };
 
-  useEffect(() => { }, [profilePage.isLoading]);
+  //loading state
+  if (profilePage.loading || profilePage.isLoading) {
+    return (
+      <LoadingSpinner 
+        overlay={true}
+        size="large"
+        message="Loading project details..."
+        variant="default"
+      />
+    );
+  }
 
   const handleEditSection = (section) => {
     // Handle editing specific sections
@@ -110,16 +135,12 @@ export const EmpleadoPerfilPage = () => {
     profilePage.handleRemoveCertificate(certificateId);
   };
 
-  if (profilePage.loading) {
-    return <>loading..</>;
-  }
-
   return (
     <div className={styles.profileContainer}>
       <div className={styles.profileContent}>
         {/* Left Column - Profile info and tabs */}
         <div className={styles.profileColumnLeft}>
-          <ProfileHeaderCard user={profilePage.userProfile} />
+          <ProfileHeaderCard user={profilePage.userProfile} url = {profilePage.pic} />
 
           <Tabs
             tabs={profilePage.tabNames.map(tab => ({

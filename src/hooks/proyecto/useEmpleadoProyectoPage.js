@@ -419,7 +419,7 @@ const useEmpleadoProyectoPage = () => {
     return Math.round((matchingSkills / totalSkills) * 100);
   }, [enhancedProjectData?.requiredSkills, userSkills]);
 
-  //update browser tab title with project and role names
+  // update browser tab title with project and role names
   useEffect(() => {
     if (enhancedProjectData?.title && enhancedProjectData?.primaryRole?.name) {
       document.title = `${enhancedProjectData.title} - ${enhancedProjectData.primaryRole.name}`;
