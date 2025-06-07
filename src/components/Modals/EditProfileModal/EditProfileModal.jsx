@@ -55,7 +55,7 @@ export const EditProfileModal = ({ isOpen, onClose, onEditSection }) => {
     {
       id: 'profile',
       title: 'Profile Details',
-      description: 'Update name, title, company, location, and profile picture',
+      description: 'Update your location and profile picture',
       icon: 'bi-card-heading',
       color: 'var(--orange-progress-1)'
     }

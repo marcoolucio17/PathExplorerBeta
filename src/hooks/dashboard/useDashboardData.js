@@ -79,7 +79,7 @@ export const useDashboardData = () => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    params: filterOptions, 
+    params: filterOptions, // 👈 correct way to send query parameters
   };
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export const useDashboardData = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          params: filterOptionsMyProjects, 
+          params: filterOptionsMyProjects, // 👈 include query params here
         };
 
         const { data } = await axios.get(

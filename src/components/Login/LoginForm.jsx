@@ -156,7 +156,7 @@ export const LoginForm = () => {
         src="/images/accenture.png" 
         width="230" 
         height="60" 
-        className="accenture-logo"
+        className="accenture-logo mb-3"
         alt="Accenture Logo"
       />
 
@@ -209,7 +209,7 @@ export const LoginForm = () => {
         <Button
           type="primary"
           onClick={handleLogin}
-          className="customSubmitButton"
+          className="customSubmitButton mt-4"
           disabled={isLoading}
         >
           Submit
@@ -218,7 +218,7 @@ export const LoginForm = () => {
               animation="border"
               role="status"
               size="sm"
-              className="ms-3"
+              className="ms-2"
             >
               <span className="visually-hidden">Loading...</span>
             </Spinner>

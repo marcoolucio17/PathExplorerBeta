@@ -188,6 +188,9 @@ export const useProfilePage = () => {
     "usuario/" + localStorage.getItem("id")
   );
 
+  // aquí guardamos la pic
+  const [ pic, setPic ] = useState(null);
+
   // Tab names for the profile page
   const tabNames = ["Contact Information", "Experience", "Objectives"];
 
@@ -208,7 +211,30 @@ export const useProfilePage = () => {
   const [activeTab, setActiveTab] = useState("Contact Information");
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // hacemos el fetch de la pp (haría perfil de una aquí también pero ya se realiza secuencialmente en useProfile)
+  useEffect(() => {
+    const fetch = async () => {
+      setIsLoading(true);
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        };
+        const data  = await axios.get(
+          DB_URL + "api/profile-url/" + localStorage.getItem("id"),
+          config
+        );
+        setPic(data.data.url);
+      } catch (err) {
+        console.error("Error fetching my applications", err);
+      }
+      setIsLoading(false);
+    };
+    fetch();
+  }, []);
 
   // User profile data
   const userProfile = transformBackendUser(data.user, data.proyectos);
@@ -239,6 +265,7 @@ export const useProfilePage = () => {
     // volteamos el status
     let status = obj.completed ? false : true;
 
+    setIsLoading(true);
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -254,6 +281,7 @@ export const useProfilePage = () => {
     );
 
     window.location.reload();
+    setIsLoading(false);
   }, []);
 
   // Handle objective addition
@@ -277,7 +305,7 @@ export const useProfilePage = () => {
     };
     newSkills.forEach(async (skill) => {
       const res = await axios.post(
-        DB_URL + "api/asignar",
+        DB_URL + "api/habilidades/asignar",
         {
           idusuario: localStorage.getItem("id"),
           nombreHabilidad: skill,
@@ -297,6 +325,7 @@ export const useProfilePage = () => {
   const handleRemoveCertificate = useCallback(async (certificateId) => {
     // setUserCertificates(prev => prev.filter(cert => cert.id !== certificateId));
 
+    setIsLoading(true);
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -308,6 +337,7 @@ export const useProfilePage = () => {
     );
 
     window.location.reload();
+    setIsLoading(false);
   }, []);
 
   // Modal handlers
@@ -360,6 +390,7 @@ export const useProfilePage = () => {
     setSearchTerm,
 
     // Loading state
+    loading,
     isLoading,
 
     // Modal state
@@ -367,6 +398,9 @@ export const useProfilePage = () => {
     openModal,
     closeModal,
     selectedCertificate,
+
+    // pic
+    pic,
 
     // Handlers
     handleObjectiveToggle,
@@ -384,4 +418,3 @@ export const useProfilePage = () => {
 };
 
 export default useProfilePage;
-``;
