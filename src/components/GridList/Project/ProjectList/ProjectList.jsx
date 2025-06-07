@@ -19,7 +19,7 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {boolean} props.isLoading - Whether items are currently loading
  */
 const ProjectList = ({
-  tabSelected,
+  tabSelected = "All",
   projects = [],
   viewMode,
   showCompatibility,
@@ -83,8 +83,10 @@ const ProjectList = ({
 
         // For project cards (My Projects tab), we don't have proyecto_rol
         const isProjectCard = item.isProjectCard || false;
-        const projectId = item.project.idproyecto || "unknown";
-        if (!isProjectCard) {
+        const isApplyCard = item.isApplyCard || false;
+        const projectId = item.project.idproyecto || item.project.proyecto.idproyecto || "unknown";
+
+        if (!isProjectCard && !isApplyCard) {
 
           if (Array.isArray(item.proyecto_rol)) {
             return item.proyecto_rol?.map((rol, rolindex) => {
@@ -97,7 +99,7 @@ const ProjectList = ({
               }
               let compatibilityValue = null;
               if (!isProjectCard && rol) {
-                compatibilityValue = rol.compability || 0; // Default to 0 if not available
+                compatibilityValue = rol.roles.compability || 0; // Default to 0 if not available
               }
               // Force cards to always re-render when filter changes with a unique key
               const renderKey = `${projectId}-${roleId || 'project'}-${index}-${rolindex}`;
@@ -153,12 +155,13 @@ const ProjectList = ({
                   userSkills={userSkills}
                   index={index}
                   isProjectCard={isProjectCard}
+                  tabActive={tabSelected}
                 />
               </div>
             );
           }
         }
-        else if (isProjectCard) {
+        else if (isProjectCard && !isApplyCard) {
           // For project cards, we only have the project object
           return (
             <div key={`${projectId}-${index}`} className={styles.item}>
@@ -170,6 +173,23 @@ const ProjectList = ({
                 selectedSkillFilters={selectedSkillFilters}
                 userSkills={userSkills}
                 isProjectCard={true} // Indicate this is a project-level card
+                tabActive={tabSelected}
+              />
+            </div>
+          );
+        } else if (isApplyCard && !isProjectCard) {
+          // For applied to cards, we only have the project object
+          return (
+            <div key={`${projectId}-${item.idaplicacion}-${item.project.roles.idrol}`} className={styles.item}>
+              <ProjectCard
+                id={projectId}
+                project={item.project}
+                viewMode={viewMode}
+                showCompatibility={showCompatibility}
+                selectedSkillFilters={selectedSkillFilters}
+                userSkills={userSkills}
+                isApplyCard={true} // Indicate this is an applied to card
+                tabActive={tabSelected}
               />
             </div>
           );
@@ -197,6 +217,8 @@ const ProjectList = ({
               userSkills={userSkills}
               index={index}
               isProjectCard={isProjectCard}
+              isApplyCard={isApplyCard} // Indicate this is an applied to card
+              tabActive={tabSelected}
             />
           </div>
         );

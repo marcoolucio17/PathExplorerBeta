@@ -215,8 +215,10 @@ export const ManagerProjectPage = () => {
               <h2 className={peopleStyles.peopleTitle}>Available Roles</h2>
               <div className={peopleStyles.peopleContent}>
                 <CustomScrollbar fadeBackground="transparent" fadeHeight={30} showHorizontalScroll={false}>
-                  {projectData && projectData.roles && projectData.roles.length > 0 ? (
-                    projectData.roles.map((proyectoRole, index) => (
+                  {projectData && projectData.roles && projectData.roles.filter(proyectoRole => proyectoRole.estado !== "Aceptado").length > 0 ? (
+                    projectData.roles
+                      .filter(proyectoRole => proyectoRole.estado !== "Aceptado")
+                      .map((proyectoRole, index) => (
                       <div key={`${proyectoRole.idrol}-${index}`} className={peopleStyles.person}>
                         <div className={peopleStyles.personAvatar}>
                           <i className="bi bi-person-workspace" style={{ fontSize: '1.5rem', color: 'var(--primary-color)' }}></i>
@@ -244,7 +246,7 @@ export const ManagerProjectPage = () => {
                   ) : (
                     <div className={peopleStyles.emptyState}>
                       <i className="bi bi-person-workspace" style={{ fontSize: '2rem', color: '#6c757d', marginBottom: '1rem' }}></i>
-                      <p>This project has no roles defined yet.</p>
+                      <p>No available roles at the moment. All roles may be filled or none have been defined yet.</p>
                     </div>
                   )}
                 </CustomScrollbar>

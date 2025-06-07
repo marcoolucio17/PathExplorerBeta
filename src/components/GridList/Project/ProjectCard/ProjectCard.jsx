@@ -6,8 +6,8 @@ import { ProgressCircle } from 'src/components/ProgressCircle';
 import SkillChip from 'src/components/SkillChip/SkillChip';
 import styles from 'src/styles/GridList/GridListCard.module.css';
 import customStyles from 'src/styles/GridList/ProjectCard.module.css';
-import useGetFetch from 'src/hooks/useGetFetch';
 
+import Button from 'src/components/shared/Button';
 const ProjectCard = ({
   id,
   idrol,
@@ -19,7 +19,8 @@ const ProjectCard = ({
   onClick,
   selectedSkillFilters = [],
   userSkills = [],
-  isProjectCard = false //new prop to indicate project-level card
+  isProjectCard = false, //new prop to indicate project-level card
+  isApplyCard = false, //new prop to indicate applied to card
 }) => {
 
   const navigate = useNavigate();
@@ -41,27 +42,37 @@ const ProjectCard = ({
 
   //stable duration calculation based on project id to prevent fluctuation
   const ensureRoleData = () => {
-    if (isProjectCard) {
+    if (isProjectCard && !isApplyCard) {
       //for project cards, show project name as title
+
       return {
         roleName: project.pnombre || 'Project',
         projectName: '', //no subtitle for project cards
-        duration: project.duracionMes ? project.duracionMes : "TBD",
+        duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD",
         roleCount: project.proyecto_roles ? project.proyecto_roles.length : 0
       };
+    } else if (isApplyCard && !isProjectCard) {
+      return {
+        roleName: project.roles.nombrerol,
+        projectName: project.proyecto.pnombre || 'Project',
+        status: project.estatus,
+        date: project.fechaaplicacion,
+
+      }
     }
-    
+
+
     //proyecto_rol.nombrerol ||
     return {
       roleName: proyecto_rol.nombrerol || 'Developer',
       projectName: project.pnombre || 'Project',
-      duration: project.duracionMes ? project.duracionMes : "TBD"
+      duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD"
     };
   };
 
   const ensureSkillsData = () => {
     //for project cards, don't show skills
-    if (isProjectCard) {
+    if (isProjectCard || isApplyCard) {
       return [];
     }
     
@@ -87,7 +98,7 @@ const ProjectCard = ({
 
   const renderSkills = () => {
     //don't render skills for project cards
-    if (isProjectCard || skillsData.length === 0) {
+    if (isProjectCard || isApplyCard || skillsData.length === 0) {
       return null;
     }
     
@@ -118,7 +129,7 @@ const ProjectCard = ({
 
   const gridContent = (
     <>
-      {showCompatibility && !isProjectCard && (
+      {showCompatibility && !isProjectCard && !isApplyCard && (
         <div className={styles.statusCircle}>
           <ProgressCircle
             value={compatibilityValue}
@@ -130,39 +141,92 @@ const ProjectCard = ({
         </div>
       )}
 
+
       <div className={styles.cardHeader}>
+
         <img
           className={styles.cardAvatar}
           src={project.imagen || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
+        {!isApplyCard && (<>
         <div className={styles.cardInfo}>
           <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
           {roleData.projectName && <p className={styles.cardSubtitle}>for {roleData.projectName}</p>}
           {isProjectCard && roleData.roleCount > 0 && (
             <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
           )}
-        </div>
+          </div></>)}
+        {isApplyCard && (
+          <div className={styles.cardInfo}>
+            <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
+
+          </div>
+
+        )}
       </div>
 
-      <div className={`${styles.cardDescription} ${styles.reducedMargin}`}>
+      {!isApplyCard && <div className={`${styles.cardDescription} ${styles.reducedMargin}`}>
         <p className={styles.descriptionText}>
           {project.descripcion || 'This project aims to develop a comprehensive solution that meets client requirements while leveraging modern technologies...'}
         </p>
-      </div>
+
+      </div>}
 
       <div className={styles.cardDetails}>
-        <div className={styles.detailRow}>
+
+        {!isApplyCard && <div className={styles.detailRow}>
           <span className={styles.detailLabel}>
             <i className="bi bi-clock"></i> Duration:
           </span>
-          <span className={styles.detailValue}>
+          {(roleData.duration !== "< 1") && <span className={styles.detailValue}>
             {roleData.duration} months
-          </span>
-        </div>
+          </span>}
+          {(roleData.duration === "< 1") && <span className={styles.detailValue}>
+            {roleData.duration} month
+          </span>}
+
+        </div>}
+
+        {isApplyCard && (
+          <div className={styles.detailRow}>
+            <span className={styles.detailLabel}>
+              <i className="bi bi-folder"></i> Applied for:
+            </span>
+            <span className={styles.detailValue}>{roleData.projectName}</span>
+          </div>
+        )
+        }
+
+        {isApplyCard && (
+          <div className={styles.detailRow}>
+            <span className={styles.detailLabel}>
+              <i className="bi bi-clock"></i> {
+                'Status:'
+              }
+            </span>
+            <span className={styles.detailValue}>
+              {roleData.status}
+            </span>
+          </div>)
+        }
       </div>
 
-      {!isProjectCard && (
+      {isApplyCard && (
+        <div className={styles.cardFooter}>
+          <Button
+            type="secondary"
+            variant="view"
+            icon="bi-file-earmark-text"
+            onClick={(e) => {
+              ;
+            }}
+          >
+            View Request
+          </Button>
+        </div>
+      )}
+      {!isProjectCard && !isApplyCard && (
         <div className={styles.cardSkills}>
           {renderSkills()}
         </div>
@@ -183,7 +247,7 @@ const ProjectCard = ({
       <div className={customStyles.titleContainer}>
         <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
         {roleData.projectName && <p className={styles.cardSubtitle}>for {roleData.projectName}</p>}
-        {isProjectCard && roleData.roleCount > 0 && (
+        {isProjectCard && !isApplyCard && roleData.roleCount > 0 && (
           <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
         )}
 
@@ -244,7 +308,13 @@ const ProjectCard = ({
         </div>
       );
     }
-    
+    if (isApplyCard) {
+      return (
+        <GlassCard className={cardClass} tabActive={"Applied To"}>
+          {gridContent}
+        </GlassCard>
+      );
+    }
     return (
       <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
         {gridContent}
@@ -265,6 +335,13 @@ const ProjectCard = ({
           {listContent}
         </GlassCard>
       </div>
+    );
+  }
+  if (isApplyCard) {
+    return (
+      <GlassCard className={cardClass} tabActive={"Applied To"}>
+        {listContent}
+      </GlassCard>
     );
   }
 

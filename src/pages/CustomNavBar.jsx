@@ -1,53 +1,122 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Logo from "../assets/Acc_GT_Dimensional_RGB 1.png";
 import { SearchHeader } from "../components/SearchHeader";
 import { Notifications } from "../components/Notifications";
-
+import axios from "axios";
 
 import "./CustomNavBar.css";
 
 function CustomNavbar() {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([])
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const authState = localStorage.getItem("role");
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Define search categories
-  const searchCategories = [
-    { key: 'people', label: 'People', icon: 'people' },
-    { key: 'projects', label: 'Projects', icon: 'projects' },
-    { key: 'certificates', label: 'Certificates', icon: 'certificates' },
-    { key: 'skills', label: 'Skills', icon: 'skills' },
-    { key: 'applicants', label: 'Applicants', icon: 'people' } // Using people icon for applicants
-  ];
+  const userRole = localStorage.getItem("role");
+
+  useEffect(() => {
+    const userId = localStorage.getItem("id");
+    if (!userId) return;
+
+    axios
+      .get(`https://pathexplorer-backend.onrender.com/api/notifications/${userId}`)
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setNotifications(res.data);
+        } else {
+          setNotifications([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching notifications", err);
+        setNotifications([]);
+      });
+  }, []);
+
+  // Define search categories based on role
+  const getSearchCategoriesByRole = (role) => {
+    switch (role) {
+      case 'empleado':
+        return [
+          { key: 'people', label: 'People', icon: 'people' },
+          { key: 'projects', label: 'Projects', icon: 'projects' }
+        ];
+      case 'manager':
+      case 'tfs':
+        return [
+          { key: 'people', label: 'People', icon: 'people' },
+          { key: 'projects', label: 'Projects', icon: 'projects' },
+          { key: 'applicants', label: 'Applicants', icon: 'people' }
+        ];
+      default:
+        return [
+          { key: 'people', label: 'People', icon: 'people' },
+          { key: 'projects', label: 'Projects', icon: 'projects' }
+        ];
+    }
+  };
+
+  const searchCategories = getSearchCategoriesByRole(userRole);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
 
   const handleSearchResultClick = (searchValue, category) => {
+    console.log('handleSearchResultClick called with:', { searchValue, category, userRole });
+
     // Navigate to the appropriate search page based on the category
-    switch (category) {
-      case 'people':
-        navigate(`/people/search?q=${encodeURIComponent(searchValue)}`);
+    switch (userRole) {
+      case 'empleado':
+        switch (category) {
+          case 'people':
+            navigate(`/${userRole}/employee-dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'projects':
+            navigate(`/${userRole}/dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          default:
+            navigate(`/search?q=${encodeURIComponent(searchValue)}`);
+            break;
+        }
         break;
-      case 'projects':
-        navigate(`/projects/search?q=${encodeURIComponent(searchValue)}`);
+      case 'manager':
+        switch (category) {
+          case 'people':
+            navigate(`/${userRole}/employee-dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'projects':
+            navigate(`/${userRole}/dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'applicants':
+            navigate(`/${userRole}/applicants?search=${encodeURIComponent(searchValue)}`);
+            break;
+          default:
+            navigate(`/search?q=${encodeURIComponent(searchValue)}`);
+            break;
+        }
         break;
-      case 'certificates':
-        navigate(`/certificates/search?q=${encodeURIComponent(searchValue)}`);
-        break;
-      case 'skills':
-        navigate(`/skills/search?q=${encodeURIComponent(searchValue)}`);
-        break;
-      case 'applicants':
-        navigate(`/manager/applicants?search=${encodeURIComponent(searchValue)}`);
+      case 'tfs':
+        switch (category) {
+          case 'people':
+            navigate(`/${userRole}/employee-dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'projects':
+            navigate(`/${userRole}/dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'applicants':
+            navigate(`/${userRole}/applicants?search=${encodeURIComponent(searchValue)}`);
+            break;
+          default:
+            navigate(`/search?q=${encodeURIComponent(searchValue)}`);
+            break;
+        }
         break;
       default:
-        // If there's no matching category, use a default
+        console.log('No matching role found, using default navigation');
         navigate(`/search?q=${encodeURIComponent(searchValue)}`);
         break;
     }
@@ -65,37 +134,34 @@ function CustomNavbar() {
       {/* Sidebar */}
       <div
         className={`sidebar 
-          ${isSidebarVisible ? "sidebar-visible" : ""} 
-          ${isSidebarOpen ? "open" : ""}`}
+            ${isSidebarOpen ? "open" : ""}`}
         onMouseEnter={() => setIsSidebarOpen(true)}
         onMouseLeave={() => {
           setIsSidebarOpen(false);
-          setIsSidebarVisible(false);
         }}
       >
         <ul className="sidebar-menu">
-          <li onClick={() => navigate(`${authState}`)}>
+          <li onClick={() => navigate(`/${authState}`)}>
             <i className="bi bi-house"></i>
             {isSidebarOpen && <span>Home</span>}
           </li>
-          <li onClick={() => navigate(`${authState}/dashboard`)}>
+          <li onClick={() => navigate(`/${authState}/dashboard`)}>
             <i className="bi bi-clipboard"></i>
             {isSidebarOpen && <span>Projects</span>}
           </li>
           <li onClick={handleLogout}>
             <i className="bi bi-box-arrow-left"></i>
             {isSidebarOpen && <span>Logout</span>}
-
           </li>
         </ul>
       </div>
+
 
       {/* Navbar */}
       <nav className="navbar glass-navbar navbar-expand-lg">
         <div className="container-fluid d-flex align-items-center">
           {/* Logo only */}
           <button
-            onMouseEnter={() => setIsSidebarVisible(true)}
             className="navbar-brand btn btn-link p-0 nav-logo"
           >
             <img src={Logo} alt="Logo" className="logo-img" />
@@ -116,21 +182,26 @@ function CustomNavbar() {
 
           {/* Icons */}
           <div className="nav-icons d-flex gap-3 align-items-center">
-
-            <div className="position-relative">
+            <div
+              className="position-relative"
+              onMouseLeave={() => setShowNotifications(false)}
+            >
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="icon-btn"
               >
                 <i className="bi bi-bell"></i>
-                <span className="badge-notif">!</span>
+                {notifications.length > 0 && <span className="badge-notif">!</span>}
               </button>
 
               <Notifications
                 userId={localStorage.getItem("id")}
                 visible={showNotifications}
+                notifications={notifications}
+                setNotifications={setNotifications}
               />
             </div>
+
 
             <button
               onClick={() => navigate(`/${authState}/perfil`)}
