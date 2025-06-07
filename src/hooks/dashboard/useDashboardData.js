@@ -1,60 +1,50 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-// import useDataFetching from "../useDataFetching"; 
-// import useListPage from "../useListPage"; 
-// import useModalControl from "../useModalControl"; 
-import useGetFetch from "../useGetFetch";
-import useGetFetchProjectsFilters from "../useGetFetchProjectsFilters";
-/**
- *
- *
- * @returns {Object} Dashboard data and related functions
- */
+import axios from "axios";
+
 export const useDashboardData = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  //search param from URL
   const searchParams = new URLSearchParams(location.search);
   const searchFromURL = searchParams.get("search") || "";
 
-  //searchand filter state
   const [searchTerm, setSearchTerm] = useState(searchFromURL);
   const [skillSelected, setSkillSelected] = useState("Skills");
   const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
-  //Selected the name of the client
   const [clientNameSelected, setClientNameSelected] = useState("Clients");
-  //Selected the id client
   const [clientId, setClientId] = useState(null);
-  //Name of the selected role
   const [roleNameSelected, setRoleNameSelected] = useState("Roles");
-  //Selected the id role
   const [roleId, setRoleId] = useState(null);
+
   const [filterOptions, setFilterOptions] = useState({
     idCompatible: localStorage.getItem("id"),
-  }); // Added to manage all filter options centrally
+  });
 
   const [filterOptionsMyProjects, setFilterOptionsMyProjects] = useState({
     idCompatible: localStorage.getItem("id"),
     idusuario: localStorage.getItem("id"),
   });
-  const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]); // Example user skills
 
-  //mock current user ID (this would come from authentication context in real app)
+  const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]);
   const currentUserId = 1;
 
-  //URL management for search
+  const [projectsData, setProjectsData] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [clientsData, setClientsData] = useState([]);
+  const [rolesData, setRolesData] = useState([]);
+  const [topData, setTopData] = useState([]);
+  const [myApplicationsData, setMyApplicationsData] = useState([]);
+
   useEffect(() => {
     if (searchTerm) {
       const params = new URLSearchParams(location.search);
       params.set("search", searchTerm);
-      handdlyApplyNameProject(searchTerm); // Apply project name filter
+      handdlyApplyNameProject(searchTerm);
       navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     } else if (searchFromURL) {
-      // If search term is cleared, remove it from URL
       const params = new URLSearchParams(location.search);
       params.delete("search");
-      handdlyApplyNameProject(); // Clear project name filter
+      handdlyApplyNameProject();
       navigate(
         `${location.pathname}${
           params.toString() ? `?${params.toString()}` : ""
@@ -64,166 +54,190 @@ export const useDashboardData = () => {
     }
   }, [searchTerm, navigate, location.pathname, location.search, searchFromURL]);
 
-  // Update search term when URL changes
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const searchParam = params.get("search");
-    if (searchParam && searchParam !== searchTerm) {
-      setSearchTerm(searchParam);
+    const currentSearchParam = params.get("search") || "";
+
+    if (searchTerm && searchTerm !== currentSearchParam) {
+      params.set("search", searchTerm);
+      handdlyApplyNameProject(searchTerm);
+      navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    } else if (!searchTerm && currentSearchParam) {
+      params.delete("search");
+      handdlyApplyNameProject();
+      navigate(
+        `${location.pathname}${
+          params.toString() ? `?${params.toString()}` : ""
+        }`,
+        { replace: true }
+      );
     }
-  }, [location.search]);
+  }, [searchTerm, navigate, location.pathname]);
 
-  //fetch data All
-  const { data: projectsData, loading: projectsLoading } =
-    useGetFetchProjectsFilters({
-      rutaApi: "projects",
-      filters: filterOptions,
-    });
+  let url = "https://pathexplorer-backend.onrender.com/api";
+  const config = {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    params: filterOptions, 
+  };
 
-  //fetch data of clients
-  const { data: clientsData } = useGetFetch({ rutaApi: "clientes" });
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setProjectsLoading(true);
+      try {
+        const { data } = await axios.get(`${url}/projects`, config);
+        setProjectsData(data);
+      } catch (err) {
+        console.error("Error fetching projects", err);
+      } finally {
+        setProjectsLoading(false);
+      }
+    };
+    fetchProjects();
+  }, [filterOptions]);
 
-  //const { data: skillsData } = useGetFetch({ rutaApi: 'habilidades' });
+  // Fetch Clients
+  useEffect(() => {
+    axios
+      .get(`${url}/clientes`, config)
+      .then((res) => setClientsData(res.data))
+      .catch((err) => console.error("Error fetching clients", err));
+  }, []);
 
-  //fetch data of roles
-  const { data: rolesData } = useGetFetch({ rutaApi: "roles" });
+  // Fetch Roles
+  useEffect(() => {
+    axios
+      .get(`${url}/roles`, config)
+      .then((res) => setRolesData(res.data))
+      .catch((err) => console.error("Error fetching roles", err));
+  }, []);
 
-  //fetch data of top projects
-  const { data: topData } = useGetFetch({
-    rutaApi: `projects/top/${localStorage.getItem("id")}`,
-  });
+  // Fetch Top Projects
+  useEffect(() => {
+    const userId = localStorage.getItem("id");
+    if (userId) {
+      axios
+        .get(`${url}/projects/top/${userId}`, config)
+        .then((res) => setTopData(res.data))
+        .catch((err) => console.error("Error fetching top projects", err));
+    }
+  }, []);
 
-  //fetch data of my applications
+  // Fetch My Applications
+  useEffect(() => {
+    const fetchMyApplications = async () => {
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          params: filterOptionsMyProjects, 
+        };
 
-  const { data: myApplicationsData } = useGetFetchProjectsFilters({
-    rutaApi: `apps/usuario/${localStorage.getItem("id")}`,
-  });
+        const { data } = await axios.get(
+          `${url}/apps/usuario/${localStorage.getItem("id")}`,
+          config
+        );
+        setMyApplicationsData(data);
+      } catch (err) {
+        console.error("Error fetching my applications", err);
+      }
+    };
+    fetchMyApplications();
+  }, [filterOptionsMyProjects]);
 
-  console.log("Projects Data:", myApplicationsData);
-  //apply skills filters
   const handleApplySkillFilters = (selectedSkills) => {
     setSelectedSkillFilters(selectedSkills);
-
-    //update the Skills button text based on selected skills
-    if (selectedSkills.length > 0) {
-      setSkillSelected(`${selectedSkills.length} skills`);
-    } else {
-      setSkillSelected("Skills");
-    }
+    setSkillSelected(
+      selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
+    );
   };
 
-  //Apply project name as filter
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
-      setFilterOptions({
-        ...filterOptions,
-        projectName: nameProject, // Update filter options with project name
-      });
-      setFilterOptionsMyProjects({
-        ...filterOptionsMyProjects,
-        projectName: nameProject, // Update filter options for My Projects with project name
-      });
+      setFilterOptions((prev) => ({ ...prev, projectName: nameProject }));
+      setFilterOptionsMyProjects((prev) => ({
+        ...prev,
+        projectName: nameProject,
+      }));
     } else {
-      // eslint-disable-next-line no-unused-vars
-      const { projectName, ...rest } = filterOptions; // Remove project name filter
-      setFilterOptions(rest);
+      const { projectName, ...rest } = filterOptions;
       const { projectName: myProjectName, ...restMyProjects } =
         filterOptionsMyProjects;
-      setFilterOptionsMyProjects(restMyProjects); // Remove project name filter for My Projects
-    }
-  };
-  //Apply client filters
-  const handleApplyClientFilters = (clientName, selectedClientId) => {
-    //update the Client button text based on selected clients
-    if (clientName && selectedClientId) {
-      setClientNameSelected(clientName);
-      setFilterOptions({
-        ...filterOptions,
-        idcliente: selectedClientId, // Update filter options with selected client ID
-      });
-      setClientId(selectedClientId);
-      setFilterOptionsMyProjects({
-        ...filterOptionsMyProjects,
-        idcliente: selectedClientId, // Update filter options for My Projects with selected client ID
-      });
-    } else {
-      setClientNameSelected("Clients");
-      // eslint-disable-next-line no-unused-vars
-      const { idcliente, ...rest } = filterOptions; // Remove client filter
       setFilterOptions(rest);
-      const { idcliente: myClientId, ...restMyProjects } =
-        filterOptionsMyProjects; // Remove client filter for My Projects
       setFilterOptionsMyProjects(restMyProjects);
-      setClientId(null);
     }
   };
 
-  //Apply role filters
+  const handleApplyClientFilters = (clientName, selectedClientId) => {
+    if (clientName && selectedClientId) {
+      setClientNameSelected(clientName);
+      setClientId(selectedClientId);
+      setFilterOptions((prev) => ({ ...prev, idcliente: selectedClientId }));
+      setFilterOptionsMyProjects((prev) => ({
+        ...prev,
+        idcliente: selectedClientId,
+      }));
+    } else {
+      setClientNameSelected("Clients");
+      setClientId(null);
+      const { idcliente, ...rest } = filterOptions;
+      const { idcliente: myClientId, ...restMyProjects } =
+        filterOptionsMyProjects;
+      setFilterOptions(rest);
+      setFilterOptionsMyProjects(restMyProjects);
+    }
+  };
+
   const handleApplyRoleFilters = (roleName, selectedRoleId) => {
-    //update the Role button text based on selected roles
     if (roleName && selectedRoleId) {
       setRoleNameSelected(roleName);
       setRoleId(selectedRoleId);
-      setFilterOptions({
-        ...filterOptions,
-        nombrerol: roleName, // Update filter options with selected role ID
-      });
+      setFilterOptions((prev) => ({ ...prev, nombrerol: roleName }));
     } else {
       setRoleNameSelected("Roles");
       setRoleId(null);
-      // eslint-disable-next-line no-unused-vars
-      const { nombrerol, ...rest } = filterOptions; // Remove role filter
+      const { nombrerol, ...rest } = filterOptions;
       setFilterOptions(rest);
     }
   };
 
-  // Remove a specific skill filter
   const removeSkillFilter = (skillToRemove) => {
-    const updatedSkills = selectedSkillFilters.filter(
-      (skill) => skill !== skillToRemove
+    handleApplySkillFilters(
+      selectedSkillFilters.filter((skill) => skill !== skillToRemove)
     );
-    handleApplySkillFilters(updatedSkills);
   };
 
-  // Remove the client filter
   const removeClientFilter = () => {
     handleApplyClientFilters("Clients", null);
   };
 
-  // Remove the role filter
   const removeRoleFilter = () => {
     handleApplyRoleFilters("Roles", null);
   };
 
-  // Clear all skill filters
   const clearAllSkillFilters = () => {
     handleApplySkillFilters([]);
   };
 
-  // Sort projects function
   const sortProjects = (projects, option) => {
     if (!Array.isArray(projects)) return [];
     const sorted = [...projects];
-
     switch (option) {
-      case "name_asc": // Name: A to Z
+      case "name_asc":
         return sorted.sort((a, b) => a.pnombre.localeCompare(b.pnombre));
-
-      case "name_desc": // Name: Z to A
+      case "name_desc":
         return sorted.sort((a, b) => b.pnombre.localeCompare(a.pnombre));
-
-      case "date_desc": // Newest First
+      case "date_desc":
         return sorted.sort((a, b) => b.idproyecto - a.idproyecto);
-
-      case "date_asc": // Oldest First
+      case "date_asc":
         return sorted.sort((a, b) => a.idproyecto - b.idproyecto);
-
       default:
         return sorted;
     }
   };
 
-  // Flatten the projects to map each role to a project for the ProjectList component
   const flattenProjectsForList = (projects) => {
     return projects
       .flatMap((project) =>
@@ -245,9 +259,9 @@ export const useDashboardData = () => {
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],
-    //skills: Array.isArray(skillsData) ? skillsData : [],
     roles: Array.isArray(rolesData) ? rolesData : [],
     top: Array.isArray(topData) ? topData : [],
+    projectsApp: Array.isArray(myApplicationsData) ? myApplicationsData : [],
     searchTerm,
     setSearchTerm,
     selectedSkillFilters,
