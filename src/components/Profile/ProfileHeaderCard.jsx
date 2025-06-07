@@ -17,7 +17,7 @@ const ProfileHeaderCard = ({ user, url = "/images/3d_avatar_6.png" }) => {
 
   const userTitle = user.role == "User" ? "Employee" : user.role;
 
-  console.log(url);
+  console.log(user);
 
   return (
     <GlassCard className={styles.profileHeaderCard}>

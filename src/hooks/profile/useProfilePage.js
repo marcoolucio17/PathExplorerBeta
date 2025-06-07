@@ -42,7 +42,7 @@ function transformBackendUser(user, projects) {
   newuser.avatarUrl =
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/sign/fotos-perfil/foto-15-1748207570840.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzFkNDY3ZWNhLTk2NDgtNGRjYy05YTQyLTJhMzQyNWZmM2VhMCJ9.eyJ1cmwiOiJmb3Rvcy1wZXJmaWwvZm90by0xNS0xNzQ4MjA3NTcwODQwLmpwZyIsImlhdCI6MTc0ODI5MTkyNywiZXhwIjoxNzc5ODI3OTI3fQ.gi_C6RcvsXN_fKFsLZHFZ8cAwQ065_8AjUxnZA-ecIU";
 
-  if (typeof projects.length > 0) {
+  if (projects.length > 0) {
     newuser.pnombre = projects[0].proyecto.pnombre || "Staff";
     newuser.finicio = projects[0].fechainicio || "-";
     newuser.fechafin = projects[0].fechafin || "-";
