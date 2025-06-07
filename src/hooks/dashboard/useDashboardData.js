@@ -30,6 +30,7 @@ export const useDashboardData = () => {
 
   const [projectsData, setProjectsData] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
+  const [applyLoading, setApplyLoading] = useState(true);
   const [clientsData, setClientsData] = useState([]);
   const [rolesData, setRolesData] = useState([]);
   const [topData, setTopData] = useState([]);
@@ -79,13 +80,18 @@ export const useDashboardData = () => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    params: filterOptions, // 👈 correct way to send query parameters
+    params: filterOptions,
   };
+  
   useEffect(() => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
+        console.log("fetching all projects with config:", config);
         const { data } = await axios.get(`${url}/projects`, config);
+        console.log("all projects fetched:", data);
+        console.log("all projects count:", data?.length);
+        console.log("sample project structure:", data?.[0]);
         setProjectsData(data);
       } catch (err) {
         console.error("Error fetching projects", err);
@@ -96,14 +102,15 @@ export const useDashboardData = () => {
     fetchProjects();
   }, [filterOptions]);
 
-  // Fetch Roles, clients, top projects, my applications and my skills
+  //fetch roles, clients, top projects, my applications and my skills
   useEffect(() => {
-    // Fetch Roles
+    //fetch roles
     axios
       .get(`${url}/roles`, config)
       .then((res) => setRolesData(res.data))
       .catch((err) => console.error("Error fetching roles", err));
-    // Get user top 3 projects compability
+    
+    //get user top 3 projects compability
     const userId = localStorage.getItem("id");
     if (userId) {
       axios
@@ -111,18 +118,31 @@ export const useDashboardData = () => {
         .then((res) => setTopData(res.data))
         .catch((err) => console.error("Error fetching top projects", err));
     }
-    // Fetch clients
+    
+    //fetch clients
     axios
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
       .catch((err) => console.error("Error fetching clients", err));
-    // Fetch user applications
+    
+    //fetch user applications
+    console.log("fetching user applications for user:", localStorage.getItem("id"));
+    console.log("dashboard data: --------------------------------------------------", projectsData);
     axios
       .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
-      .then((res) => setMyApplicationsData(res.data))
-      .catch((err) => console.error("Error fetching my applications", err));
+      .then((res) => {
+        console.log("applications data fetched:", res.data);
+        console.log("applications count:", res.data?.length);
+        console.log("sample application structure:", res.data?.[0]);
+        setMyApplicationsData(res.data);
+        setApplyLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching my applications", err);
+        setApplyLoading(false);
+      });
 
-    // Fetch user skills
+    //fetch user skills
     axios
       .get(`${url}/habilidades/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
@@ -137,7 +157,9 @@ export const useDashboardData = () => {
       selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
     );
   };
+  
   console.log(myApplicationsData);
+  
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
       setFilterOptions((prev) => ({ ...prev, projectName: nameProject }));
@@ -223,12 +245,34 @@ export const useDashboardData = () => {
   };
 
   const flattenProjectsForList = (projects) => {
-    console.log("flattenProjectsForList", projects);
-    return projects
-      .flatMap((project) =>
-        project.proyecto_roles
-          .filter((proyecto_rol) => proyecto_rol.estado !== "Aceptado")
-          .map((proyecto_rol) => ({
+    const timestamp = Date.now();
+    console.log(`[${timestamp}] flattenProjectsForList called with projects:`, projects);
+    
+    const finalResult = projects
+      .flatMap((project) => {
+        //defensive check for proyecto_roles
+        if (!project.proyecto_roles || !Array.isArray(project.proyecto_roles)) {
+          console.log(`[${timestamp}] project has no proyecto_roles:`, project.pnombre);
+          return [];
+        }
+        
+        console.log(`[${timestamp}] processing project ${project.pnombre} with ${project.proyecto_roles.length} roles`);
+        
+        const filteredRoles = project.proyecto_roles
+          .filter((proyecto_rol) => {
+            //ensure we have complete data before filtering
+            if (!proyecto_rol.roles || proyecto_rol.roles.disponible === undefined) {
+              console.log(`[${timestamp}] role ${proyecto_rol.roles?.nombrerol || 'unknown'} has no disponible property: FILTERED OUT (incomplete data)`);
+              return false; //filter out incomplete data
+            }
+            const shouldInclude = proyecto_rol.roles.disponible === true;
+            console.log(`[${timestamp}] role ${proyecto_rol.roles?.nombrerol || 'unknown'} with disponible ${proyecto_rol.roles.disponible}: ${shouldInclude ? 'INCLUDED' : 'FILTERED OUT'}`);
+            return shouldInclude;
+          });
+          
+        console.log(`[${timestamp}] after filtering: ${filteredRoles.length} roles remaining for ${project.pnombre}`);
+        
+        return filteredRoles.map((proyecto_rol) => ({
           project,
           proyecto_rol,
           hasSelectedSkills:
@@ -238,11 +282,18 @@ export const useDashboardData = () => {
                 req_rol.requerimientos.habilidades.nombre
               )
             ),
-        }))
-      )
+        }));
+      })
       .filter((item) => item.hasSelectedSkills);
+      
+    console.log(`[${timestamp}] flattenProjectsForList final result:`, finalResult);
+    console.log(`[${timestamp}] flattenProjectsForList final result length:`, finalResult.length);
+    
+    return finalResult;
   };
+  
   console.log("projectsData", myApplicationsData);
+  
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],
@@ -274,6 +325,7 @@ export const useDashboardData = () => {
     filterOptionsMyProjects,
     setFilterOptionsMyProjects,
     projectsLoading,
+    applyLoading,
   };
 };
 
