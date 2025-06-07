@@ -228,7 +228,7 @@ export const useDashboardData = () => {
       )
       .filter((item) => item.hasSelectedSkills);
   };
-
+  console.log("Projects Data:", myApplicationsData);
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],

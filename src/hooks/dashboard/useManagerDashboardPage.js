@@ -206,8 +206,7 @@ export const useManagerDashboardPage = () => {
       //for applied to tab, flatten roles but keep project structure
       return tabProjects.map((project) => ({
         project: project,
-        proyecto_rol: null,
-        isProjectCard: false, //indicate this is a role card
+        proyecto_rol: null, //indicate this is a role card
         isApplyCard: true, //indicate this is an applied to card
       }));
     }
