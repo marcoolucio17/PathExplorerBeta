@@ -240,7 +240,7 @@ export const useDashboardData = () => {
       )
       .filter((item) => item.hasSelectedSkills);
   };
-  console.log("projectsData", myApplicationsData);
+  console.log("projectsData", projectsData);
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],

@@ -146,7 +146,7 @@ const ProjectCard = ({
 
         <img
           className={styles.cardAvatar}
-          src={project.imagen || "/images/ImagenProyectoDefault.png"}
+          src={project.cliente?.fotodecliente_url || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
         {!isApplyCard && (<>
