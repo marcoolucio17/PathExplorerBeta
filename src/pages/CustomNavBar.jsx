@@ -12,14 +12,13 @@ function CustomNavbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const authState = localStorage.getItem("role");
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const userRole = localStorage.getItem("role");
 
   // Define search categories based on role
   const getSearchCategoriesByRole = (role) => {
-    switch(role) {
+    switch (role) {
       case 'empleado':
         return [
           { key: 'people', label: 'People', icon: 'people' },
@@ -40,7 +39,7 @@ function CustomNavbar() {
     }
   };
 
-  const searchCategories = getSearchCategoriesByRole(userRole); 
+  const searchCategories = getSearchCategoriesByRole(userRole);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -48,7 +47,7 @@ function CustomNavbar() {
 
   const handleSearchResultClick = (searchValue, category) => {
     console.log('handleSearchResultClick called with:', { searchValue, category, userRole });
-    
+
     // Navigate to the appropriate search page based on the category
     switch (userRole) {
       case 'empleado':
@@ -113,40 +112,36 @@ function CustomNavbar() {
   return (
     <>
       {/* Sidebar */}
-      {isSidebarVisible && (
-        <div
-          className={`sidebar 
-            ${isSidebarVisible ? "sidebar-visible" : ""} 
+      <div
+        className={`sidebar 
             ${isSidebarOpen ? "open" : ""}`}
-          onMouseEnter={() => setIsSidebarOpen(true)}
-          onMouseLeave={() => {
-            setIsSidebarOpen(false);
-            setIsSidebarVisible(false);
-          }}
-        >
-          <ul className="sidebar-menu">
-            <li onClick={() => navigate(`/${authState}`)}>
-              <i className="bi bi-house"></i>
-              {isSidebarOpen && <span>Home</span>}
-            </li>
-            <li onClick={() => navigate(`/${authState}/dashboard`)}>
-              <i className="bi bi-clipboard"></i>
-              {isSidebarOpen && <span>Projects</span>}
-            </li>
-            <li onClick={handleLogout}>
-              <i className="bi bi-box-arrow-left"></i>
-              {isSidebarOpen && <span>Logout</span>}
-            </li>
-          </ul>
-        </div>
-      )}
+        onMouseEnter={() => setIsSidebarOpen(true)}
+        onMouseLeave={() => {
+          setIsSidebarOpen(false);
+        }}
+      >
+        <ul className="sidebar-menu">
+          <li onClick={() => navigate(`/${authState}`)}>
+            <i className="bi bi-house"></i>
+            {isSidebarOpen && <span>Home</span>}
+          </li>
+          <li onClick={() => navigate(`/${authState}/dashboard`)}>
+            <i className="bi bi-clipboard"></i>
+            {isSidebarOpen && <span>Projects</span>}
+          </li>
+          <li onClick={handleLogout}>
+            <i className="bi bi-box-arrow-left"></i>
+            {isSidebarOpen && <span>Logout</span>}
+          </li>
+        </ul>
+      </div>
+
 
       {/* Navbar */}
       <nav className="navbar glass-navbar navbar-expand-lg">
         <div className="container-fluid d-flex align-items-center">
           {/* Logo only */}
           <button
-            onMouseEnter={() => setIsSidebarVisible(true)}
             className="navbar-brand btn btn-link p-0 nav-logo"
           >
             <img src={Logo} alt="Logo" className="logo-img" />

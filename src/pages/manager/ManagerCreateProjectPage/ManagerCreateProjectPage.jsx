@@ -48,7 +48,7 @@ export const ManagerCreateProjectPage = () => {
 
     try {
 
-      const res = await axios.post(`${DB_URL}mejorar-texto`, {
+      const res = await axios.post(`https://pathexplorer-backend.onrender.com/api/mejorar-texto`, {
         texto: formData.description,
       });
 
@@ -277,7 +277,7 @@ export const ManagerCreateProjectPage = () => {
         rfpForm.append('file', formData.projectRFP);
         rfpForm.append('projectId', idproyecto);
 
-        await axios.post('https://pathexplorer-backend.onrender.com/api/upload-rfp', rfpForm, {
+        await axios.patch('https://pathexplorer-backend.onrender.com/api/upload-rfp', rfpForm, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
