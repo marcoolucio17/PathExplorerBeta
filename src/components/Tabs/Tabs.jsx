@@ -27,7 +27,7 @@ const Tabs = ({
   const [indicatorStyle, setIndicatorStyle] = useState({});
   
   // Update indicator position when the active tab changes
-  /*useEffect(() => {
+  useEffect(() => {
     if (tabRefs.current.length === 0) return;
     
     const activeTabIndex = isObjectTabs
@@ -37,7 +37,7 @@ const Tabs = ({
     if (activeTabIndex === -1 || !tabRefs.current[activeTabIndex]) return;
     
     const activeTabElement = tabRefs.current[activeTabIndex];
-  /  
+
     // Calculate position based on active tab
     const { offsetLeft, offsetWidth } = activeTabElement;
     
@@ -45,12 +45,12 @@ const Tabs = ({
       left: `${offsetLeft}px`,
       width: `${offsetWidth}px`
     });
-  }, [activeTab, tabs, isObjectTabs]);*/
+  }, [activeTab, tabs, isObjectTabs]);
 
-  /*// Initialize refs array when tabs change
+  // Initialize refs array when tabs change
   useEffect(() => {
     tabRefs.current = tabRefs.current.slice(0, tabs.length);
-  }, [tabs]);*/
+  }, [tabs]);
   
   return (
     <div 

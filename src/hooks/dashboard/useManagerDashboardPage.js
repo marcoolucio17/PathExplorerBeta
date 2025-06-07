@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, use } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useDashboardData from "./useDashboardData";
@@ -6,6 +6,7 @@ import useListPage from "../useListPage";
 import useModalControl from "../useModalControl";
 import useToggleState from "../useToggleState";
 import useGetFetchProjectsFilters from "../useGetFetchProjectsFilters";
+import axios from "axios";
 
 export const useManagerDashboardPage = () => {
   const navigate = useNavigate();
@@ -17,16 +18,35 @@ export const useManagerDashboardPage = () => {
     () => localStorage.getItem("id") || sessionStorage.getItem("id"),
     []
   );
+  const [myProjectsData, setMyProjectsData] = useState([]);
+  const [myProjectsLoading, setMyProjectsLoading] = useState(true);
+  const [myProjectsError, setMyProjectsError] = useState(null);
 
-  const {
-    data: myProjectsData,
-    error: myProjectsError,
-    loading: myProjectsLoading,
-  } = useGetFetchProjectsFilters({
-    rutaApi: "projects",
-    filters: dashboardData.filterOptionsMyProjects,
-  });
+  let url = "https://pathexplorer-backend.onrender.com/api";
+  const config = {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    params: dashboardData.filterOptionsMyProjects, // 👈 correct way to send query parameters
+  };
 
+  useEffect(() => {
+    const fetchMyProjects = async () => {
+      setMyProjectsLoading(true);
+
+      try {
+        const response = await axios.get(`${url}/projects`, config);
+        setMyProjectsData(response.data);
+      } catch (error) {
+        console.error("Error fetching my projects:", error);
+        setMyProjectsError(error);
+      } finally {
+        setMyProjectsLoading(false);
+      }
+    };
+
+    fetchMyProjects();
+  }, [dashboardData.filterOptionsMyProjects]);
   const { modals, openModal, closeModal, toggleModal } = useModalControl({
     skillsFilter: false,
     createProject: false,
@@ -69,11 +89,9 @@ export const useManagerDashboardPage = () => {
   const toggleRolesFilterModal = () => toggleModal("rolesFilter");
 
   const handleViewApplicants = useCallback(() => {
-    console.log("Navigating to applicants page...");
     try {
       navigate("/manager/applicants", { replace: false });
     } catch (error) {
-      console.error("Navigation error:", error);
       window.location.href = "/manager/applicants";
     }
   }, [navigate]);
@@ -83,12 +101,12 @@ export const useManagerDashboardPage = () => {
 
     switch (listPage.activeTab) {
       case "All":
-        filteredProjects = dashboardData.projects;
+        filteredProjects = dashboardData.projects ? dashboardData.projects : [];
         break;
       case "Applied To":
-        filteredProjects = dashboardData.projects.filter(
-          (project) => project.userHasApplied === true
-        );
+        filteredProjects = dashboardData.projectsApp
+          ? dashboardData.projectsApp
+          : [];
         break;
       case "My Projects":
         //use projects from /creador endpoint
@@ -184,6 +202,13 @@ export const useManagerDashboardPage = () => {
         proyecto_rol: null, //no specific role for project-level cards
         isProjectCard: true, //flag to indicate this is a project card, not role card*/
       }));
+    } else if (listPage.activeTab === "Applied To") {
+      //for applied to tab, flatten roles but keep project structure
+      return tabProjects.map((project) => ({
+        project: project,
+        proyecto_rol: null, //indicate this is a role card
+        isApplyCard: true, //indicate this is an applied to card
+      }));
     }
 
     //for other tabs, use normal flattening
@@ -195,9 +220,16 @@ export const useManagerDashboardPage = () => {
       return dashboardData.projectsLoading;
     } else if (listPage.activeTab === "My Projects") {
       return myProjectsLoading;
+    } else if (listPage.activeTab === "Applied To") {
+      return dashboardData.applyLoading;
     }
-    return dashboardData.isLoading || false;
-  }, [listPage.activeTab, myProjectsLoading, dashboardData.projectsLoading]);
+    return false;
+  }, [
+    listPage.activeTab,
+    myProjectsLoading,
+    dashboardData.projectsLoading,
+    dashboardData.applyLoading,
+  ]);
 
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
@@ -206,12 +238,8 @@ export const useManagerDashboardPage = () => {
 
     const counts = { All: 0, "Applied To": 0, "My Projects": 0 };
 
-    const appliedToProjects = dashboardData.projects.filter(
-      (project) => project.userHasApplied === true
-    );
     counts["All"] = dashboardData.projects.length;
-    counts["Applied To"] =
-      dashboardData.flattenProjectsForList(appliedToProjects).length;
+    counts["Applied To"] = dashboardData.projectsApp.length;
 
     //for my projects, count actual projects (not flattened roles)
     if (Array.isArray(myProjectsData)) {
@@ -219,18 +247,14 @@ export const useManagerDashboardPage = () => {
     }
 
     return counts;
-  }, [
-    dashboardData.projects,
-    dashboardData.flattenProjectsForList,
-    myProjectsData,
-  ]);
+  }, [dashboardData.projects, dashboardData.projectsApp, myProjectsData]);
 
   return {
     ...listPage,
     ...dashboardData,
     displayProjects,
     tabNames,
-    showCompatibility: listPage.activeTab === "My Projects" ? false : showCompatibility,
+    showCompatibility,
     toggleCompatibility,
     modals,
     openModal,
