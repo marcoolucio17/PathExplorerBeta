@@ -67,7 +67,7 @@ export const useManagerDashboardPage = () => {
     },
     filterConfig: {},
     sortFunction: dashboardData.sortProjects,
-    baseUrl: "/manager/bNamdashboard",
+    baseUrl: "/manager/dashboard",
   });
 
   const toggleViewMode = useCallback(() => {
@@ -80,8 +80,8 @@ export const useManagerDashboardPage = () => {
         if (listPage.triggerAnimationSequence) {
           listPage.triggerAnimationSequence();
         }
-      });
-    });
+      }, 50);
+    }, 50);
   }, [listPage]);
 
   const toggleSkillsFilterModal = () => toggleModal("skillsFilter");

@@ -6,8 +6,8 @@ import { ProgressCircle } from 'src/components/ProgressCircle';
 import SkillChip from 'src/components/SkillChip/SkillChip';
 import styles from 'src/styles/GridList/GridListCard.module.css';
 import customStyles from 'src/styles/GridList/ProjectCard.module.css';
-import useGetFetch from 'src/hooks/useGetFetch';
 
+import Button from 'src/components/shared/Button';
 const ProjectCard = ({
   id,
   idrol,
@@ -44,10 +44,11 @@ const ProjectCard = ({
   const ensureRoleData = () => {
     if (isProjectCard && !isApplyCard) {
       //for project cards, show project name as title
+
       return {
         roleName: project.pnombre || 'Project',
         projectName: '', //no subtitle for project cards
-        duration: project.duracionMes ? project.duracionMes : "TBD",
+        duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD",
         roleCount: project.proyecto_roles ? project.proyecto_roles.length : 0
       };
     } else if (isApplyCard && !isProjectCard) {
@@ -65,7 +66,7 @@ const ProjectCard = ({
     return {
       roleName: proyecto_rol.nombrerol || 'Developer',
       projectName: project.pnombre || 'Project',
-      duration: project.duracionMes ? project.duracionMes : "TBD"
+      duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD"
     };
   };
 
@@ -142,12 +143,13 @@ const ProjectCard = ({
 
 
       <div className={styles.cardHeader}>
-        {!isApplyCard && (<>
+
         <img
           className={styles.cardAvatar}
           src={project.imagen || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
+        {!isApplyCard && (<>
         <div className={styles.cardInfo}>
           <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
           {roleData.projectName && <p className={styles.cardSubtitle}>for {roleData.projectName}</p>}
@@ -177,19 +179,15 @@ const ProjectCard = ({
           <span className={styles.detailLabel}>
             <i className="bi bi-clock"></i> Duration:
           </span>
-          <span className={styles.detailValue}>
+          {(roleData.duration !== "< 1") && <span className={styles.detailValue}>
             {roleData.duration} months
-          </span>
+          </span>}
+          {(roleData.duration === "< 1") && <span className={styles.detailValue}>
+            {roleData.duration} month
+          </span>}
 
         </div>}
-        {isApplyCard && (
-          <>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className={styles.detailRow}>
-              </div>
-            ))}
-          </>
-        )}
+
         {isApplyCard && (
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>
@@ -201,7 +199,6 @@ const ProjectCard = ({
         }
 
         {isApplyCard && (
-
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>
               <i className="bi bi-clock"></i> {
@@ -215,7 +212,20 @@ const ProjectCard = ({
         }
       </div>
 
-
+      {isApplyCard && (
+        <div className={styles.cardFooter}>
+          <Button
+            type="secondary"
+            variant="view"
+            icon="bi-file-earmark-text"
+            onClick={(e) => {
+              ;
+            }}
+          >
+            View Request
+          </Button>
+        </div>
+      )}
       {!isProjectCard && !isApplyCard && (
         <div className={styles.cardSkills}>
           {renderSkills()}
@@ -298,7 +308,13 @@ const ProjectCard = ({
         </div>
       );
     }
-    
+    if (isApplyCard) {
+      return (
+        <GlassCard className={cardClass} tabActive={"Applied To"}>
+          {gridContent}
+        </GlassCard>
+      );
+    }
     return (
       <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
         {gridContent}
@@ -319,6 +335,13 @@ const ProjectCard = ({
           {listContent}
         </GlassCard>
       </div>
+    );
+  }
+  if (isApplyCard) {
+    return (
+      <GlassCard className={cardClass} tabActive={"Applied To"}>
+        {listContent}
+      </GlassCard>
     );
   }
 
