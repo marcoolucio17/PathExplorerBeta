@@ -50,7 +50,7 @@ function App() {
 
       {/* rutas de manager */}
       <Route element={<PrivateRoutes allowedRoles={["manager"]} />}>
-        <Route path="manager" element={<ManagerHomePage />} />
+        <Route path="manager" element={<EmpleadoHome />} />
         <Route path="manager/dashboard" element={<ManagerDashboardPage />} />
         <Route path="manager/applicants" element={<ManagerApplicantsPage />} />
         <Route path="manager/applicants/view" element={<ManagerViewApplicantPage />} />

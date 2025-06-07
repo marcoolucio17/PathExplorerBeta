@@ -2,24 +2,35 @@ import React, { useState, useRef, useEffect } from "react";
 import { TypeAnimation } from "react-type-animation";
 import { LoginForm } from "../components/Login/LoginForm";
 import "./../styles/Login.css";
+import "./../index.css";
 
 const Login = () => {
   return (
     <div id="login-main-div" className="loginMainDiv">
+      <div className="wave"></div>
+      <div className="wave"></div>
+      <div className="wave"></div>
+      
       <div id="image-background" className="imageBackground">
         <div id="image-header-main-div" className="imageHeaderMainDiv">
           <div id="image-header-div">
             <h1
-              className="text-light"
+              className="page-title"
               style={{ width: "30%", fontSize: "72px" }}
             >
               Path Explorer
             </h1>
           </div>
 
-          <div id="image-subheader-div">
+          <div id="image-subheader-div" style={{ position: "relative", height: "120px" }}>
             <div
-              style={{ width: "100%", minHeight: "10vh", marginTop: "1rem" }}
+              className="subtitle-light"
+              style={{ 
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%"
+              }}
             >
               <TypeAnimation
                 sequence={[
@@ -33,8 +44,13 @@ const Login = () => {
                 wrapper="p"
                 cursor={true}
                 repeat={Infinity}
-                className="text-light"
-                style={{ textAlign: "start", fontSize: "28px" }}
+                style={{ 
+                  textAlign: "start", 
+                  fontSize: "30px",
+                  margin: 0,
+                  lineHeight: "1.2",
+                  width: "100%"
+                }}
               />
             </div>
           </div>

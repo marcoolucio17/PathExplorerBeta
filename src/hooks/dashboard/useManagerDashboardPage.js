@@ -230,7 +230,7 @@ export const useManagerDashboardPage = () => {
     ...dashboardData,
     displayProjects,
     tabNames,
-    showCompatibility,
+    showCompatibility: listPage.activeTab === "My Projects" ? false : showCompatibility,
     toggleCompatibility,
     modals,
     openModal,
