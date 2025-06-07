@@ -214,7 +214,9 @@ export const useDashboardData = () => {
   const flattenProjectsForList = (projects) => {
     return projects
       .flatMap((project) =>
-        project.proyecto_roles.map((proyecto_rol) => ({
+        project.proyecto_roles
+          .filter((proyecto_rol) => proyecto_rol.estado !== "Aceptado")
+          .map((proyecto_rol) => ({
           project,
           proyecto_rol,
           hasSelectedSkills:
