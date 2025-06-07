@@ -36,7 +36,6 @@ function CustomNavbar() {
       });
   }, []);
 
-  // Define search categories based on role
   const getSearchCategoriesByRole = (role) => {
     switch (role) {
       case 'empleado':
@@ -68,7 +67,6 @@ function CustomNavbar() {
   const handleSearchResultClick = (searchValue, category) => {
     console.log('handleSearchResultClick called with:', { searchValue, category, userRole });
 
-    // Navigate to the appropriate search page based on the category
     switch (userRole) {
       case 'empleado':
         switch (category) {
@@ -143,15 +141,15 @@ function CustomNavbar() {
         <ul className="sidebar-menu">
           <li onClick={() => navigate(`/${authState}`)}>
             <i className="bi bi-house"></i>
-            {isSidebarOpen && <span>Home</span>}
+            {isSidebarOpen && <span className="title-light">Home</span>}
           </li>
           <li onClick={() => navigate(`/${authState}/dashboard`)}>
             <i className="bi bi-clipboard"></i>
-            {isSidebarOpen && <span>Projects</span>}
+            {isSidebarOpen && <span className="title-light">Projects</span>}
           </li>
           <li onClick={handleLogout}>
             <i className="bi bi-box-arrow-left"></i>
-            {isSidebarOpen && <span>Logout</span>}
+            {isSidebarOpen && <span className="title-light">Logout</span>}
           </li>
         </ul>
       </div>
@@ -172,7 +170,7 @@ function CustomNavbar() {
             <SearchHeader
               searchTerm={searchTerm}
               setSearchTerm={handleSearch}
-              placeholder="Search..."
+              placeholder="  Search..."
               searchName="navSearch"
               inSearchBar={true}
               onSearchResultClick={handleSearchResultClick}
