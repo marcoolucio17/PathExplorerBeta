@@ -1,20 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Logo from "../assets/Acc_GT_Dimensional_RGB 1.png";
 import { SearchHeader } from "../components/SearchHeader";
 import { Notifications } from "../components/Notifications";
-
+import axios from "axios";
 
 import "./CustomNavBar.css";
 
 function CustomNavbar() {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([])
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const authState = localStorage.getItem("role");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const userRole = localStorage.getItem("role");
+
+  useEffect(() => {
+    const userId = localStorage.getItem("id");
+    if (!userId) return;
+
+    axios
+      .get(`https://pathexplorer-backend.onrender.com/api/notifications/${userId}`)
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setNotifications(res.data);
+        } else {
+          setNotifications([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching notifications", err);
+        setNotifications([]);
+      });
+  }, []);
 
   // Define search categories based on role
   const getSearchCategoriesByRole = (role) => {
@@ -162,20 +182,26 @@ function CustomNavbar() {
 
           {/* Icons */}
           <div className="nav-icons d-flex gap-3 align-items-center">
-            <div className="position-relative">
+            <div
+              className="position-relative"
+              onMouseLeave={() => setShowNotifications(false)}
+            >
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="icon-btn"
               >
                 <i className="bi bi-bell"></i>
-                <span className="badge-notif">!</span>
+                {notifications.length > 0 && <span className="badge-notif">!</span>}
               </button>
 
               <Notifications
                 userId={localStorage.getItem("id")}
                 visible={showNotifications}
+                notifications={notifications}
+                setNotifications={setNotifications}
               />
             </div>
+
 
             <button
               onClick={() => navigate(`/${authState}/perfil`)}
