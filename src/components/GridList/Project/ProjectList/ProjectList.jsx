@@ -19,7 +19,7 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {boolean} props.isLoading - Whether items are currently loading
  */
 const ProjectList = ({
-  tabSelected,
+  tabSelected = "All",
   projects = [],
   viewMode,
   showCompatibility,
@@ -99,7 +99,7 @@ const ProjectList = ({
               }
               let compatibilityValue = null;
               if (!isProjectCard && rol) {
-                compatibilityValue = rol.compability || 0; // Default to 0 if not available
+                compatibilityValue = rol.roles.compability || 0; // Default to 0 if not available
               }
               // Force cards to always re-render when filter changes with a unique key
               const renderKey = `${projectId}-${roleId || 'project'}-${index}-${rolindex}`;
@@ -155,6 +155,7 @@ const ProjectList = ({
                   userSkills={userSkills}
                   index={index}
                   isProjectCard={isProjectCard}
+                  tabActive={tabSelected}
                 />
               </div>
             );
@@ -172,6 +173,7 @@ const ProjectList = ({
                 selectedSkillFilters={selectedSkillFilters}
                 userSkills={userSkills}
                 isProjectCard={true} // Indicate this is a project-level card
+                tabActive={tabSelected}
               />
             </div>
           );
@@ -187,6 +189,7 @@ const ProjectList = ({
                 selectedSkillFilters={selectedSkillFilters}
                 userSkills={userSkills}
                 isApplyCard={true} // Indicate this is an applied to card
+                tabActive={tabSelected}
               />
             </div>
           );
@@ -215,6 +218,7 @@ const ProjectList = ({
               index={index}
               isProjectCard={isProjectCard}
               isApplyCard={isApplyCard} // Indicate this is an applied to card
+              tabActive={tabSelected}
             />
           </div>
         );

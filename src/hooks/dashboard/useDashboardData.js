@@ -25,7 +25,7 @@ export const useDashboardData = () => {
     idusuario: localStorage.getItem("id"),
   });
 
-  const [userSkills, setUserSkills] = useState(["C#", "React", "Node.js"]);
+  const [userSkills, setUserSkills] = useState([]);
   const currentUserId = 1;
 
   const [projectsData, setProjectsData] = useState([]);
@@ -81,7 +81,6 @@ export const useDashboardData = () => {
     },
     params: filterOptions, // 👈 correct way to send query parameters
   };
-
   useEffect(() => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
@@ -97,12 +96,14 @@ export const useDashboardData = () => {
     fetchProjects();
   }, [filterOptions]);
 
-  // Fetch Roles, clients, top projects and my applications
+  // Fetch Roles, clients, top projects, my applications and my skills
   useEffect(() => {
+    // Fetch Roles
     axios
       .get(`${url}/roles`, config)
       .then((res) => setRolesData(res.data))
       .catch((err) => console.error("Error fetching roles", err));
+    // Get user top 3 projects compability
     const userId = localStorage.getItem("id");
     if (userId) {
       axios
@@ -110,14 +111,24 @@ export const useDashboardData = () => {
         .then((res) => setTopData(res.data))
         .catch((err) => console.error("Error fetching top projects", err));
     }
+    // Fetch clients
     axios
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
       .catch((err) => console.error("Error fetching clients", err));
+    // Fetch user applications
     axios
       .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => setMyApplicationsData(res.data))
       .catch((err) => console.error("Error fetching my applications", err));
+
+    // Fetch user skills
+    axios
+      .get(`${url}/habilidades/usuario/${localStorage.getItem("id")}`, config)
+      .then((res) => {
+        setUserSkills(res.data.data);
+      })
+      .catch((err) => console.error("Error fetching user skills", err));
   }, []);
 
   const handleApplySkillFilters = (selectedSkills) => {
@@ -126,7 +137,7 @@ export const useDashboardData = () => {
       selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
     );
   };
-
+  console.log(myApplicationsData);
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
       setFilterOptions((prev) => ({ ...prev, projectName: nameProject }));
@@ -212,6 +223,7 @@ export const useDashboardData = () => {
   };
 
   const flattenProjectsForList = (projects) => {
+    console.log("flattenProjectsForList", projects);
     return projects
       .flatMap((project) =>
         project.proyecto_roles
@@ -230,7 +242,7 @@ export const useDashboardData = () => {
       )
       .filter((item) => item.hasSelectedSkills);
   };
-  console.log("Projects Data:", myApplicationsData);
+  console.log("projectsData", myApplicationsData);
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],
