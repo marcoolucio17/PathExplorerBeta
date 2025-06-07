@@ -15,39 +15,89 @@ function CustomNavbar() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Define search categories
-  const searchCategories = [
-    { key: 'people', label: 'People', icon: 'people' },
-    { key: 'projects', label: 'Projects', icon: 'projects' },
-    { key: 'certificates', label: 'Certificates', icon: 'certificates' },
-    { key: 'skills', label: 'Skills', icon: 'skills' },
-    { key: 'applicants', label: 'Applicants', icon: 'people' } // Using people icon for applicants
-  ];
+  const userRole = localStorage.getItem("role");
+
+  // Define search categories based on role
+  const getSearchCategoriesByRole = (role) => {
+    switch(role) {
+      case 'empleado':
+        return [
+          { key: 'people', label: 'People', icon: 'people' },
+          { key: 'projects', label: 'Projects', icon: 'projects' }
+        ];
+      case 'manager':
+      case 'tfs':
+        return [
+          { key: 'people', label: 'People', icon: 'people' },
+          { key: 'projects', label: 'Projects', icon: 'projects' },
+          { key: 'applicants', label: 'Applicants', icon: 'people' }
+        ];
+      default:
+        return [
+          { key: 'people', label: 'People', icon: 'people' },
+          { key: 'projects', label: 'Projects', icon: 'projects' }
+        ];
+    }
+  };
+
+  const searchCategories = getSearchCategoriesByRole(userRole); 
 
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
 
   const handleSearchResultClick = (searchValue, category) => {
+    console.log('handleSearchResultClick called with:', { searchValue, category, userRole });
+    
     // Navigate to the appropriate search page based on the category
-    switch (category) {
-      case 'people':
-        navigate(`/people/search?q=${encodeURIComponent(searchValue)}`);
+    switch (userRole) {
+      case 'empleado':
+        switch (category) {
+          case 'people':
+            navigate(`/${userRole}/employee-dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'projects':
+            navigate(`/${userRole}/dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          default:
+            navigate(`/search?q=${encodeURIComponent(searchValue)}`);
+            break;
+        }
         break;
-      case 'projects':
-        navigate(`/projects/search?q=${encodeURIComponent(searchValue)}`);
+      case 'manager':
+        switch (category) {
+          case 'people':
+            navigate(`/${userRole}/employee-dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'projects':
+            navigate(`/${userRole}/dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'applicants':
+            navigate(`/${userRole}/applicants?search=${encodeURIComponent(searchValue)}`);
+            break;
+          default:
+            navigate(`/search?q=${encodeURIComponent(searchValue)}`);
+            break;
+        }
         break;
-      case 'certificates':
-        navigate(`/certificates/search?q=${encodeURIComponent(searchValue)}`);
-        break;
-      case 'skills':
-        navigate(`/skills/search?q=${encodeURIComponent(searchValue)}`);
-        break;
-      case 'applicants':
-        navigate(`/manager/applicants?search=${encodeURIComponent(searchValue)}`);
+      case 'tfs':
+        switch (category) {
+          case 'people':
+            navigate(`/${userRole}/employee-dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'projects':
+            navigate(`/${userRole}/dashboard?search=${encodeURIComponent(searchValue)}`);
+            break;
+          case 'applicants':
+            navigate(`/${userRole}/applicants?search=${encodeURIComponent(searchValue)}`);
+            break;
+          default:
+            navigate(`/search?q=${encodeURIComponent(searchValue)}`);
+            break;
+        }
         break;
       default:
-        // If there's no matching category, use a default
+        console.log('No matching role found, using default navigation');
         navigate(`/search?q=${encodeURIComponent(searchValue)}`);
         break;
     }
@@ -63,32 +113,33 @@ function CustomNavbar() {
   return (
     <>
       {/* Sidebar */}
-      <div
-        className={`sidebar 
-          ${isSidebarVisible ? "sidebar-visible" : ""} 
-          ${isSidebarOpen ? "open" : ""}`}
-        onMouseEnter={() => setIsSidebarOpen(true)}
-        onMouseLeave={() => {
-          setIsSidebarOpen(false);
-          setIsSidebarVisible(false);
-        }}
-      >
-        <ul className="sidebar-menu">
-          <li onClick={() => navigate(`${authState}`)}>
-            <i className="bi bi-house"></i>
-            {isSidebarOpen && <span>Home</span>}
-          </li>
-          <li onClick={() => navigate(`${authState}/dashboard`)}>
-            <i className="bi bi-clipboard"></i>
-            {isSidebarOpen && <span>Projects</span>}
-          </li>
-          <li onClick={handleLogout}>
-            <i className="bi bi-box-arrow-left"></i>
-            {isSidebarOpen && <span>Logout</span>}
-
-          </li>
-        </ul>
-      </div>
+      {isSidebarVisible && (
+        <div
+          className={`sidebar 
+            ${isSidebarVisible ? "sidebar-visible" : ""} 
+            ${isSidebarOpen ? "open" : ""}`}
+          onMouseEnter={() => setIsSidebarOpen(true)}
+          onMouseLeave={() => {
+            setIsSidebarOpen(false);
+            setIsSidebarVisible(false);
+          }}
+        >
+          <ul className="sidebar-menu">
+            <li onClick={() => navigate(`/${authState}`)}>
+              <i className="bi bi-house"></i>
+              {isSidebarOpen && <span>Home</span>}
+            </li>
+            <li onClick={() => navigate(`/${authState}/dashboard`)}>
+              <i className="bi bi-clipboard"></i>
+              {isSidebarOpen && <span>Projects</span>}
+            </li>
+            <li onClick={handleLogout}>
+              <i className="bi bi-box-arrow-left"></i>
+              {isSidebarOpen && <span>Logout</span>}
+            </li>
+          </ul>
+        </div>
+      )}
 
       {/* Navbar */}
       <nav className="navbar glass-navbar navbar-expand-lg">
@@ -116,7 +167,6 @@ function CustomNavbar() {
 
           {/* Icons */}
           <div className="nav-icons d-flex gap-3 align-items-center">
-
             <div className="position-relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}

@@ -7,17 +7,15 @@ import useToggleState from '../useToggleState';
 
 /**
  * users dashboard hook
- * tabs: "all", "active", "inactive"
+ * tabs: "all employees"
  * 
  * @returns {Object} complete state and functions for the users dashboard page
  */
 export const useUsersDashboardPage = () => {
   const navigate = useNavigate();
   
-  //get users data from api
   const { data: usuarios, loading: isLoading, error } = useFetch("usuarios/total");
   
-  //debugging: log user data structure
   useEffect(() => {
     if (usuarios && usuarios.length > 0) {
       console.log("users data from backend:", usuarios);
@@ -28,14 +26,14 @@ export const useUsersDashboardPage = () => {
   
   const tabNames = ['All Employees'];
   
-  //modal controls
   const { 
     modals, 
     openModal, 
     closeModal, 
     toggleModal 
   } = useModalControl({
-    skillsFilter: false
+    skillsFilter: false,
+    roleFilter: false
   });
   
   const { 
@@ -49,10 +47,15 @@ export const useUsersDashboardPage = () => {
     defaultSortOption: 'name_asc',
     defaultViewMode: 'grid',
     tabConfig: { 
-      defaultTab: 'all', 
-      tabNameField: 'status' 
+      defaultTab: 'All Employees', 
+      tabNameField: 'status',
+      singleTab: true
     },
-    filterConfig: {},
+    filterConfig: {
+      roleField: 'tipo',
+      nameField: 'nombre', 
+      emailField: 'correoelectronico'
+    },
     sortFunction: sortUsers,
     baseUrl: '/employee-dashboard'
   });
@@ -96,59 +99,88 @@ export const useUsersDashboardPage = () => {
     }, 50);
   }, [listPage]);
   
-  //helper to toggle skills filter modal
   const toggleSkillsFilterModal = () => {
     toggleModal('skillsFilter');
   };
-  
-  //get filtered users for the current tab
-  const getTabUsers = () => {
-    return sortUsers(usuarios || [], listPage.sortOption);
+
+  const toggleRoleFilterModal = () => {
+    toggleModal('roleFilter');
+  };
+
+  const handleApplyRoleFilters = (roles) => {
+    console.log('Applying role filters:', roles);
+    if (listPage.filterStates.setSelectedRoles) {
+      listPage.filterStates.setSelectedRoles(roles);
+    }
   };
   
-  //generate active filters for header
+  const getTabUsers = () => {
+    return listPage.filteredData || usuarios || [];
+  };
+  
   const getActiveFilters = () => {
     const filters = {};
-    //no skill filters for users, keeping for consistency
+    
+    if (listPage.filterStates.selectedRoles && listPage.filterStates.selectedRoles.length > 0) {
+      filters.roles = {
+        label: 'Role',
+        values: listPage.filterStates.selectedRoles
+      };
+    }
+    
     return filters;
   };
   
-  //handle removing a specific filter
   const handleRemoveFilter = (filterType, value) => {
-    //no filters to remove for users
+    if (filterType === 'roles' && listPage.filterStates.setSelectedRoles) {
+      const currentRoles = listPage.filterStates.selectedRoles || [];
+      const newRoles = currentRoles.filter(role => role !== value);
+      listPage.filterStates.setSelectedRoles(newRoles);
+    }
   };
   
-  //handle clear filters action
   const handleClearFilters = () => {
+    console.log('Clearing all filters');
+    if (listPage.filterStates.setSelectedRoles) {
+      listPage.filterStates.setSelectedRoles([]);
+    }
     listPage.handleClearFilters();
   };
   
-  //compute display users
   const displayUsers = getTabUsers();
   
   const tabCounts = useMemo(() => {
-    return { 'all': 0 }; 
+    return { 'All Employees': usuarios?.length || 0 }; 
   }, [usuarios]);
+
+  useEffect(() => {
+    console.log('Current search term:', listPage.searchTerm);
+    console.log('Selected roles:', listPage.filterStates?.selectedRoles);
+    console.log('Filtered data length:', displayUsers?.length);
+  }, [listPage.searchTerm, listPage.filterStates?.selectedRoles, displayUsers]);
 
   return {
     ...listPage,
     displayProjects: displayUsers, 
     usuarios,
     tabNames,
+    activeTab: 'All Employees',
+    setActiveTab: () => {}, 
     showCompatibility,
     toggleCompatibility,
     modals,
     openModal,
     closeModal,
     toggleSkillsFilterModal,
+    toggleRoleFilterModal,
     getActiveFilters,
     handleRemoveFilter,
     handleClearFilters,
+    handleApplyRoleFilters,
     toggleViewMode,
     tabCounts,
     isLoading,
     error,
-    //user-specific properties
     userSkills: [],
     selectedSkillFilters: [], 
     calculateMatchPercentage: () => 0 
