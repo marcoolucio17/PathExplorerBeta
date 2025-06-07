@@ -97,7 +97,7 @@ const ProjectList = ({
               let roleId = null;
 
               if (!isProjectCard && rol) {
-                roleId = rol.idrol || null;
+                roleId = rol.roles?.idrol || null;
               }
               let compatibilityValue = null;
               if (!isProjectCard && rol) {
@@ -132,11 +132,11 @@ const ProjectList = ({
             // Fix role ID extraction - check the nested structure
             let roleId = null;
             if (!isProjectCard && item.proyecto_rol) {
-              roleId = item.proyecto_rol.idrol || null;
+              roleId = item.proyecto_rol.roles?.idrol || null;
             }
             let compatibilityValue = null;
             if (!isProjectCard && item.proyecto_rol) {
-              compatibilityValue = item.proyecto_rol.roles?.compability || item.proyecto_rol.compability || 0; // Default to 0 if not available
+              compatibilityValue = item.proyecto_rol.roles?.compability || item.proyecto_rol.compability || 0; //default to 0 if not available
             }
             const renderKey = `${projectId}-${roleId || 'project'}`;
             return (
@@ -150,7 +150,7 @@ const ProjectList = ({
                   id={projectId}
                   idrol={roleId}
                   project={item.project}
-                  proyecto_rol={item.proyecto_rol}
+                  proyecto_rol={item.proyecto_rol.roles}
                   viewMode={viewMode}
                   compatibilityValue={compatibilityValue}
                   showCompatibility={showCompatibility}

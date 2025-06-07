@@ -56,7 +56,10 @@ function transformBackendProject(projectData, roleId = null) {
         primaryRole = roleObj;
       }
 
-      availableRoles.push(roleObj);
+      //only add roles that are available (estado: "pendiente")
+      if (proyectoRole.estado === "Pendiente") {
+        availableRoles.push(roleObj);
+      }
     });
   }
   else if (project.roles) {
@@ -74,7 +77,10 @@ function transformBackendProject(projectData, roleId = null) {
           primaryRole = roleObj;
         }
 
-        availableRoles.push(roleObj);
+        //only add roles that are available (estado: "pendiente")
+        if (role.estado === "Pendiente") {
+          availableRoles.push(roleObj);
+        }
       });
     }
     else if (project.roles.nombrerol && project.roles.idrol) {
