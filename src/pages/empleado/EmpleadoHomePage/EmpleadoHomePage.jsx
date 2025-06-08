@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import components
 import { GlassCard } from "../../../components/shared/GlassCard";
 import SkillChip from "../../../components/SkillChip/SkillChip";
 import Button from "../../../components/shared/Button/Button";
-//import page-specific styles
 import pageStyles from "./EmpleadoHomePage.module.css";
-//import styles for specific sections
 import quickActionsStyles from "./QuickActions.module.css";
 import useFetch from "src/hooks/useFetch";
 import { formatName } from "src/hooks/profile/useProfilePage";
@@ -16,6 +13,7 @@ import useEmpleadoDashboardPage from "src/hooks/dashboard/useEmpleadoDashboardPa
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 import CustomScrollbar from "src/components/CustomScrollbar";
 import { ProjectList } from "src/components/GridList/Project";
+import useGetFetch from "src/hooks/useGetFetch";
 
 const hardcodedSkillsData = {
   message: "Habilidades conseguidas fácilmente",
@@ -31,123 +29,194 @@ const hardcodedSkillsData = {
 export const EmpleadoHomePage = () => {
   const navigate = useNavigate();
   
-  //api stuff needed for the page
   const { data, error, loading } = useFetch(
     "usuario/" + localStorage.getItem("id")
   );
 
-  const {data1, loading1, error1} = useFetch(
-    "habilidades/top/5"
-  )
 
-  if (loading1) return <p>Loading skills...</p>;
-  if (error1) return <p>Error loading skills: {error1.message}</p>;
+  const userRole = localStorage.getItem("role");
 
-  console.log(data1);
-
-  const handleApplyToProject = (projectId) => {
-    console.log(`Applying to project ${projectId}`);
-    //handle application logic here
+  const getQuickActionsByRole = (role) => {
+    switch(role) {
+      case "manager":
+        return [
+          {
+            id: 1,
+            icon: "bi-person-fill",
+            title: "My Profile",
+            path: "/manager/perfil"
+          },
+          {
+            id: 2,
+            icon: "bi-folder-fill",
+            title: "Project Dashboard",
+            path: "/manager/dashboard"
+          },
+          {
+            id: 3,
+            icon: "bi-people-fill",
+            title: "Employees Dashboard",
+            path: "/manager/employee-dashboard"
+          }
+        ];
+      
+      case "empleado":
+        return [
+          {
+            id: 1,
+            icon: "bi-person-fill",
+            title: "My Profile",
+            path: "/empleado/perfil"
+          },
+          {
+            icon: "bi-folder-fill",
+            title: "Project Dashboard",
+            path: "/empleado/dashboard"
+          },
+          {
+            id: 3,
+            icon: "bi-people-fill",
+            title: "Employees Dashboard",
+            path: "/empleado/employee-dashboard"
+          }
+        ];
+      
+      case "tfs":
+        return [
+          {
+            id: 1,
+            icon: "bi-gear-fill",
+            title: "System Admin",
+            path: "/tfs/admin"
+          },
+          {
+            id: 2,
+            icon: "bi-database",
+            title: "Data Management",
+            path: "/tfs/data"
+          },
+          {
+            id: 3,
+            icon: "bi-shield-check",
+            title: "Security Settings",
+            path: "/tfs/security"
+          },
+          {
+            id: 4,
+            icon: "bi-bar-chart",
+            title: "System Reports",
+            path: "/tfs/reports"
+          }
+        ];
+      
+      default:
+        return [
+          {
+            id: 1,
+            icon: "bi-person-fill",
+            title: "My Profile",
+            path: "/empleado/perfil"
+          },
+          {
+            id: 2,
+            icon: "bi-laptop",
+            title: "Dashboard",
+            path: "/empleado/dashboard"
+          }
+        ];
+    }
   };
 
-  const quickActions = [
-    {
-      id: 1,
-      icon: "bi-person-fill",
-      title: "My Profile",
-      path: "/empleado/perfil"
-    },
-    {
-      id: 2,
-      icon: "bi-laptop",
-      title: "Project Dashboard",
-      path: "/empleado/dashboard"
-    },
-    {
-      id: 3,
-      icon: "bi-folder-fill",
-      title: "My Project",
-      path: "/empleado/proyectos"
-    }
-  ];
+  const quickActions = getQuickActionsByRole(userRole);
 
   const dashboardPage = useEmpleadoDashboardPage();
-  
+
+  const {data: data1, loading: loading1, error: error1} = useFetch(
+    "habilidades/top/5"
+  );
   
   return (
-    <div className={pageStyles.homeLayout}>
-      <div className={pageStyles.mainContentWrapper}>
-        {/* header section */}
-        <div className={pageStyles.headerSection}>
-          <h1 className={pageStyles.mainTitle}>{`Welcome back, ${formatName(data?.user?.nombre) || "..."}!`}</h1>
-        </div>
+    <>
+      <style>{`
+        .empleado-home-cards [class*="gridContainer"] {
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+          gap: 1.5rem !important;
+          padding: 1rem !important;
+        }
+        .empleado-home-cards [class*="item"] {
+          height: 280px !important;
+        }
+        .empleado-home-cards [class*="item"] > * {
+          height: 100% !important;
+        }
+      `}</style>
+      
+      <div className={pageStyles.homeLayout}>
+        <div className={pageStyles.mainContentWrapper}>
+          <div className={pageStyles.headerSection}>
+            <h1 className={pageStyles.mainTitle}>{`Welcome back, ${formatName(data?.user?.nombre) || "..."}!`}</h1>
+          </div>
 
-        {/* main content area */}
-        <div className={pageStyles.contentSection}>
-          <div className={pageStyles.mainbar}>
-            {/* progress section*/}
-            <div className={pageStyles.progressCard}>
-              <div className={pageStyles.progressContent}>
-                <GlassCard className={pageStyles.mainbarAnnouncementCard}>
-                  <ImageCarousel />
-                </GlassCard>
+          <div className={pageStyles.contentSection}>
+            <div className={pageStyles.mainbar}>
+              <div className={pageStyles.progressCard}>
+                <div className={pageStyles.progressContent}>
+                  <GlassCard className={pageStyles.mainbarAnnouncementCard}>
+                    <ImageCarousel />
+                  </GlassCard>
+                </div>
+              </div>
+
+              <div className={pageStyles.recommendationsCard}>
+                <h3 className={pageStyles.recommendationTitle}>
+                  Based on your profile, you'd be a great fit for these projects:
+                </h3>
+                
+                <div className="empleado-home-cards" style={{ display: 'block', width: '100%'}}>
+                  <ProjectList 
+                    projects={dashboardPage.topProjects}
+                    viewMode={dashboardPage.viewMode}
+                    showCompatibility={dashboardPage.showCompatibility}
+                    selectedSkillFilters={dashboardPage.selectedSkillFilters}
+                    userSkills={dashboardPage.userSkills}
+                    calculateMatchPercentage={dashboardPage.calculateMatchPercentage}
+                    onClearFilters={dashboardPage.handleClearFilters}
+                    isLoading={dashboardPage.isLoading}
+                  />
+                </div>
               </div>
             </div>
-
-            {/* project recommendations section */}
-            <div className={pageStyles.recommendationsCard}>
-              <h3 className={pageStyles.recommendationTitle}>
-                Based on your profile, you'd be a great fit for these projects:
-              </h3>
-              
-            <div className={styles.cardsContainer}>
-                <ProjectList 
-                  projects={dashboardPage.topProjects}
-                  viewMode={dashboardPage.viewMode}
-                  showCompatibility={dashboardPage.showCompatibility}
-                  selectedSkillFilters={dashboardPage.selectedSkillFilters}
-                  userSkills={dashboardPage.userSkills}
-                  calculateMatchPercentage={dashboardPage.calculateMatchPercentage}
-                  onClearFilters={dashboardPage.handleClearFilters}
-                  isLoading={dashboardPage.isLoading}
-                />
-            </div>
-            </div>
           </div>
-        </div>
 
-        {/* sidebar */}
-        <div className={pageStyles.sidebar}>
-          {/* quick actions card */}
-          <GlassCard className={pageStyles.sidebarCard}>
-            <h2 className={pageStyles.sectionTitle}>Quick Actions</h2>
-            <div className={quickActionsStyles.actionsContainer}>
+          <div className={pageStyles.sidebar}>
+            <GlassCard className={pageStyles.sidebarCard}>
+              <h2 className={pageStyles.sectionTitle}>Quick Actions</h2>
+              <div className={quickActionsStyles.actionsContainer}>
               {quickActions.map((action) => (
-                <div key={action.id} className={quickActionsStyles.actionItem}>
+                <button
+                  key={action.id}
+                  onClick={() => navigate(action.path)}
+                  className={quickActionsStyles.actionItem} // Make the entire item the button
+                >
                   <div className={quickActionsStyles.actionInfo}>
                     <i className={`${action.icon} ${quickActionsStyles.actionIcon}`} />
                     <span className={quickActionsStyles.actionTitle}>{action.title}</span>
                   </div>
-                  <button
-                    onClick={() => navigate(action.path)}
-                    className={quickActionsStyles.actionButton}
-                  >
-                    <i className="bi bi-arrow-right-circle-fill" />
-                  </button>
-                </div>
+                  <i className="bi bi-arrow-right-circle-fill" />
+                </button>
               ))}
-            </div>
-          </GlassCard>
+              </div>
+            </GlassCard>
 
-          {/* trends card at bottom */}
-          <div className={pageStyles.trendsContainer}>
-            <TrendsCard 
-              className={pageStyles.sidebarSection}
-              data={hardcodedSkillsData.result} 
-            />
+            <div className={pageStyles.trendsContainer}>
+              <TrendsCard 
+                className={pageStyles.sidebarSection}
+                data={data1.result} 
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

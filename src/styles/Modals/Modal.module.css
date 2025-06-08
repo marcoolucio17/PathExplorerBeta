@@ -151,7 +151,7 @@
   font-size: 1.1rem;
   color: var(--modal-accent);
   margin: 0;
-  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Graphik Regular", -apple-system, BlinkMacSystemFont, sans-serif;
   text-shadow: var(--shadow-text);
 }
 
@@ -174,7 +174,7 @@
 .formGroup label {
   font-size: 0.95rem;
   color: var(--text-muted);
-  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Graphik Regular", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .formGroup input,
@@ -189,7 +189,7 @@
   color: var(--text-light);
   font-size: 0.95rem;
   transition: all 0.2s ease;
-  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Graphik Regular", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .formGroup input::placeholder,
@@ -354,7 +354,7 @@
 .detailLabel {
   font-size: 0.95rem;
   color: var(--text-muted);
-  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Graphik Regular", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .detailValue {
@@ -420,7 +420,7 @@
 .uploadPlaceholder span {
   color: var(--text-muted);
   font-size: 0.95rem;
-  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Graphik Regular", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .fileInput {
@@ -453,7 +453,7 @@
   color: var(--text-light);
   font-size: 0.95rem;
   transition: all 0.2s ease;
-  font-family: 'Graphik Regular', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Graphik Regular", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .searchInput::placeholder {
@@ -473,31 +473,31 @@
     border-radius: 16px 16px 0 0;
     margin-top: auto;
   }
-  
+
   .modalHeader {
     padding: 1.5rem 1.5rem 1rem;
   }
-  
+
   .title {
     font-size: 1.5rem;
   }
-  
+
   .form,
   .modalBody,
   .contentSection {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
-  
+
   .formGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .buttonGroup {
     margin: 0 1.5rem 1.5rem;
     flex-direction: column;
   }
-  
+
   .cancelButton,
   .secondaryButton,
   .primaryButton,
@@ -573,4 +573,45 @@
 
 .mt-4 {
   margin-top: 2rem;
+}
+
+.login-error-alert {
+  background: rgba(255, 107, 107, 0.1) !important;
+  border: 1px solid rgba(255, 107, 107, 0.3) !important;
+  border-radius: 12px !important;
+  color: #ff6b6b !important;
+  text-align: center;
+  padding: 1rem;
+  margin: 0;
+  font-family: "Graphik Regular", sans-serif !important;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  animation: errorSlideIn 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+}
+
+/* voy a intentar el botonsito con ai */
+.generateButton {
+  font-size: var(--btn-font-size);
+  font-weight: 500;
+  font-family: var(--btn-font-family);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #9772fd, #8f1ef9);
+  border: none;
+  border-radius: var(--btn-border-radius);
+  padding: 1rem 2rem;
+  color: white;
+  box-shadow: 0 0 10px rgba(193, 127, 255, 0.6),
+    0 0 20px rgba(193, 127, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.generateButton:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 15px rgba(193, 127, 255, 0.8),
+    0 0 25px rgba(193, 127, 255, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.3);
 }

@@ -38,6 +38,8 @@ export const useDashboardData = () => {
   const [projectsData, setProjectsData] = useState([]);
   // State for boolean loading projects All
   const [projectsLoading, setProjectsLoading] = useState(true);
+  // State for boolean loading projects Aplications
+  const [applyLoading, setApplyLoading] = useState(true);
   // State for clients data
   const [clientsData, setClientsData] = useState([]);
   // State for roles data
@@ -94,14 +96,18 @@ export const useDashboardData = () => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    params: filterOptions, // 👈 correct way to send query parameters
+    params: filterOptions,
   };
   // Fetch projects All data when filter options change
   useEffect(() => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
+        console.log("fetching all projects with config:", config);
         const { data } = await axios.get(`${url}/projects`, config);
+        console.log("all projects fetched:", data);
+        console.log("all projects count:", data?.length);
+        console.log("sample project structure:", data?.[0]);
         setProjectsData(data);
       } catch (err) {
         console.error("Error fetching projects", err);
@@ -112,14 +118,17 @@ export const useDashboardData = () => {
     fetchProjects();
   }, [filterOptions]);
 
+
   // Fetch Roles, clients, top projects, my applications and my skills once
+
   useEffect(() => {
-    // Fetch Roles
+    //fetch roles
     axios
       .get(`${url}/roles`, config)
       .then((res) => setRolesData(res.data))
       .catch((err) => console.error("Error fetching roles", err));
-    // Get user top 3 projects compability
+    
+    //get user top 3 projects compability
     const userId = localStorage.getItem("id");
     if (userId) {
       axios
@@ -127,18 +136,28 @@ export const useDashboardData = () => {
         .then((res) => setTopData(res.data))
         .catch((err) => console.error("Error fetching top projects", err));
     }
-    // Fetch clients
+    
+    //fetch clients
     axios
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
       .catch((err) => console.error("Error fetching clients", err));
-    // Fetch user applications
+    
+    //fetch user applications
+    console.log("fetching user applications for user:", localStorage.getItem("id"));
+    console.log("dashboard data: --------------------------------------------------", projectsData);
     axios
       .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
-      .then((res) => setMyApplicationsData(res.data))
-      .catch((err) => console.error("Error fetching my applications", err));
+      .then((res) => {
+       
+        setMyApplicationsData(res.data);
+        setApplyLoading(false);
+      })
+      .catch((err) => {
+        setApplyLoading(false);
+      });
 
-    // Fetch user skills
+    //fetch user skills
     axios
       .get(`${url}/habilidades/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
@@ -154,6 +173,7 @@ export const useDashboardData = () => {
       selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
     );
   };
+
   // Handle the project name in the search bar
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
@@ -296,8 +316,11 @@ export const useDashboardData = () => {
               ),
           };
         }
+
       })
       .filter((item) => item.hasSelectedSkills);
+      
+
   };
 
   return {
@@ -330,6 +353,7 @@ export const useDashboardData = () => {
     filterOptionsMyProjects,
     setFilterOptionsMyProjects,
     projectsLoading,
+    applyLoading,
   };
 };
 
