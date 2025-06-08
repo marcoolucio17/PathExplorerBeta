@@ -136,13 +136,13 @@ export const FeedbackModal = ({
               <div className={styles.formSection}>
                 <label className={styles.formLabel}>
                   <i className="bi bi-star-fill"></i>
-                  Rating (1-9)
+                  Rating (1-10)
                 </label>
                 <div className={styles.ratingContainer}>
                   <input
                     type="range"
                     min="1"
-                    max="9"
+                    max="10"
                     value={rating}
                     onChange={(e) => setRating(parseInt(e.target.value))}
                     className={styles.ratingSlider}

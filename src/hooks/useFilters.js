@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 
 /**
- * Custom hook for managing multiple filters (skills, projects, search)
+ * Custom hook for managing multiple filters (skills, projects, search, roles)
  * @param {Array} data - The data array to filter
  * @param {Object} options - Filter options and configuration
  * @returns {Object} - Filter state and filtered data
@@ -9,20 +9,51 @@ import { useState, useEffect, useMemo } from "react";
 const useFilters = (data = [], options = {}) => {
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [selectedProject, setSelectedProject] = useState("All Projects");
+  const [selectedRoles, setSelectedRoles] = useState([]);
   const {
     searchTerm = "",
     skillsField = "skills",
     projectField = "project",
+    roleField = "tipo",
+    nameField = "nombre",
+    emailField = "correoelectronico",
   } = options;
 
   // Ensure data is always an array
   const safeData = Array.isArray(data) ? data : [];
 
+  // Filtering logic for roles
+  const filterByRoles = useMemo(() => {
+    if (selectedRoles.length === 0) return safeData;
+
+    console.log('Filtering by roles:', selectedRoles);
+    console.log('Sample user data:', safeData[0]);
+    
+    const filtered = safeData.filter((item) => {
+      if (!item || !item[roleField]) {
+        console.log('Item missing role field:', item);
+        return false;
+      }
+      
+      const itemRole = item[roleField];
+      const matchesRole = selectedRoles.includes(itemRole);
+      
+      if (selectedRoles.length > 0) {
+        console.log(`Checking ${item[nameField]} with role "${itemRole}" against [${selectedRoles.join(', ')}] = ${matchesRole}`);
+      }
+      
+      return matchesRole;
+    });
+    
+    console.log('Filtered by roles result:', filtered.length, 'out of', safeData.length);
+    return filtered;
+  }, [safeData, selectedRoles, roleField, nameField]);
+
   // Filtering logic for skills
   const filterBySkills = useMemo(() => {
-    if (selectedSkills.length === 0) return safeData;
+    if (selectedSkills.length === 0) return filterByRoles;
 
-    return safeData.filter((item) => {
+    return filterByRoles.filter((item) => {
       if (!item || !item[skillsField] || !Array.isArray(item[skillsField])) {
         return false;
       }
@@ -39,7 +70,7 @@ const useFilters = (data = [], options = {}) => {
         (skill) => skill && itemSkills.includes(skill.toLowerCase())
       );
     });
-  }, [safeData, selectedSkills, skillsField]);
+  }, [filterByRoles, selectedSkills, skillsField]);
 
   // Filtering logic for project
   const filterByProject = useMemo(() => {
@@ -96,75 +127,56 @@ const useFilters = (data = [], options = {}) => {
 
     const lowerSearchTerm = searchTerm.toLowerCase();
 
-    return filterByProject.filter((item) => {
+    const searchResults = filterByProject.filter((item) => {
       if (!item) return false;
 
-      // Check name
-      if (
-        item.name &&
-        typeof item.name === "string" &&
-        item.name.toLowerCase().includes(lowerSearchTerm)
-      ) {
-        return true;
-      }
+      let found = false;
+      let matchField = '';
 
-      // Check email
-      if (
-        item.email &&
-        typeof item.email === "string" &&
-        item.email.toLowerCase().includes(lowerSearchTerm)
-      ) {
-        return true;
-      }
-
-      // Check role
-      if (
-        item.role &&
-        typeof item.role === "string" &&
-        item.role.toLowerCase().includes(lowerSearchTerm)
-      ) {
-        return true;
-      }
-
-      // Check project
-      if (
-        item[projectField] &&
-        typeof item[projectField] === "string" &&
-        item[projectField].toLowerCase().includes(lowerSearchTerm)
-      ) {
-        return true;
-      }
-
-      // Check skills
-      if (item[skillsField] && Array.isArray(item[skillsField])) {
-        return item[skillsField].some((skill) => {
-          if (
-            typeof skill === "string" &&
-            skill.toLowerCase().includes(lowerSearchTerm)
-          ) {
-            return true;
+      //check all possible name fields
+      const possibleNameFields = [nameField, 'nombre', 'name', 'fullName', 'displayName'];
+      for (const field of possibleNameFields) {
+        if (item[field] && typeof item[field] === "string") {
+          const fieldValue = item[field].toLowerCase();
+          if (fieldValue.includes(lowerSearchTerm)) {
+            found = true;
+            matchField = field;
+            break;
+          } else {
           }
-
-          if (
-            skill &&
-            skill.nombre &&
-            typeof skill.nombre === "string" &&
-            skill.nombre.toLowerCase().includes(lowerSearchTerm)
-          ) {
-            return true;
-          }
-
-          return false;
-        });
+        }
       }
 
-      return false;
+      //check all possible email fields
+      if (!found) {
+        const possibleEmailFields = [emailField, 'correoelectronico', 'email', 'emailAddress'];
+        for (const field of possibleEmailFields) {
+          if (item[field] && typeof item[field] === "string") {
+            const fieldValue = item[field].toLowerCase();
+            if (fieldValue.includes(lowerSearchTerm)) {
+              found = true;
+              matchField = field;
+              break;
+            } else {
+              console.log(`no match in ${field}: "${item[field]}" does not contain "${lowerSearchTerm}"`);
+            }
+          } else {
+            console.log(`field ${field} missing or not string:`, typeof item[field], item[field]);
+          }
+        }
+      }
+
+      return found;
     });
-  }, [filterByProject, searchTerm, skillsField, projectField]);
+    
+    
+    return searchResults;
+  }, [filterByProject, searchTerm, nameField, emailField]);
 
   const resetFilters = () => {
     setSelectedSkills([]);
     setSelectedProject("All Projects");
+    setSelectedRoles([]);
   };
 
   return {
@@ -172,6 +184,8 @@ const useFilters = (data = [], options = {}) => {
     setSelectedSkills,
     selectedProject,
     setSelectedProject,
+    selectedRoles,
+    setSelectedRoles,
     filteredData,
     resetFilters,
   };
