@@ -17,7 +17,6 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {Function} props.calculateMatchPercentage - Function to calculate match percentage
  * @param {Function} props.onClearFilters - Function called when Clear Filters button is clicked
  * @param {boolean} props.isLoading - Whether items are currently loading
- * @param {Function} props.onViewApplication - Function called when View Request button is clicked
  */
 const ProjectList = ({
   tabSelected = "All",
@@ -28,7 +27,6 @@ const ProjectList = ({
   userSkills = [],
   onClearFilters,
   isLoading = false,
-  onViewApplication,
 }) => {
 
   // Safety check for undefined/null projects array
@@ -98,11 +96,11 @@ const ProjectList = ({
               let roleId = null;
 
               if (!isProjectCard && rol) {
-                roleId = rol.roles?.idrol || null;
+                roleId = rol.idrol || null;
               }
               let compatibilityValue = null;
               if (!isProjectCard && rol) {
-                compatibilityValue = rol.roles?.compability || rol.compability || 0; // Default to 0 if not available
+                compatibilityValue = rol.roles.compability || 0; // Default to 0 if not available
               }
               // Force cards to always re-render when filter changes with a unique key
               const renderKey = `${projectId}-${roleId || 'project'}-${index}-${rolindex}`;
@@ -123,7 +121,6 @@ const ProjectList = ({
                     userSkills={userSkills}
                     index={index}
                     isProjectCard={isProjectCard}
-                    onViewApplication={onViewApplication}
                   />
                 </div>
               );
@@ -134,7 +131,6 @@ const ProjectList = ({
             let roleId = null;
 
             if (!isProjectCard && item.proyecto_rol) {
-
               roleId = item.proyecto_rol.idrol || null;
             } else {
               roleId = item.project.idrol || null; // Fallback to idrol if proyecto_rol is not available
@@ -168,7 +164,6 @@ const ProjectList = ({
                   index={index}
                   isProjectCard={isProjectCard}
                   tabActive={tabSelected}
-                  onViewApplication={onViewApplication}
                 />
               </div>
             );
@@ -188,7 +183,6 @@ const ProjectList = ({
                 userSkills={userSkills}
                 isProjectCard={true} // Indicate this is a project-level card
                 tabActive={tabSelected}
-                onViewApplication={onViewApplication}
               />
             </div>
           );
@@ -197,7 +191,7 @@ const ProjectList = ({
           const applicationId = item.applicationId || item.project.applicationId || "unknown";
           const roleId = item.roleId || item.project.roleId || "unknown";
           return (
-            <div key={`${projectId}-${applicationId}-${roleId}`} className={styles.item}>
+            <div key={`${projectId}-${item.idaplicacion}-${item.project.roles.idrol}`} className={styles.item}>
               <ProjectCard
                 id={projectId}
                 project={item.project}
@@ -207,11 +201,11 @@ const ProjectList = ({
                 userSkills={userSkills}
                 isApplyCard={true} // Indicate this is an applied to card
                 tabActive={tabSelected}
-                onViewApplication={onViewApplication}
               />
             </div>
           );
         }
+
       })}
     </div>
   );

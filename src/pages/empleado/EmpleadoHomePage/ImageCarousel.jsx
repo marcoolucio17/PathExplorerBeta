@@ -2,9 +2,9 @@ import React, { useState, useEffect} from "react";
 import styles from "/src/pages/empleado/EmpleadoHomePage/EmpleadoHomePage.module.css";
 
 const images = [
-  {src:"/images/accenture-news.png", headline: "Accenture Stocks go up 50%", link: "https://www.accenture.com/us-en"},
-  {src:"/images/codex.png", headline: "Welcome to the Announcements Tab!", link: "https://openai.com/index/introducing-codex/"},
-  {src:"/images/agile.png", headline: "Take this course on the Agile Methodology.", link: "https://www.pmi.org/learning/agile"},
+  {src:"/images/software-development.jpg", headline: "Welcome to the Announcements Tab!"},
+  {src:"/images/accenture-img1.jpg", headline: "Accenture Stocks go up 50%"},
+  {src:"/images/agile-methodology.jpg", headline: "Take this course on the Agile Methodology."},
 ];
 
 
@@ -27,17 +27,14 @@ export default function ImageCarousel() {
           transform: `translateX(-${currentIndex * 100}%)`,
         }}
       >
-      {images.map((image, index) => (
-        <a
-          key={index}
-          href={image.link} // URL for this image
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.carouselSlide}
-          style={{ backgroundImage: `url(${image.src})` }}
-        >
-        </a>
-      ))}
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={styles.carouselSlide}
+            style={{ backgroundImage: `url(${image.src})` }}
+          >
+          </div>
+        ))}
       </div>
 
       <div className={styles.carouselButtons}>

@@ -23,7 +23,6 @@ import { ManagerHomePage } from "./pages/manager/ManagerHomePage/ManagerHomePage
 import {ManagerCreateProjectPage} from "./pages/manager/ManagerCreateProjectPage/ManagerCreateProjectPage";
 
 // Imports de TFS
-import { TfsHomePage } from "./pages/tfs/TFSHome";
 import { TFSDashboard } from "./pages/tfs/TFSDashboard";
 import { TFSApplicantsPage } from "./pages/tfs/TFSApplicantsPage/TFSApplicantsPage";
 import { TFSPerfil } from "./pages/tfs/TFSPerfil";
@@ -69,7 +68,7 @@ function App() {
 
       {/* rutas de tfs */}
       <Route element={<PrivateRoutes allowedRoles={["tfs"]} />}>
-        <Route path="tfs" element={<TfsHomePage />} />
+        <Route path="tfs" element={<Navigate to="dashboard" />} />
         <Route path="tfs/dashboard" element={<TFSDashboard />} />
         <Route path="tfs/applicants" element={<TFSApplicantsPage />} />
         <Route path="tfs/perfil" element={<TFSPerfil />} />

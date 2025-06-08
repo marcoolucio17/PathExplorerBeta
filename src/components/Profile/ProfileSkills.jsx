@@ -1,15 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { GlassCard } from "../shared/GlassCard";
 import { SkillChip } from "../SkillChip";
 import CustomScrollbar from "../CustomScrollbar";
 import styles from "./ProfileSkills.module.css";
-
-import axios from "axios";
-
-import LoadingSpinner from "src/components/LoadingSpinner";
-
-
-const DB_URL = "https://pathexplorer-backend.onrender.com/";
 
 /**
  * ProfileSkills component for displaying skills with categories
@@ -17,39 +10,9 @@ const DB_URL = "https://pathexplorer-backend.onrender.com/";
  * @param {Function} onSkillsClick - Function to handle skills button click
  * @returns {JSX.Element}
  */
-export const ProfileSkills = ({
-  categorizedSkills = { hardSkills: [], softSkills: [] },
-  onSkillsClick,
-  setIsLoading,
-}) => {
+export const ProfileSkills = ({ categorizedSkills = { hardSkills: [], softSkills: [] }, onSkillsClick }) => {
   const { hardSkills, softSkills } = categorizedSkills;
   const hasNoSkills = hardSkills.length === 0 && softSkills.length === 0;
-
-  // función para eliminar una skill del usuario
-  const handleRemove = async (id) => {
-    setIsLoading(true);
-
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
-      const res = await axios.delete(
-        DB_URL +
-          "api/habilidades/usuario/" +
-          localStorage.getItem("id") +
-          "/" +
-          id,
-        config
-      );
-    } catch {
-      console.log("oopsie");
-    }
-
-    setIsLoading(false);
-  };
-
 
   return (
     <GlassCard className={styles.skillsCard}>
@@ -66,9 +29,7 @@ export const ProfileSkills = ({
               <div className={styles.placeholder}>
                 <i className="bi bi-gear-wide-connected"></i>
                 <p>No skills added yet</p>
-                <span>
-                  Add your technical and soft skills to showcase your expertise
-                </span>
+                <span>Add your technical and soft skills to showcase your expertise</span>
               </div>
             ) : (
               <>
@@ -78,27 +39,19 @@ export const ProfileSkills = ({
                     <div className={styles.divider}></div>
                     <div className={styles.skillChipsContainer}>
                       {hardSkills.map((skill, index) => (
-                        <SkillChip
-                          key={`hard-${index}`}
-                          text={skill.nombre}
-                          onRemove={() => handleRemove(skill.idhabilidad)}
-                        />
+                        <SkillChip key={`hard-${skill}-${index}`} text={skill} />
                       ))}
                     </div>
                   </div>
                 )}
-
+                
                 {softSkills.length > 0 && (
                   <div className={styles.skillCategory}>
                     <h3 className={styles.categoryHeader}>Soft Skills</h3>
                     <div className={styles.divider}></div>
                     <div className={styles.skillChipsContainer}>
                       {softSkills.map((skill, index) => (
-                        <SkillChip
-                          key={`hard-${index}`}
-                          text={skill.nombre}
-                          onRemove={() => handleRemove(skill.idhabilidad)}
-                        />
+                        <SkillChip key={`soft-${skill}-${index}`} text={skill} />
                       ))}
                     </div>
                   </div>
