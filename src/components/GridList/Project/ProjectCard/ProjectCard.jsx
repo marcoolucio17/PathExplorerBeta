@@ -62,6 +62,7 @@ const ProjectCard = ({
     }
 
 
+
     //proyecto_rol.nombrerol ||
     return {
       roleName: proyecto_rol.nombrerol || 'Developer',

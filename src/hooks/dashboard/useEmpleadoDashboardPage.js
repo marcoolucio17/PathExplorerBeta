@@ -170,7 +170,7 @@ export const useEmpleadoDashboardPage = () => {
         project,
         proyecto_rol: project.proyecto_roles,
       }));
-    } else if (listPage.activeTab === "Applied To") {
+    } else if (listPage.activeTab === "Applied to") {
       //for applied to tab, flatten roles but keep project structure
       return tabProjects.map((project) => ({
         project: project,
@@ -186,7 +186,7 @@ export const useEmpleadoDashboardPage = () => {
   const isLoading = useMemo(() => {
     if (listPage.activeTab === "All") {
       return dashboardData.projectsLoading;
-    } else if (listPage.activeTab === "Applied To") {
+    } else if (listPage.activeTab === "Applied to") {
       return dashboardData.applyLoading;
     }
     return false;
