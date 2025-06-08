@@ -126,8 +126,6 @@ const useFilters = (data = [], options = {}) => {
     if (!searchTerm) return filterByProject;
 
     const lowerSearchTerm = searchTerm.toLowerCase();
-    console.log('Searching for:', lowerSearchTerm);
-    console.log('Sample item for search:', filterByProject[0]);
 
     const searchResults = filterByProject.filter((item) => {
       if (!item) return false;
@@ -135,36 +133,43 @@ const useFilters = (data = [], options = {}) => {
       let found = false;
       let matchField = '';
 
-      // Check all possible name fields
+      //check all possible name fields
       const possibleNameFields = [nameField, 'nombre', 'name', 'fullName', 'displayName'];
       for (const field of possibleNameFields) {
-        if (item[field] && typeof item[field] === "string" && item[field].toLowerCase().includes(lowerSearchTerm)) {
-          found = true;
-          matchField = field;
-          break;
-        }
-      }
-
-      // Check all possible email fields
-      if (!found) {
-        const possibleEmailFields = [emailField, 'correoelectronico', 'email', 'emailAddress'];
-        for (const field of possibleEmailFields) {
-          if (item[field] && typeof item[field] === "string" && item[field].toLowerCase().includes(lowerSearchTerm)) {
+        if (item[field] && typeof item[field] === "string") {
+          const fieldValue = item[field].toLowerCase();
+          if (fieldValue.includes(lowerSearchTerm)) {
             found = true;
             matchField = field;
             break;
+          } else {
           }
         }
       }
 
-      if (found) {
-        console.log(`Found match in ${matchField}: "${item[matchField]}" for search "${lowerSearchTerm}"`);
+      //check all possible email fields
+      if (!found) {
+        const possibleEmailFields = [emailField, 'correoelectronico', 'email', 'emailAddress'];
+        for (const field of possibleEmailFields) {
+          if (item[field] && typeof item[field] === "string") {
+            const fieldValue = item[field].toLowerCase();
+            if (fieldValue.includes(lowerSearchTerm)) {
+              found = true;
+              matchField = field;
+              break;
+            } else {
+              console.log(`no match in ${field}: "${item[field]}" does not contain "${lowerSearchTerm}"`);
+            }
+          } else {
+            console.log(`field ${field} missing or not string:`, typeof item[field], item[field]);
+          }
+        }
       }
 
       return found;
     });
     
-    console.log('Search results:', searchResults.length, 'out of', filterByProject.length);
+    
     return searchResults;
   }, [filterByProject, searchTerm, nameField, emailField]);
 

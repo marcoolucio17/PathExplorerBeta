@@ -10,6 +10,7 @@ import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
 import { ClientsModal } from "../../../components/Modals/ClientsModal";
 import { RolesModal } from "../../../components/Modals/RolesModal";
+import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 
@@ -60,6 +61,7 @@ export const EmpleadoDashboardPage = () => {
               userSkills={dashboardPage.userSkills}
               onClearFilters={dashboardPage.handleClearFilters}
               isLoading={dashboardPage.isLoading}
+              onViewApplication={dashboardPage.handleViewApplication}
             />
           </CustomScrollbar>
         </div>
@@ -84,6 +86,13 @@ export const EmpleadoDashboardPage = () => {
         onClose={() => dashboardPage.closeModal('rolesFilter')}
         onRoleSelected={dashboardPage.handleApplyRoleFilters}
         roles={dashboardPage.roles}
+      />
+      <ViewApplicationModal
+        isOpen={dashboardPage.modals.viewApplication}
+        onClose={dashboardPage.handleCloseViewApplication}
+        applicant={dashboardPage.transformApplicationData(dashboardPage.selectedApplication)}
+        readOnly={true}
+        messageOnly={true}
       />
     </div>
   );

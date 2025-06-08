@@ -1,28 +1,107 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useFetch } from '../useFetch';
-import useListPage from '../useListPage';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import useModalControl from '../useModalControl';
 import useToggleState from '../useToggleState';
 
 /**
- * users dashboard hook
+ * users dashboard hook - now with backend search like projects
  * tabs: "all employees"
  * 
  * @returns {Object} complete state and functions for the users dashboard page
  */
 export const useUsersDashboardPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchFromURL = searchParams.get("search") || "";
   
-  const { data: usuarios, loading: isLoading, error } = useFetch("usuarios/total");
+  const [searchTerm, setSearchTerm] = useState(searchFromURL);
+  const [usuarios, setUsuarios] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [viewMode, setViewMode] = useState('grid');
+  const [sortOption, setSortOption] = useState('name_asc');
   
+  //filter options for backend
+  const [filterOptions, setFilterOptions] = useState({});
+  
+  //update url when search term changes
   useEffect(() => {
-    if (usuarios && usuarios.length > 0) {
-      console.log("users data from backend:", usuarios);
-      console.log("first user structure:", usuarios[0]);
-      console.log("user keys:", Object.keys(usuarios[0]));
+    if (searchTerm) {
+      const params = new URLSearchParams(location.search);
+      params.set("search", searchTerm);
+      handleApplyNameFilter(searchTerm);
+      navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    } else if (searchFromURL) {
+      const params = new URLSearchParams(location.search);
+      params.delete("search");
+      handleApplyNameFilter();
+      navigate(
+        `${location.pathname}${
+          params.toString() ? `?${params.toString()}` : ""
+        }`,
+        { replace: true }
+      );
     }
-  }, [usuarios]);
+  }, [searchTerm, navigate, location.pathname, location.search, searchFromURL]);
+
+  //handle search filtering - similar to projects
+  const handleApplyNameFilter = (searchName) => {
+    if (searchName && searchName.trim() !== "") {
+      setFilterOptions((prev) => ({ ...prev, nombre: searchName.trim() }));
+    } else {
+      const { nombre, ...rest } = filterOptions;
+      setFilterOptions(rest);
+    }
+  };
+
+  //fetch users with backend filtering
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      try {
+        const url = "https://pathexplorer-backend.onrender.com/api";
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          params: filterOptions,
+        };
+        
+        console.log("=== FETCHING USERS WITH BACKEND SEARCH ===");
+        console.log("Search term:", searchTerm);
+        console.log("Filter options:", filterOptions);
+        console.log("Request config:", config);
+        console.log("Full API URL:", `${url}/usuarios/total`);
+        console.log("Query parameters that will be sent:", config.params);
+        
+        const { data } = await axios.get(`${url}/usuarios/total`, config);
+        
+        console.log("=== API RESPONSE ===");
+        console.log("Users returned from backend:", data);
+        console.log("Users count:", data?.length);
+        console.log("Search term was:", searchTerm);
+        console.log("Expected: should be filtered by nombre =", filterOptions.nombre);
+        
+        if (data && data.length > 0) {
+          console.log("First user structure:", data[0]);
+          console.log("User keys:", Object.keys(data[0]));
+          console.log("All user names returned:", data.map(u => u.nombre));
+        }
+        
+        setUsuarios(data || []);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUsers();
+  }, [filterOptions]);
   
   const tabNames = ['All Employees'];
   
@@ -40,25 +119,6 @@ export const useUsersDashboardPage = () => {
     state: showCompatibility,
     toggle: toggleCompatibility 
   } = useToggleState(false);
-  
-
-  const listPage = useListPage({
-    data: usuarios || [],
-    defaultSortOption: 'name_asc',
-    defaultViewMode: 'grid',
-    tabConfig: { 
-      defaultTab: 'All Employees', 
-      tabNameField: 'status',
-      singleTab: true
-    },
-    filterConfig: {
-      roleField: 'tipo',
-      nameField: 'nombre', 
-      emailField: 'correoelectronico'
-    },
-    sortFunction: sortUsers,
-    baseUrl: '/employee-dashboard'
-  });
 
   function sortUsers(users, sortOption) {
     if (!users || users.length === 0) return [];
@@ -84,20 +144,8 @@ export const useUsersDashboardPage = () => {
   }
 
   const toggleViewMode = useCallback(() => {
-    listPage.toggleViewMode();
-    
-    setTimeout(() => {
-      if (listPage.resetAnimation) {
-        listPage.resetAnimation();
-      }
-      
-      setTimeout(() => {
-        if (listPage.triggerAnimationSequence) {
-          listPage.triggerAnimationSequence();
-        }
-      }, 50);
-    }, 50);
-  }, [listPage]);
+    setViewMode(prev => prev === 'grid' ? 'list' : 'grid');
+  }, []);
   
   const toggleSkillsFilterModal = () => {
     toggleModal('skillsFilter');
@@ -109,62 +157,79 @@ export const useUsersDashboardPage = () => {
 
   const handleApplyRoleFilters = (roles) => {
     console.log('Applying role filters:', roles);
-    if (listPage.filterStates.setSelectedRoles) {
-      listPage.filterStates.setSelectedRoles(roles);
-    }
-  };
-  
-  const getTabUsers = () => {
-    return listPage.filteredData || usuarios || [];
+    //implement role filtering if needed
   };
   
   const getActiveFilters = () => {
     const filters = {};
     
-    if (listPage.filterStates.selectedRoles && listPage.filterStates.selectedRoles.length > 0) {
-      filters.roles = {
-        label: 'Role',
-        values: listPage.filterStates.selectedRoles
-      };
-    }
+    //add active filters here if needed
     
     return filters;
   };
   
   const handleRemoveFilter = (filterType, value) => {
-    if (filterType === 'roles' && listPage.filterStates.setSelectedRoles) {
-      const currentRoles = listPage.filterStates.selectedRoles || [];
-      const newRoles = currentRoles.filter(role => role !== value);
-      listPage.filterStates.setSelectedRoles(newRoles);
-    }
+    //implement filter removal if needed
   };
   
   const handleClearFilters = () => {
     console.log('Clearing all filters');
-    if (listPage.filterStates.setSelectedRoles) {
-      listPage.filterStates.setSelectedRoles([]);
-    }
-    listPage.handleClearFilters();
+    setSearchTerm("");
   };
   
-  const displayUsers = getTabUsers();
+  //sort and filter the users (fallback if backend doesn't filter)
+  const filteredAndSortedUsers = useMemo(() => {
+    let filtered = usuarios;
+    
+    //if we have a search term but backend returned all users, filter on frontend
+    if (searchTerm && searchTerm.trim() && usuarios.length > 0) {
+      const lowerSearch = searchTerm.toLowerCase().trim();
+      console.log("=== FRONTEND FILTERING FALLBACK ===");
+      console.log("Filtering frontend for:", lowerSearch);
+      
+      filtered = usuarios.filter(user => {
+        const nombre = (user.nombre || '').toLowerCase();
+        const email = (user.correoelectronico || '').toLowerCase();
+        const matches = nombre.includes(lowerSearch) || email.includes(lowerSearch);
+        
+        if (matches) {
+          console.log(`✓ MATCH: ${user.nombre} (${user.correoelectronico})`);
+        }
+        
+        return matches;
+      });
+      
+      console.log(`Frontend filtered: ${filtered.length} out of ${usuarios.length} users`);
+      console.log("=====================================");
+    }
+    
+    //sort the filtered results
+    return sortUsers(filtered, sortOption);
+  }, [usuarios, sortOption, searchTerm]);
   
   const tabCounts = useMemo(() => {
-    return { 'All Employees': usuarios?.length || 0 }; 
-  }, [usuarios]);
-
-  useEffect(() => {
-    console.log('Current search term:', listPage.searchTerm);
-    console.log('Selected roles:', listPage.filterStates?.selectedRoles);
-    console.log('Filtered data length:', displayUsers?.length);
-  }, [listPage.searchTerm, listPage.filterStates?.selectedRoles, displayUsers]);
+    return { 'All Employees': filteredAndSortedUsers?.length || 0 }; 
+  }, [filteredAndSortedUsers]);
 
   return {
-    ...listPage,
-    displayProjects: displayUsers, 
+    //states
+    viewMode,
+    searchTerm,
+    activeTab: 'All Employees',
+    sortOption,
+    isLoading,
+    
+    //data
+    displayProjects: filteredAndSortedUsers, //keeping this name for compatibility 
     usuarios,
     tabNames,
-    activeTab: 'All Employees',
+    tabCounts,
+    
+    //functions
+    setViewMode,
+    toggleViewMode,
+    setSortOption,
+    setSearchTerm,
     setActiveTab: () => {}, 
     showCompatibility,
     toggleCompatibility,
@@ -177,13 +242,16 @@ export const useUsersDashboardPage = () => {
     handleRemoveFilter,
     handleClearFilters,
     handleApplyRoleFilters,
-    toggleViewMode,
-    tabCounts,
-    isLoading,
     error,
     userSkills: [],
     selectedSkillFilters: [], 
-    calculateMatchPercentage: () => 0 
+    calculateMatchPercentage: () => 0,
+    
+    //filter states for compatibility
+    filterStates: {
+      selectedRoles: [],
+      setSelectedRoles: () => {},
+    }
   };
 };
 

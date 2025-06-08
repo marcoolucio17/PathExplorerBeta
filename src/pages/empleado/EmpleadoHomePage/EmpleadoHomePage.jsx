@@ -13,6 +13,7 @@ import useEmpleadoDashboardPage from "src/hooks/dashboard/useEmpleadoDashboardPa
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 import CustomScrollbar from "src/components/CustomScrollbar";
 import { ProjectList } from "src/components/GridList/Project";
+import useGetFetch from "src/hooks/useGetFetch";
 
 const hardcodedSkillsData = {
   message: "Habilidades conseguidas fácilmente",
@@ -32,18 +33,6 @@ export const EmpleadoHomePage = () => {
     "usuario/" + localStorage.getItem("id")
   );
 
-  const {data1, loading1, error1} = useFetch(
-    "habilidades/top/5"
-  )
-
-  if (loading1) return <p>Loading skills...</p>;
-  if (error1) return <p>Error loading skills: {error1.message}</p>;
-
-  console.log(data1);
-
-  const handleApplyToProject = (projectId) => {
-    console.log(`Applying to project ${projectId}`);
-  };
 
   const userRole = localStorage.getItem("role");
 
@@ -65,12 +54,6 @@ export const EmpleadoHomePage = () => {
           },
           {
             id: 3,
-            icon: "bi-kanban",
-            title: "My Projects Overview",
-            path: "/manager/projects"
-          },
-          {
-            id: 4,
             icon: "bi-people-fill",
             title: "Employees Dashboard",
             path: "/manager/employee-dashboard"
@@ -92,12 +75,6 @@ export const EmpleadoHomePage = () => {
           },
           {
             id: 3,
-            icon: "bi-kanban",
-            title: "My Project",
-            path: "/empleado/proyectos"
-          },
-          {
-            id: 4,
             icon: "bi-people-fill",
             title: "Employees Dashboard",
             path: "/empleado/employee-dashboard"
@@ -153,6 +130,11 @@ export const EmpleadoHomePage = () => {
   const quickActions = getQuickActionsByRole(userRole);
 
   const dashboardPage = useEmpleadoDashboardPage();
+
+  const {data: data1, loading: loading1, error: error1} = useFetch(
+    "habilidades/top/5"
+  );
+  console.log("datos:", data1);
   
   return (
     <>
@@ -191,7 +173,7 @@ export const EmpleadoHomePage = () => {
                   Based on your profile, you'd be a great fit for these projects:
                 </h3>
                 
-                <div className="empleado-home-cards" style={{ display: 'block', width: '100%' }}>
+                <div className="empleado-home-cards" style={{ display: 'block', width: '100%'}}>
                   <ProjectList 
                     projects={dashboardPage.topProjects}
                     viewMode={dashboardPage.viewMode}
@@ -211,27 +193,26 @@ export const EmpleadoHomePage = () => {
             <GlassCard className={pageStyles.sidebarCard}>
               <h2 className={pageStyles.sectionTitle}>Quick Actions</h2>
               <div className={quickActionsStyles.actionsContainer}>
-                {quickActions.map((action) => (
-                  <div key={action.id} className={quickActionsStyles.actionItem}>
-                    <div className={quickActionsStyles.actionInfo}>
-                      <i className={`${action.icon} ${quickActionsStyles.actionIcon}`} />
-                      <span className={quickActionsStyles.actionTitle}>{action.title}</span>
-                    </div>
-                    <button
-                      onClick={() => navigate(action.path)}
-                      className={quickActionsStyles.actionButton}
-                    >
-                      <i className="bi bi-arrow-right-circle-fill" />
-                    </button>
+              {quickActions.map((action) => (
+                <button
+                  key={action.id}
+                  onClick={() => navigate(action.path)}
+                  className={quickActionsStyles.actionItem} // Make the entire item the button
+                >
+                  <div className={quickActionsStyles.actionInfo}>
+                    <i className={`${action.icon} ${quickActionsStyles.actionIcon}`} />
+                    <span className={quickActionsStyles.actionTitle}>{action.title}</span>
                   </div>
-                ))}
+                  <i className="bi bi-arrow-right-circle-fill" />
+                </button>
+              ))}
               </div>
             </GlassCard>
 
             <div className={pageStyles.trendsContainer}>
               <TrendsCard 
                 className={pageStyles.sidebarSection}
-                data={hardcodedSkillsData.result} 
+                data={data1.result} 
               />
             </div>
           </div>

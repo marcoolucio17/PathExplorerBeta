@@ -574,3 +574,18 @@
 .mt-4 {
   margin-top: 2rem;
 }
+
+.login-error-alert {
+    background: rgba(255, 107, 107, 0.1) !important;
+    border: 1px solid rgba(255, 107, 107, 0.3) !important;
+    border-radius: 12px !important;
+    color: #ff6b6b !important;
+    text-align: center;
+    padding: 1rem;
+    margin: 0;
+    font-family: 'Graphik Regular', sans-serif !important;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    animation: errorSlideIn 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+}
