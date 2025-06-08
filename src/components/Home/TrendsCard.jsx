@@ -3,6 +3,7 @@ import { GlassCard } from "../shared/GlassCard";
 import { SkillChip } from "../SkillChip";
 import CustomScrollbar from "../CustomScrollbar";
 import styles from "/src/components/Profile/ProfileSkills.module.css";
+import certStyles from "src/components/Profile/ProfileCertificates.module.css";
 
 /**
  * ProfileSkills component for displaying skills with categories
@@ -12,6 +13,23 @@ import styles from "/src/components/Profile/ProfileSkills.module.css";
  */
 export const TrendsCard = ({ data, onSkillsClick }) => {
   const skills = Array.isArray(data) ? data : [];  const hasNoSkills = skills.length === 0 ;
+
+  const certsWithImages = [
+    {
+      id: 3,
+      title: "Agile Methodology Explorer",
+      issuer: "IBM Skillsbuild",
+      img: "/images/ibmskillsbuild.png",
+      alt: "Certificate for Agile Methodology Explorer",
+    },
+    {
+      id: 4, 
+      title: "Javascript for Beginners",
+      issuer: "JS Institute",
+      img: "/images/jscert.png",
+      alt: "Certificate for Javascript Development",
+    }
+  ];
 
   console.log("Raw data:", data);
   console.log("skills:", Array.isArray(data?.result) ? data.result : []);
@@ -44,8 +62,38 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
                   </div>
                 )}
               </>
+              
             )}
           </div>
+          <br></br>
+          <h3 className={styles.categoryHeader}>Most Popular Certificates</h3>
+          <div className={styles.divider}></div>
+          <br></br>
+
+          <div className={certStyles.certificatesContent}>
+            {certsWithImages.length === 0 ? (
+              <div className={certStyles.placeholder}>
+                <i className="bi bi-award"></i>
+                <p>No certificates yet</p>
+                <span>Add your first certificate to showcase your achievements</span>
+              </div>
+            ) : (
+              certsWithImages.map(cert => (
+                <article 
+                  key={cert.id} 
+                  className={certStyles.certificate}
+                  onClick={() => onCertificateClick(cert)}
+                >
+                  <img src={cert.img} alt={cert.alt} />
+                  <div>
+                    <h3>{cert.title}</h3>
+                    <p>by {cert.issuer}</p>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+          
         </CustomScrollbar>
       </div>
     </GlassCard>
