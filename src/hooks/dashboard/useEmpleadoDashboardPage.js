@@ -170,7 +170,7 @@ export const useEmpleadoDashboardPage = () => {
         project,
         proyecto_rol: project.proyecto_roles,
       }));
-    } else if (listPage.activeTab === "Applied To") {
+    } else if (listPage.activeTab === "Applied to") {
       //for applied to tab, flatten roles but keep project structure
       return tabProjects.map((project) => ({
         project: project,
