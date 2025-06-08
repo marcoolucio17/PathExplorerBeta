@@ -39,6 +39,7 @@
 .mainTitle {
   font-size: 2rem;
   font-weight: 700;
+  padding-left: 0.5rem;
   color: white;
   margin: 0;
   font-family: 'Graphik Light', sans-serif;
@@ -418,14 +419,14 @@
   height: 12px;
   border-radius: 50%;
   border: none;
-  background-color: lightgray;
+  background-color: rgba(255, 255, 255, 0.418);
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .dot:hover,
 .active {
-  background-color: #7500C0;
+  background-color: #ffffff;
 }
 
 

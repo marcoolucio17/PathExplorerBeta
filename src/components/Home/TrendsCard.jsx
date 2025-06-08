@@ -4,6 +4,7 @@ import { SkillChip } from "../SkillChip";
 import CustomScrollbar from "../CustomScrollbar";
 import styles from "/src/components/Profile/ProfileSkills.module.css";
 import certStyles from "src/components/Profile/ProfileCertificates.module.css";
+import "src/index.css";
 import DoughnutChart from "../shared/Doughnut/DoughnutChart";
 
 /**
@@ -36,7 +37,7 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
   return (
     <GlassCard className={styles.skillsCard}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Trends</h2>
+        <h2 className="sectionTitle">Trends</h2>
       </div>
       <div className={styles.skillsScrollContainer}>
         <CustomScrollbar fadeBackground="transparent" fadeHeight={40}>
@@ -53,7 +54,7 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
               <>
                 {/* {skills.length > 0 && (
                   <div className={styles.skillCategory}>
-                    <h3 className={styles.categoryHeader}>Most Popular Skills</h3>
+                    <h3 className="subtitle">Most Popular Skills</h3>
                     <div className={styles.divider}></div>
                     <div className={styles.skillChipsContainer}>
                       {skills.map((skill, index) => (
@@ -67,7 +68,7 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
             )}
           </div>
           <br></br>
-          <h3 className={styles.categoryHeader}>Most Popular Certificates</h3>
+          <h3 className="subtitle">Most Popular Certificates</h3>
           <div className={styles.divider}></div>
           <br></br>
 

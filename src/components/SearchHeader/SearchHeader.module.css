@@ -368,6 +368,7 @@
   padding: 12px 16px;
   cursor: pointer;
   transition: background 0.2s ease;
+  font-family: 'Graphik Light', -apple-system, BlinkMacSystemFont, sans-serif;
   color: #fff;
 }
 
@@ -403,4 +404,36 @@
     padding: 0.2rem 0.4rem 0.2rem 0.6rem;
     height: 24px;
   }
+}
+
+/* placeholder color styling for white text */
+.searchInput::placeholder {
+  color: #ffffff !important;
+  opacity: 0.7;
+}
+
+.searchInput::-webkit-input-placeholder {
+  color: #ffffff !important;
+  opacity: 0.7;
+}
+
+.searchInput::-moz-placeholder {
+  color: #ffffff !important;
+  opacity: 0.7;
+}
+
+/* navbar search input placeholder */
+.inSearchBarInput::placeholder {
+  color: #ffffff !important;
+  opacity: 0.8;
+}
+
+.inSearchBarInput::-webkit-input-placeholder {
+  color: #ffffff !important;
+  opacity: 0.8;
+}
+
+.inSearchBarInput::-moz-placeholder {
+  color: #ffffff !important;
+  opacity: 0.8;
 }
