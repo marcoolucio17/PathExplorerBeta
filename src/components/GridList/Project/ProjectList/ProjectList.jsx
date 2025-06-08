@@ -184,6 +184,7 @@ const ProjectList = ({
           );
         } else if (isApplyCard && !isProjectCard) {
           // For applied to cards, we only have the project object
+          console.log("isApplyCard", item);
           const applicationId = item.project.idaplicacion || index;
           const roleId = item.project.roles?.idrol || 'unknown';
           return (
