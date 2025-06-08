@@ -100,14 +100,29 @@ export const SearchHeader = ({
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowResults(false);
+        setIsFocused(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    if (showResults) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [showResults]);
+
+  // Function to handle search result click - closes dropdown
+  const handleSearchResultClick = (searchValue, category) => {
+    // Close the dropdown first
+    setShowResults(false);
+    setIsFocused(false);
+    
+    // Then call the original handler
+    if (onSearchResultClick) {
+      onSearchResultClick(searchValue, category);
+    }
+  };
 
   // Function to render the appropriate icon
   const renderIcon = (iconType) => {
@@ -169,6 +184,11 @@ export const SearchHeader = ({
               if (inSearchBar && searchTerm.length > 0) {
                 setShowResults(true);
               }
+              // Close dropdown when escape is pressed
+              if (e.key === 'Escape') {
+                setShowResults(false);
+                setIsFocused(false);
+              }
             }}
           />
 
@@ -180,7 +200,7 @@ export const SearchHeader = ({
                 <div
                   key={category.key}
                   className={styles.searchResultItem}
-                  onClick={() => onSearchResultClick(searchTerm, category.key)}
+                  onClick={() => handleSearchResultClick(searchTerm, category.key)}
                 >
                   <div className={styles.iconWrapper}>
                     {renderIcon(category.icon)}

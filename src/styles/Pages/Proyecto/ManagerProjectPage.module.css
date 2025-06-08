@@ -59,7 +59,7 @@
 
 .titleContainer {
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
   width: 100%;
 }
 
@@ -151,6 +151,30 @@
   font-family: 'Graphik Light', sans-serif;
 }
 
+.deliverablesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.deliverablesList li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-family: 'Graphik Light', sans-serif;
+}
+
+.checkmarkIcon {
+  color: var(--success-color, #22c55e);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
 /* Action buttons */
 .projectActions {
   display: flex;
@@ -182,10 +206,16 @@
   box-sizing: border-box;
 }
 
-/* Team members section (full height) */
+/* Team members section (equal height) */
 .sidebarSection:first-child {
   flex: 1;
   z-index: 20;
+}
+
+/* Available roles section (equal height) */
+.sidebarSection:last-child {
+  flex: 1;
+  z-index: 10;
 }
 
 /* Responsive styles */

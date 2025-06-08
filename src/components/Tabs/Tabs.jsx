@@ -37,7 +37,7 @@ const Tabs = ({
     if (activeTabIndex === -1 || !tabRefs.current[activeTabIndex]) return;
     
     const activeTabElement = tabRefs.current[activeTabIndex];
-    
+
     // Calculate position based on active tab
     const { offsetLeft, offsetWidth } = activeTabElement;
     
@@ -46,7 +46,7 @@ const Tabs = ({
       width: `${offsetWidth}px`
     });
   }, [activeTab, tabs, isObjectTabs]);
-  
+
   // Initialize refs array when tabs change
   useEffect(() => {
     tabRefs.current = tabRefs.current.slice(0, tabs.length);

@@ -8,6 +8,9 @@ import useEmpleadoDashboardHeaderConfig from '../../../hooks/dashboard/useEmplea
 import ProjectList from '../../../components/GridList/Project/ProjectList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
+import { ClientsModal } from "../../../components/Modals/ClientsModal";
+import { RolesModal } from "../../../components/Modals/RolesModal";
+import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 
@@ -49,14 +52,15 @@ export const EmpleadoDashboardPage = () => {
         <div className={styles.cardsContainer}>
           <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
             <ProjectList 
+              tabSelected={dashboardPage.activeTab}
               projects={dashboardPage.displayProjects}
               viewMode={dashboardPage.viewMode}
               showCompatibility={dashboardPage.showCompatibility}
               selectedSkillFilters={dashboardPage.selectedSkillFilters}
               userSkills={dashboardPage.userSkills}
-              calculateMatchPercentage={dashboardPage.calculateMatchPercentage}
               onClearFilters={dashboardPage.handleClearFilters}
               isLoading={dashboardPage.isLoading}
+              onViewApplication={dashboardPage.handleViewApplication}
             />
           </CustomScrollbar>
         </div>
@@ -68,6 +72,26 @@ export const EmpleadoDashboardPage = () => {
         onClose={() => dashboardPage.closeModal('skillsFilter')}
         userSkills={dashboardPage.selectedSkillFilters}
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
+      />
+      <ClientsModal
+        isOpen={dashboardPage.modals.clientsFilter}
+        onClose={() => dashboardPage.closeModal('clientsFilter')}
+        selectedClients={dashboardPage.selectedClientFilters}
+        onClientSelected={dashboardPage.handleApplyClientFilters}
+        clients={dashboardPage.clients}
+      />
+      <RolesModal
+        isOpen={dashboardPage.modals.rolesFilter}
+        onClose={() => dashboardPage.closeModal('rolesFilter')}
+        onRoleSelected={dashboardPage.handleApplyRoleFilters}
+        roles={dashboardPage.roles}
+      />
+      <ViewApplicationModal
+        isOpen={dashboardPage.modals.viewApplication}
+        onClose={dashboardPage.handleCloseViewApplication}
+        applicant={dashboardPage.transformApplicationData(dashboardPage.selectedApplication)}
+        readOnly={true}
+        messageOnly={true}
       />
     </div>
   );

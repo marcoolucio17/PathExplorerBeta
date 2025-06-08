@@ -13,20 +13,18 @@ function formatDateToMonthYear(dateString) {
   return `${month} ${year}`;
 }
 
-const ProfileHeaderCard = ({ user }) => {
-
-  const { data, loading, error } = useFetch(
-    "profile-url/" + localStorage.getItem("id")
-  );
+const ProfileHeaderCard = ({ user, url = "/images/3d_avatar_6.png" }) => {
 
   const userTitle = user.role == "User" ? "Employee" : user.role;
+
+  console.log(url);
 
   return (
     <GlassCard className={styles.profileHeaderCard}>
       <div className={styles.profileHeaderMain}>
         <div className={styles.employeeSection}>
           <img
-            src={ !error ?  data.url : "/images/3d_avatar_6.png"}
+            src={ url }
             alt={`${user.name}`}
             className={styles.avatarXl}
           />

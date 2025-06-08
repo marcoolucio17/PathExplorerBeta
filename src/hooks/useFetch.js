@@ -1,64 +1,52 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+
 /**
- * hook simple para GET con loading, error y data
- * @param {string} ruta
- * @returns data, loading & error
+ * Hook simple para GET con loading, error y data
+ * @param {string} ruta - Parte final de la URL (después de /api/)
+ * @returns {Object} - { data, loading, error, refetch }
  */
 export const useFetch = (ruta, body = null) => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    //dont fetch if ruta is null or undefined
+  const fetchData = useCallback(async () => {
     if (!ruta) {
       setLoading(false);
       return;
     }
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      
-      let url = `https://pathexplorer-backend.onrender.com/api/${ruta}`;
+    setLoading(true);
+    setError(null);
+
+    const url = `https://pathexplorer-backend.onrender.com/api/${ruta}`;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+
     try {
       let response;
-      const config = {
-        headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
       if (body && typeof body === "string") {
         response = await axios.get(url, body, config);
       } else {
         response = await axios.get(url, config);
       }
       setData(response.data);
-      setLoading(false);
-    } catch (error) {
-      setError(error);
+    } catch (err) {
+      setError(err);
+    } finally {
       setLoading(false);
     }
-      try {
-        let response;
-        const config = {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        };
-      response = await axios.get(url, config);
-        setData(response.data);
-        setLoading(false);
-      } catch (error) {
-        setError(error);
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [ruta]);
+  }, [ruta, body]);
 
-  return { data, error, loading };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, error, loading, refetch: fetchData };
 };
 
 export default useFetch;
