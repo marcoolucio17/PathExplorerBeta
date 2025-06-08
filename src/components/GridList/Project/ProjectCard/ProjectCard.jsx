@@ -38,8 +38,6 @@ const ProjectCard = ({
     }
   };
 
-  console.log("ProjectCard props:", { project });
-
   //stable duration calculation based on project id to prevent fluctuation
   const ensureRoleData = () => {
     if (isProjectCard && !isApplyCard) {
@@ -62,9 +60,7 @@ const ProjectCard = ({
     }
 
 
-    console.log("nombrerol:", project.nombrerol);
-    console.log("projectName:", project.pnombre);
-    console.log("duracionMes:", project.duracionMes);
+
     //proyecto_rol.nombrerol ||
     return {
       roleName: project.nombrerol || 'Developer',

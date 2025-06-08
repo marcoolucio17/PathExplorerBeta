@@ -142,7 +142,7 @@ export const useDashboardData = () => {
     axios
       .get(`${url}/habilidades/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
-        setUserSkills(res.data.data);
+        setUserSkills(res.data.data.map((skill) => skill.nombre));
       })
       .catch((err) => console.error("Error fetching user skills", err));
   }, []);
@@ -173,7 +173,6 @@ export const useDashboardData = () => {
   // Handle the client selection
   const handleApplyClientFilters = (clientName, selectedClientId) => {
     if (clientName && selectedClientId) {
-      console.log("Selected Client:", clientName, selectedClientId);
       setClientNameSelected(clientName);
       setClientId(selectedClientId);
       setFilterOptions((prev) => ({ ...prev, idcliente: selectedClientId }));
@@ -182,7 +181,6 @@ export const useDashboardData = () => {
         idcliente: selectedClientId,
       }));
     } else {
-      console.log("Selected Client:", clientName, selectedClientId);
       setClientNameSelected("Clients");
       setClientId(null);
       const { idcliente, ...rest } = filterOptions;
@@ -203,7 +201,6 @@ export const useDashboardData = () => {
       setRoleNameSelected("Roles");
       setRoleId(null);
       const { nombrerol, ...rest } = filterOptions;
-      console.log("Rest:", rest);
       setFilterOptions(rest);
     }
   };
@@ -242,7 +239,6 @@ export const useDashboardData = () => {
           // Use the project name when in "My Projects" tab
           return sorted.sort((a, b) => a.pnombre.localeCompare(b.pnombre));
         }
-
       case "name_desc":
         // Sort by name descending
         if (activeTab !== "My Projects") {

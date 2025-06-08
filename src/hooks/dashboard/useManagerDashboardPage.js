@@ -176,17 +176,16 @@ export const useManagerDashboardPage = () => {
         borderColor: "rgba(0, 123, 255, 0.5)",
       };
     }
-    if (listPage.activeTab === "All") {
-      // Check if a role is selected
-      if (dashboardData.roleNameSelected !== "Roles") {
-        filters.roles = {
-          label: "Role",
-          values: [dashboardData.roleNameSelected],
-          color: "rgba(0, 123, 255, 0.2)",
-          borderColor: "rgba(0, 123, 255, 0.5)",
-        };
-      }
+    // Check if a role is selected
+    if (dashboardData.roleNameSelected !== "Roles") {
+      filters.roles = {
+        label: "Role",
+        values: [dashboardData.roleNameSelected],
+        color: "rgba(0, 123, 255, 0.2)",
+        borderColor: "rgba(0, 123, 255, 0.5)",
+      };
     }
+    
     return filters;
   }, [
     dashboardData.selectedSkillFilters,
