@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styles from "src/styles/Modals/Modal.module.css";
 import modalStyles from "./EditObjectivesModal.module.css";
+import Spinner from "react-bootstrap/Spinner";
+import Placeholder from "react-bootstrap/Placeholder";
+import { Card } from "react-bootstrap";
 
 import axios from "axios";
 
@@ -183,7 +186,6 @@ export const EditObjectivesModal = ({
     }
   };
 
-
   const handleCancel = () => {
     //resetForm();
     setEditingIndex(null);
@@ -283,8 +285,9 @@ export const EditObjectivesModal = ({
               {objectivesList.map((obj, index) => (
                 <div
                   key={obj.id}
-                  className={`${modalStyles.objectiveItem} ${editingIndex === index ? modalStyles.editing : ""
-                    } ${obj.completed ? modalStyles.completed : ""}`}
+                  className={`${modalStyles.objectiveItem} ${
+                    editingIndex === index ? modalStyles.editing : ""
+                  } ${obj.completed ? modalStyles.completed : ""}`}
                 >
                   <div className={modalStyles.objectiveInfo}>
                     <div className={modalStyles.objectiveHeader}>
@@ -351,21 +354,27 @@ export const EditObjectivesModal = ({
 
               <div className={styles.formGroup}>
                 <label htmlFor="description">Description *</label>
-                <button
-                  type="button"
-                  onClick={handleEnhance}
-                  className={styles.primaryButton}
-                >
-                  Enhance Description
-                </button>
+
                 <textarea
-                  id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Complete the self-assessment and gather feedback from peers and supervisors..."
-                  rows="3"
+                  className={modalStyles.textarea}
+                  placeholder="Describe your objective"
                 />
+
+                <button
+                  type="button"
+                  onClick={handleEnhance}
+                  className={modalStyles.generateButton}
+                >
+                  Enhance with AI ✨
+                  {isLoading && (
+                    <Spinner animation="border" role="status" size="sm">
+                      <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                  )}
+                </button>
               </div>
 
               <div className={styles.formGrid}>

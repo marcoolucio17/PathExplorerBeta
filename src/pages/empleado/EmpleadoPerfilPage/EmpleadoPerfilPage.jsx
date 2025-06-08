@@ -36,11 +36,16 @@ import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
  * Profile page component for Employee role
  */
 export const EmpleadoPerfilPage = () => {
-  // Use the custom hook to handle all logic
-  const profilePage = useProfilePage();
+  // this is for triggering reloads from modals
+  const [load, setLoad] = useState(false);
 
+  // Use the custom hook to handle all logic
+  const profilePage = useProfilePage(load);
+
+  const skills = [...profilePage.categorizedSkills["softSkills"], ...profilePage.categorizedSkills["hardSkills"]];
+  
   //loading state
-  if (profilePage.loading || profilePage.isLoading || profilePage.pic == null) {
+  if (profilePage.isLoading) {
 
     return (
       <LoadingSpinner 
@@ -184,6 +189,7 @@ export const EmpleadoPerfilPage = () => {
             className={styles.sidebarSection}
             categorizedSkills={profilePage.categorizedSkills}
             onSkillsClick={profilePage.handleSkillsClick}
+            setIsLoading = {setLoad}
           />
 
           <ProfileCertificates
@@ -214,6 +220,8 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('skills')}
         userSkills={profilePage.userSkills}
         onUpdateSkills={profilePage.handleUpdateSkills}
+        disabledSkills={skills}
+        setLoad={setLoad}
       />
 
       <AddCertificateModal

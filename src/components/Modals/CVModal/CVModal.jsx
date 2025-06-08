@@ -218,11 +218,11 @@ const handleDownload = async () => {
 
           <button
             onClick={handleCVUploadWithAI}
-            className={styles.secondaryButton}
+            className={styles.generateButton}
             disabled={isLoading2}
           >
             <i className="bi bi-upload"></i>
-            Upload New With AI
+            Upload New With AI ✨
             {isLoading2 && (
             <Spinner
               animation="border"

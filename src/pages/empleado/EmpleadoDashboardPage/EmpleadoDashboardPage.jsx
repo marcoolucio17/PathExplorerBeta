@@ -24,6 +24,7 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 export const EmpleadoDashboardPage = () => {
   // Use the employee-specific dashboard hook
   const dashboardPage = useEmpleadoDashboardPage();
+
   
   // Get employee-specific header configuration (excludes manager buttons)
   const headerProps = useEmpleadoDashboardHeaderConfig(dashboardPage);

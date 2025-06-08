@@ -134,7 +134,6 @@ export const EmpleadoHomePage = () => {
   const {data: data1, loading: loading1, error: error1} = useFetch(
     "habilidades/top/5"
   );
-  console.log("datos:", data1);
   
   return (
     <>

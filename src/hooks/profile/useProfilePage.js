@@ -42,7 +42,7 @@ function transformBackendUser(user, projects) {
   newuser.avatarUrl =
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/sign/fotos-perfil/foto-15-1748207570840.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzFkNDY3ZWNhLTk2NDgtNGRjYy05YTQyLTJhMzQyNWZmM2VhMCJ9.eyJ1cmwiOiJmb3Rvcy1wZXJmaWwvZm90by0xNS0xNzQ4MjA3NTcwODQwLmpwZyIsImlhdCI6MTc0ODI5MTkyNywiZXhwIjoxNzc5ODI3OTI3fQ.gi_C6RcvsXN_fKFsLZHFZ8cAwQ065_8AjUxnZA-ecIU";
 
-  if (typeof projects.length > 0) {
+  if (projects.length > 0) {
     newuser.pnombre = projects[0].proyecto.pnombre || "Staff";
     newuser.finicio = projects[0].fechainicio || "-";
     newuser.fechafin = projects[0].fechafin || "-";
@@ -150,15 +150,25 @@ function transformBackendSkils(skills) {
   if (!skills) return res;
 
   skills.forEach((skill) => {
-    if (skill.habilidades.estecnica === true) {
-      res.hardSkills.push(skill.habilidades.nombre);
+    const { nombre, idhabilidad, estecnica } = skill.habilidades;
+
+    const skillEntry = {
+      nombre,
+      idhabilidad,
+    };
+
+    if (estecnica === true) {
+      res.hardSkills.push(skillEntry);
     } else {
-      res.softSkills.push(skill.habilidades.nombre);
+      res.softSkills.push(skillEntry);
     }
   });
 
+  console.log(res);
+
   return res;
 }
+
 
 // the name doesn't come formatted so i need to apply this function
 export function formatName(name) {
@@ -180,13 +190,10 @@ export function formatName(name) {
  *
  * @returns {Object} Complete state and functions for the Profile page
  */
-export const useProfilePage = () => {
+export const useProfilePage = ( load = false ) => {
   const navigate = useNavigate();
 
-  // api stuff needed for the page
-  const { data, error, loading } = useFetch(
-    "usuario/" + localStorage.getItem("id")
-  );
+  const [data, setData] = useState({});
 
   // aquí guardamos la pic
   const [ pic, setPic ] = useState(null);
@@ -216,7 +223,7 @@ export const useProfilePage = () => {
   // hacemos el fetch de la pp (haría perfil de una aquí también pero ya se realiza secuencialmente en useProfile)
   useEffect(() => {
     const fetch = async () => {
-      setIsLoading(true);
+      //setIsLoading(true);
       try {
         const config = {
           headers: {
@@ -229,12 +236,35 @@ export const useProfilePage = () => {
         );
         setPic(data.data.url);
       } catch (err) {
+        //console.error("Error fetching my applications", err);
+        setPic('/images/3d_avatar_6.png')
+      }
+      //setIsLoading(false);
+    };
+
+    const fetchData = async () => {
+      //setIsLoading(true);
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        };
+        const data  = await axios.get(
+          DB_URL + "api/usuario/" + localStorage.getItem("id"),
+          config
+        );
+        setData(data.data);
+      } catch (err) {
         console.error("Error fetching my applications", err);
       }
       setIsLoading(false);
     };
+
     fetch();
-  }, []);
+    fetchData();
+
+  }, [load]);
 
   // User profile data
   const userProfile = transformBackendUser(data.user, data.proyectos);
@@ -390,8 +420,8 @@ export const useProfilePage = () => {
     setSearchTerm,
 
     // Loading state
-    loading,
     isLoading,
+    setIsLoading,
 
     // Modal state
     modals,

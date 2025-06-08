@@ -4,15 +4,17 @@ import { SkillChip } from "../SkillChip";
 import CustomScrollbar from "../CustomScrollbar";
 import styles from "/src/components/Profile/ProfileSkills.module.css";
 import certStyles from "src/components/Profile/ProfileCertificates.module.css";
+import DoughnutChart from "../shared/Doughnut/DoughnutChart";
 
 /**
  * ProfileSkills component for displaying skills with categories
- * @param {Object} data 
+ * @param {Object} data
  * @param {Function} onSkillsClick - Function to handle skills button click
  * @returns {JSX.Element}
  */
 export const TrendsCard = ({ data, onSkillsClick }) => {
-  const skills = Array.isArray(data) ? data : [];  const hasNoSkills = skills.length === 0 ;
+  const skills = Array.isArray(data) ? data : [];
+  const hasNoSkills = skills.length === 0;
 
   const certsWithImages = [
     {
@@ -23,16 +25,13 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
       alt: "Certificate for Agile Methodology Explorer",
     },
     {
-      id: 4, 
+      id: 4,
       title: "Javascript for Beginners",
       issuer: "JS Institute",
       img: "/images/jscert.png",
       alt: "Certificate for Javascript Development",
-    }
+    },
   ];
-
-  console.log("Raw data:", data);
-  console.log("skills:", Array.isArray(data?.result) ? data.result : []);
 
   return (
     <GlassCard className={styles.skillsCard}>
@@ -42,6 +41,8 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
       <div className={styles.skillsScrollContainer}>
         <CustomScrollbar fadeBackground="transparent" fadeHeight={40}>
           <div className={styles.skillsContent}>
+            <h3 className={styles.categoryHeader}>Most Popular Skills</h3>
+            <div className={styles.divider}></div>
             {hasNoSkills ? (
               <div className={styles.placeholder}>
                 <i className="bi bi-gear-wide-connected"></i>
@@ -50,7 +51,7 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
               </div>
             ) : (
               <>
-                {skills.length > 0 && (
+                {/* {skills.length > 0 && (
                   <div className={styles.skillCategory}>
                     <h3 className={styles.categoryHeader}>Most Popular Skills</h3>
                     <div className={styles.divider}></div>
@@ -60,9 +61,9 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
                       ))}
                     </div>
                   </div>
-                )}
+                )} */}
+                <DoughnutChart data={data} />
               </>
-              
             )}
           </div>
           <br></br>
@@ -75,12 +76,14 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
               <div className={certStyles.placeholder}>
                 <i className="bi bi-award"></i>
                 <p>No certificates yet</p>
-                <span>Add your first certificate to showcase your achievements</span>
+                <span>
+                  Add your first certificate to showcase your achievements
+                </span>
               </div>
             ) : (
-              certsWithImages.map(cert => (
-                <article 
-                  key={cert.id} 
+              certsWithImages.map((cert) => (
+                <article
+                  key={cert.id}
                   className={certStyles.certificate}
                   onClick={() => onCertificateClick(cert)}
                 >
@@ -93,7 +96,6 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
               ))
             )}
           </div>
-          
         </CustomScrollbar>
       </div>
     </GlassCard>
