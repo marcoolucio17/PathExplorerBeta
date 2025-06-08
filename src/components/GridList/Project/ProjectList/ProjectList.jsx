@@ -188,7 +188,8 @@ const ProjectList = ({
           );
         } else if (isApplyCard && !isProjectCard) {
           // For applied to cards, we only have the project object
-
+          const applicationId = item.applicationId || item.project.applicationId || "unknown";
+          const roleId = item.roleId || item.project.roleId || "unknown";
           return (
             <div key={`${projectId}-${item.idaplicacion}-${item.project.roles.idrol}`} className={styles.item}>
               <ProjectCard
