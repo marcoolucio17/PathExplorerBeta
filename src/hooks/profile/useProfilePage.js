@@ -42,7 +42,7 @@ function transformBackendUser(user, projects) {
   newuser.avatarUrl =
     "https://nxkreheabczqsutrzafn.supabase.co/storage/v1/object/sign/fotos-perfil/foto-15-1748207570840.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzFkNDY3ZWNhLTk2NDgtNGRjYy05YTQyLTJhMzQyNWZmM2VhMCJ9.eyJ1cmwiOiJmb3Rvcy1wZXJmaWwvZm90by0xNS0xNzQ4MjA3NTcwODQwLmpwZyIsImlhdCI6MTc0ODI5MTkyNywiZXhwIjoxNzc5ODI3OTI3fQ.gi_C6RcvsXN_fKFsLZHFZ8cAwQ065_8AjUxnZA-ecIU";
 
-  if (typeof projects.length > 0) {
+  if (projects.length > 0) {
     newuser.pnombre = projects[0].proyecto.pnombre || "Staff";
     newuser.finicio = projects[0].fechainicio || "-";
     newuser.fechafin = projects[0].fechafin || "-";
@@ -150,15 +150,25 @@ function transformBackendSkils(skills) {
   if (!skills) return res;
 
   skills.forEach((skill) => {
-    if (skill.habilidades.estecnica === true) {
-      res.hardSkills.push(skill.habilidades.nombre);
+    const { nombre, idhabilidad, estecnica } = skill.habilidades;
+
+    const skillEntry = {
+      nombre,
+      idhabilidad,
+    };
+
+    if (estecnica === true) {
+      res.hardSkills.push(skillEntry);
     } else {
-      res.softSkills.push(skill.habilidades.nombre);
+      res.softSkills.push(skillEntry);
     }
   });
 
+  console.log(res);
+
   return res;
 }
+
 
 // the name doesn't come formatted so i need to apply this function
 export function formatName(name) {
@@ -180,13 +190,13 @@ export function formatName(name) {
  *
  * @returns {Object} Complete state and functions for the Profile page
  */
-export const useProfilePage = () => {
+export const useProfilePage = ( load = false ) => {
   const navigate = useNavigate();
 
-  // api stuff needed for the page
-  const { data, error, loading } = useFetch(
-    "usuario/" + localStorage.getItem("id")
-  );
+  const [data, setData] = useState({});
+
+  // aquí guardamos la pic
+  const [ pic, setPic ] = useState(null);
 
   // Tab names for the profile page
   const tabNames = ["Contact Information", "Experience", "Objectives"];
@@ -208,7 +218,53 @@ export const useProfilePage = () => {
   const [activeTab, setActiveTab] = useState("Contact Information");
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // hacemos el fetch de la pp (haría perfil de una aquí también pero ya se realiza secuencialmente en useProfile)
+  useEffect(() => {
+    const fetch = async () => {
+      //setIsLoading(true);
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        };
+        const data  = await axios.get(
+          DB_URL + "api/profile-url/" + localStorage.getItem("id"),
+          config
+        );
+        setPic(data.data.url);
+      } catch (err) {
+        //console.error("Error fetching my applications", err);
+        setPic('/images/3d_avatar_6.png')
+      }
+      //setIsLoading(false);
+    };
+
+    const fetchData = async () => {
+      //setIsLoading(true);
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        };
+        const data  = await axios.get(
+          DB_URL + "api/usuario/" + localStorage.getItem("id"),
+          config
+        );
+        setData(data.data);
+      } catch (err) {
+        console.error("Error fetching my applications", err);
+      }
+      setIsLoading(false);
+    };
+
+    fetch();
+    fetchData();
+
+  }, [load]);
 
   // User profile data
   const userProfile = transformBackendUser(data.user, data.proyectos);
@@ -239,6 +295,7 @@ export const useProfilePage = () => {
     // volteamos el status
     let status = obj.completed ? false : true;
 
+    setIsLoading(true);
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -254,6 +311,7 @@ export const useProfilePage = () => {
     );
 
     window.location.reload();
+    setIsLoading(false);
   }, []);
 
   // Handle objective addition
@@ -277,7 +335,7 @@ export const useProfilePage = () => {
     };
     newSkills.forEach(async (skill) => {
       const res = await axios.post(
-        DB_URL + "api/asignar",
+        DB_URL + "api/habilidades/asignar",
         {
           idusuario: localStorage.getItem("id"),
           nombreHabilidad: skill,
@@ -297,6 +355,7 @@ export const useProfilePage = () => {
   const handleRemoveCertificate = useCallback(async (certificateId) => {
     // setUserCertificates(prev => prev.filter(cert => cert.id !== certificateId));
 
+    setIsLoading(true);
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -308,6 +367,7 @@ export const useProfilePage = () => {
     );
 
     window.location.reload();
+    setIsLoading(false);
   }, []);
 
   // Modal handlers
@@ -361,12 +421,16 @@ export const useProfilePage = () => {
 
     // Loading state
     isLoading,
+    setIsLoading,
 
     // Modal state
     modals,
     openModal,
     closeModal,
     selectedCertificate,
+
+    // pic
+    pic,
 
     // Handlers
     handleObjectiveToggle,
@@ -384,4 +448,3 @@ export const useProfilePage = () => {
 };
 
 export default useProfilePage;
-``;

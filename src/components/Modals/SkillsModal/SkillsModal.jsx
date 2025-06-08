@@ -1,56 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import modalStyles from 'src/styles/Modals/Modal.module.css';
-import styles from './SkillsModal.module.css';
+import React, { useState, useEffect } from "react";
+import modalStyles from "src/styles/Modals/Modal.module.css";
+import styles from "./SkillsModal.module.css";
 import { SkillChip } from "src/components/SkillChip";
-import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
+import ModalScrollbar from "src/components/Modals/ModalScrollbar";
 
-// Complete skills data structure from the Excel file
-const SKILLS_DATA = {
-  ".NET Development": ["ASP.NET Core", "Blazor WebAssembly", "C# 12 language features", "Entity Framework Core", "LINQ mastery", "SignalR", "WPF / WinUI 3 desktop apps", ".NET MAUI (cross-platform UI)", ".NET microservices with Dapr", "Azure DevOps pipelines", "Dapper micro-ORM", "Dependency Injection (built-in container)", "gRPC for .NET", "NuGet package management", "Performance profiling (dotTrace)", "Roslyn analyzers & source generators", "Task-based async programming", "Unity / Prism MVVM frameworks", "xUnit / NUnit testing"],
-  "AI / Machine Learning Engineering": ["MLOps", "fine-tuning", "model lifecycle", "responsible AI", "vector DBs"],
-  "AI-Augmented Development Skills": ["AI code review", "prompt engineering", "workflow orchestration"],
-  "API & Integration Design": ["GraphQL", "OpenAPI", "REST", "event streaming Kafka/Pulsar", "gRPC"],
-  "AR/VR & 3-D Programming": ["Unity", "Unreal", "WebXR", "shader programming"],
-  "AWS Cloud Services": ["AWS API Gateway", "AWS CDK (Cloud Development Kit)", "AWS CloudFormation", "AWS DynamoDB", "AWS ECS", "AWS EKS", "AWS Elastic Beanstalk", "AWS Fargate", "AWS Glue", "AWS IAM (Identity & Access Management)", "AWS Lambda", "AWS Step Functions", "AWS VPC design", "Amazon CloudWatch", "Amazon EC2", "Amazon Kinesis", "Amazon RDS", "Amazon S3", "Amazon SNS", "Amazon SQS"],
-  "Blockchain & Smart-Contract Development": ["Hardhat/Foundry", "Solidity", "security audits"],
-  "Cloud & DevOps": ["AWS/Azure/GCP", "CI/CD", "Docker", "IaC", "Kubernetes"],
-  "Collaboration & Product Skills": ["Git mastery", "agile practices", "architectural writing", "code reviews", "communication"],
-  "Core CS Foundations": ["algorithms", "complexity", "data structures", "memory"],
-  "Data & Analytics Tools": ["Amazon Redshift", "Apache Superset", "Azure Synapse Analytics", "Google BigQuery", "Informatica PowerCenter", "Looker / Looker Studio", "Power BI", "Snowflake", "Tableau", "Talend Open Studio", "dbt (Core & Cloud)"],
-  "Data Engineering & Analytics": ["Airflow", "ETL/ELT", "SQL + NoSQL tuning", "Spark/Flink", "data lakes"],
-  "DevOps": ["Ansible", "Argo CD", "GitHub Actions", "GitLab CI/CD", "Helm Charts", "Jenkins", "Packer", "Site Reliability Engineering (SRE)", "Spinnaker", "Terraform Modules & Workspaces"],
-  "Front-End Development": ["Angular", "Angular Material", "Next.js", "React 18", "Redux Toolkit / NgRx", "Tailwind CSS", "TypeScript", "Webpack & Vite"],
-  "Java Development": ["Apache Kafka (Java client)", "GraalVM Native Image", "Gradle", "Hibernate / JPA", "JUnit & Mockito testing", "JVM GC tuning & performance", "Jakarta EE", "Java Flight Recorder", "Maven", "MicroProfile", "Micronaut", "Quarkus", "Reactive Streams (Reactor / RxJava)", "Spring Boot", "Spring Framework"],
-  "Low-/No-Code & RPA": ["Appian", "Mendix", "Power Platform", "UiPath"],
-  "Mobile Development": ["Android Jetpack Compose", "Android Studio", "Combine & Async/Await", "Core Data", "Cross-platform Kotlin Multiplatform", "Flutter", "Hilt & Room", "Kotlin + Jetpack Compose", "Objective-C legacy", "React Native", "SwiftUI", "iOS SwiftUI"],
-  "Multi-language Fluency": ["C/C++", "Go", "Java/Kotlin", "Python", "Rust", "Swift", "TypeScript/JS"],
-  "Observability & Reliability": ["OpenTelemetry", "Prometheus", "SLO/SLA", "incident command", "tracing"],
-  "Performance & Scalability Engineering": ["async/reactive patterns", "caching", "load-balancing"],
-  "Project Management & Agile": ["Confluence Knowledge Bases", "Jira Administration", "Kanban Flow", "OKR Road-mapping", "PMI / PMP framework", "PRINCE2", "Risk & Issue Management", "SAFe 5.0", "Scrum Mastery"],
-  "Quantum & Edge Computing Basics": ["Q#", "Qiskit", "edge orchestration"],
-  "SAP Solutions": ["ABAP OO", "SAP BTP (Business Technology Platform)", "SAP Fiori UX", "SAP HANA modelling", "SAP Integration Suite / PI-PO", "SAP S/4HANA Extensibility", "SAP SuccessFactors", "SAP UI5"],
-  "SQL & Databases": ["Cassandra", "InfluxDB (time-series)", "Microsoft SQL Server", "MongoDB", "MySQL / MariaDB", "Neo4j", "Oracle Database", "PostgreSQL", "Redis", "SQLite"],
-  "Security & DevSecOps": ["IAM", "OWASP", "SAST/DAST", "SBOM", "threat modeling", "zero-trust"],
-  "Soft Skills": ["Accountability", "Active Listening", "Adaptability", "Collaboration", "Communication", "Conflict Resolution", "Creativity & Innovation", "Critical Thinking", "Cultural Awareness", "Decision-Making", "Emotional Intelligence", "Empathy", "Facilitation", "Flexibility", "Growth Mindset", "Leadership", "Mentoring & Coaching", "Negotiation", "Networking", "Presentation Skills", "Prioritization", "Problem-Solving", "Public Speaking", "Resilience", "Self-Motivation", "Stakeholder Management", "Stress Management", "Teamwork", "Technical Writing", "Time Management"],
-  "Software Design & Architecture": ["DDD", "OOP", "functional", "micro-/event-driven services"],
-  "Systems & Performance Programming": ["C/C++ optimization", "Rust safety", "concurrency", "eBPF", "embedded/IoT"],
-  "Testing & Quality Automation": ["Playwright/Cypress", "TDD/BDD", "chaos engineering", "contract testing", "property tests"],
-  "UX / UI Design": ["Accessibility (WCAG 2.2)", "Adobe XD", "Design Systems (Storybook, Material 3)", "Figma", "Interaction & Motion Design", "Responsive & Mobile-first Design", "Sketch", "Usability Testing"],
-  "Web Front-End Engineering": ["PWA patterns", "React/Next.js", "Svelte", "Vue", "WebAssembly"]
+import axios from "axios";
+
+function groupSkillsByCategory(skillsArray) {
+  return skillsArray.reduce((acc, skill) => {
+    const category = skill.categoria?.cnombre || "Uncategorized";
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(skill);
+    return acc;
+  }, {});
+}
+
+const getFilteredCategories = (data, selectedCategory, searchTerm) => {
+  const filtered = {};
+
+  Object.entries(data).forEach(([category, skills]) => {
+    // Apply category filter first
+    let shouldInclude = false;
+
+    if (selectedCategory === "all") {
+      shouldInclude = true;
+    } else if (selectedCategory === "hard") {
+      // For hard skills, exclude soft skill categories
+      shouldInclude =
+        category !== "Soft Skills" &&
+        category !== "Collaboration & Product Skills" &&
+        category !== "Project Management & Agile";
+    } else if (selectedCategory === "soft") {
+      // For soft skills, only include the relevant categories
+      shouldInclude =
+        category === "Soft Skills" ||
+        category === "Collaboration & Product Skills" ||
+        category === "Project Management & Agile";
+    }
+
+    if (shouldInclude) {
+      // Then filter skills by search term if there is one
+      if (searchTerm) {
+        const filteredSkills = skills.filter((skill) =>
+          skill.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        if (filteredSkills.length > 0) {
+          filtered[category] = filteredSkills;
+        }
+      } else {
+        // If no search term, include all skills in the category
+        filtered[category] = skills;
+      }
+    }
+  });
+
+  return filtered;
 };
 
-// List of all soft skills for filtering
-const SOFT_SKILLS_LIST = SKILLS_DATA["Soft Skills"].concat([
-  "Git mastery", "agile practices", "architectural writing", "code reviews", "communication"
-]);
+const DB_URL = "https://pathexplorer-backend.onrender.com/";
 
-export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }) => {
+export const SkillsModal = ({
+  isOpen,
+  onClose,
+  userSkills = [],
+  onUpdateSkills,
+  disabledSkills = [],
+  setLoad,
+}) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSkills, setSelectedSkills] = useState(new Set(userSkills));
-  const [expandedCategories, setExpandedCategories] = useState(new Set()); // Start with all collapsed
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const disabledSkillsSet = new Set(disabledSkills.map((skill) => skill.idhabilidad));
+  const [SKILLS_DATA, setSkillsData] = useState([]);
 
   useEffect(() => {
     if (isOpen) {
@@ -58,6 +84,18 @@ export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }
       setIsClosing(false);
       setSelectedSkills(new Set(userSkills));
     }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+
+    const fetchSkills = async () => {
+      const res = await axios.get(DB_URL + "api/habilidades", config);
+      setSkillsData(groupSkillsByCategory(res.data));
+    };
+    fetchSkills();
   }, [isOpen]);
 
   if (!isVisible) return null;
@@ -97,60 +135,30 @@ export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }
     setExpandedCategories(newExpandedCategories);
   };
 
-  const handleSave = () => {
-    onUpdateSkills(Array.from(selectedSkills));
+  const handleSave = async () => {
+    setLoad(true);
+    await onUpdateSkills(Array.from(selectedSkills));
     handleClose();
+    setLoad(false);
   };
 
-  const getFilteredCategories = () => {
-    const filtered = {};
-    
-    Object.entries(SKILLS_DATA).forEach(([category, skills]) => {
-      // Apply category filter first
-      let shouldInclude = false;
-      
-      if (selectedCategory === 'all') {
-        shouldInclude = true;
-      } else if (selectedCategory === 'hard') {
-        // For hard skills, exclude soft skill categories
-        shouldInclude = category !== 'Soft Skills' && 
-                       category !== 'Collaboration & Product Skills' &&
-                       category !== 'Project Management & Agile';
-      } else if (selectedCategory === 'soft') {
-        // For soft skills, only include the relevant categories
-        shouldInclude = category === 'Soft Skills' || 
-                       category === 'Collaboration & Product Skills' ||
-                       category === 'Project Management & Agile';
-      }
-      
-      if (shouldInclude) {
-        // Then filter skills by search term if there is one
-        if (searchTerm) {
-          const filteredSkills = skills.filter(skill =>
-            skill.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-          if (filteredSkills.length > 0) {
-            filtered[category] = filteredSkills;
-          }
-        } else {
-          // If no search term, include all skills in the category
-          filtered[category] = skills;
-        }
-      }
-    });
-    
-    return filtered;
-  };
-
-  const filteredCategories = getFilteredCategories();
+  const filteredCategories = getFilteredCategories(
+    SKILLS_DATA,
+    selectedCategory,
+    searchTerm
+  );
 
   return (
     <div
-      className={`${modalStyles.modalBackdrop} ${isClosing ? modalStyles.closing : ''}`}
+      className={`${modalStyles.modalBackdrop} ${
+        isClosing ? modalStyles.closing : ""
+      }`}
       onClick={handleBackdropClick}
     >
-      <div 
-        className={`${modalStyles.modalContent} ${isClosing ? modalStyles.closing : ''}`}
+      <div
+        className={`${modalStyles.modalContent} ${
+          isClosing ? modalStyles.closing : ""
+        }`}
       >
         <button className={modalStyles.closeButton} onClick={handleClose}>
           <i className="bi bi-x-lg"></i>
@@ -158,9 +166,13 @@ export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }
 
         <div className={modalStyles.modalHeader}>
           <h2 className={modalStyles.title}>Manage Skills</h2>
-          <p className={modalStyles.subtitle}>Add or remove skills from your profile</p>
-          <p className={styles.selectedCount}>{selectedSkills.size} skills selected</p>
-        
+          <p className={modalStyles.subtitle}>
+            Add or remove skills from your profile
+          </p>
+          <p className={styles.selectedCount}>
+            {selectedSkills.size} skills selected
+          </p>
+
           <div className={styles.searchBox}>
             <i className={`bi bi-search ${styles.searchIcon}`}></i>
             <input
@@ -174,46 +186,62 @@ export const SkillsModal = ({ isOpen, onClose, userSkills = [], onUpdateSkills }
 
           <div className={styles.filterButtons}>
             <button
-              className={`${styles.filterButton} ${selectedCategory === 'all' ? styles.active : ''}`}
-              onClick={() => setSelectedCategory('all')}
+              className={`${styles.filterButton} ${
+                selectedCategory === "all" ? styles.active : ""
+              }`}
+              onClick={() => setSelectedCategory("all")}
             >
               All
             </button>
             <button
-              className={`${styles.filterButton} ${selectedCategory === 'hard' ? styles.active : ''}`}
-              onClick={() => setSelectedCategory('hard')}
+              className={`${styles.filterButton} ${
+                selectedCategory === "hard" ? styles.active : ""
+              }`}
+              onClick={() => setSelectedCategory("hard")}
             >
               Hard Skills
             </button>
             <button
-              className={`${styles.filterButton} ${selectedCategory === 'soft' ? styles.active : ''}`}
-              onClick={() => setSelectedCategory('soft')}
+              className={`${styles.filterButton} ${
+                selectedCategory === "soft" ? styles.active : ""
+              }`}
+              onClick={() => setSelectedCategory("soft")}
             >
               Soft Skills
             </button>
           </div>
         </div>
 
-        <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
+        <div
+          className={modalStyles.modalBody}
+          style={{ height: "calc(100% - 200px)" }}
+        >
           {Object.entries(filteredCategories).map(([category, skills]) => (
             <div key={category} className={styles.categorySection}>
               <button
-                className={`${styles.categoryHeader} ${expandedCategories.has(category) ? styles.expanded : ''}`}
+                className={`${styles.categoryHeader} ${
+                  expandedCategories.has(category) ? styles.expanded : ""
+                }`}
                 onClick={() => toggleCategory(category)}
               >
                 <span>{category}</span>
                 <i className={`bi bi-chevron-down`}></i>
               </button>
-              
+
               {expandedCategories.has(category) && (
                 <div className={styles.skillsList}>
-                  {skills.map(skill => (
+                  {skills.map((skill) => (
                     <SkillChip
-                      key={skill}
-                      text={skill}
-                      iconClass={selectedSkills.has(skill) ? "bi bi-check-circle-fill" : null}
-                      isUserSkill={selectedSkills.has(skill)}
-                      onClick={() => toggleSkill(skill)}
+                      key={skill.idhabilidad}
+                      text={skill.nombre}
+                      iconClass={
+                        selectedSkills.has(skill.nombre)
+                          ? "bi bi-check-circle-fill"
+                          : null
+                      }
+                      isUserSkill={selectedSkills.has(skill.nombre)}
+                      onClick={() => toggleSkill(skill.nombre)}
+                      disabled={disabledSkillsSet.has(skill.idhabilidad)}
                     />
                   ))}
                 </div>

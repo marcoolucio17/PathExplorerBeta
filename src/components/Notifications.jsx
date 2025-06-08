@@ -3,8 +3,7 @@ import axios from "axios";
 import Logo from "../assets/Acc_GT_Dimensional_RGB 1.png";
 import "./Notifications.css";
 
-export function Notifications({ userId, visible }) {
-  const [notifications, setNotifications] = useState([]);
+export function Notifications({ userId, visible, notifications, setNotifications }) {
   const [deletingId, setDeletingId] = useState(null);
 
   const fetchNotifications = () => {

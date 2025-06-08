@@ -5,6 +5,7 @@
   overflow: hidden; /* Prevent expansion beyond container */
 }
 
+
 .sectionHeader {
   display: flex;
   align-items: center;

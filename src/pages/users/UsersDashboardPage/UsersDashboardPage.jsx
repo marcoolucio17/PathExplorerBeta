@@ -1,17 +1,15 @@
 import React from "react";
 
-// Custom Hooks
 import useUsersDashboardPage from '../../../hooks/users/useUsersDashboardPage';
 import useUsersDashboardHeaderConfig from '../../../hooks/users/useUsersDashboardHeaderConfig';
 
-// Components
 import UserList from '../../../components/GridList/User/UserList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
+import { RoleFilterModal } from "../../../components/Modals/RoleFilterModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 
-// CSS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
 /**
@@ -19,10 +17,8 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
  * displays all users with filtering and search capabilities
  */
 export const UsersDashboardPage = () => {
-  //use the users-specific dashboard hook
   const dashboardPage = useUsersDashboardPage();
   
-  //get users-specific header configuration
   const headerProps = useUsersDashboardHeaderConfig(dashboardPage);
 
   return (
@@ -35,15 +31,14 @@ export const UsersDashboardPage = () => {
         <SearchHeader {...headerProps} />
         
         <Tabs 
-          tabs={dashboardPage.tabNames.map(tab => ({
-            name: tab,
-            notificationCount: dashboardPage.tabCounts[tab] || 0
-          }))}
+          tabs={[{
+            name: 'All Employees',
+            notificationCount: dashboardPage.tabCounts['All Employees'] || 0
+          }]}
           activeTab={dashboardPage.activeTab}
           onTabClick={dashboardPage.setActiveTab}
         />
 
-        {/* main content area with users list */}
         <div className={styles.cardsContainer}>
           <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
             <UserList 
@@ -60,12 +55,18 @@ export const UsersDashboardPage = () => {
         </div>
       </div>
 
-      {/* modals */}
       <SkillsModal 
         isOpen={dashboardPage.modals.skillsFilter}
         onClose={() => dashboardPage.closeModal('skillsFilter')}
         userSkills={dashboardPage.selectedSkillFilters}
         onUpdateSkills={dashboardPage.handleApplySkillFilters}
+      />
+
+      <RoleFilterModal
+        isOpen={dashboardPage.modals.roleFilter}
+        onClose={() => dashboardPage.closeModal('roleFilter')}
+        selectedRoles={dashboardPage.filterStates?.selectedRoles || []}
+        onUpdateRoles={dashboardPage.handleApplyRoleFilters}
       />
     </div>
   );
