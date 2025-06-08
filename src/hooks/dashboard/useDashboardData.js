@@ -88,7 +88,7 @@ export const useDashboardData = () => {
 
   // Url for the backend API in render
   let url = "https://pathexplorer-backend.onrender.com/api";
-  let url2 = "http://localhost:8080/api"; // Local development URL
+
   // Configuration for axios requests
   const config = {
     headers: {
@@ -101,7 +101,7 @@ export const useDashboardData = () => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
-        const { data } = await axios.get(`${url2}/projects`, config);
+        const { data } = await axios.get(`${url}/projects`, config);
         setProjectsData(data);
       } catch (err) {
         console.error("Error fetching projects", err);
@@ -123,7 +123,7 @@ export const useDashboardData = () => {
     const userId = localStorage.getItem("id");
     if (userId) {
       axios
-        .get(`${url2}/projects/top/${userId}`, config)
+        .get(`${url}/projects/top/${userId}`, config)
         .then((res) => setTopData(res.data))
         .catch((err) => console.error("Error fetching top projects", err));
     }
