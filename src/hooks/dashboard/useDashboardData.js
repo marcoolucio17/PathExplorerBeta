@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, act } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -7,33 +7,48 @@ export const useDashboardData = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const searchFromURL = searchParams.get("search") || "";
-
+  // Initialize state variables
   const [searchTerm, setSearchTerm] = useState(searchFromURL);
+  // State for selected filters
   const [skillSelected, setSkillSelected] = useState("Skills");
+  // State for selected skill filters
   const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
+  // State for client filters
   const [clientNameSelected, setClientNameSelected] = useState("Clients");
+  // State for cliend id
   const [clientId, setClientId] = useState(null);
+  // State for role filters
   const [roleNameSelected, setRoleNameSelected] = useState("Roles");
+  // State for role id
   const [roleId, setRoleId] = useState(null);
-
+  // Parameters for All projects
   const [filterOptions, setFilterOptions] = useState({
     idCompatible: localStorage.getItem("id"),
+    type: true,
   });
-
+  // Parameters for My projects
   const [filterOptionsMyProjects, setFilterOptionsMyProjects] = useState({
     idCompatible: localStorage.getItem("id"),
     idusuario: localStorage.getItem("id"),
   });
-
+  // State for user skills
   const [userSkills, setUserSkills] = useState([]);
-  const currentUserId = 1;
 
+  // State for currents projects All
   const [projectsData, setProjectsData] = useState([]);
+  // State for boolean loading projects All
   const [projectsLoading, setProjectsLoading] = useState(true);
+   // State for boolean loading apply projects
   const [applyLoading, setApplyLoading] = useState(true);
+
+  // State for clients data
+
   const [clientsData, setClientsData] = useState([]);
+  // State for roles data
   const [rolesData, setRolesData] = useState([]);
+  // State for top 3 projects data
   const [topData, setTopData] = useState([]);
+  // State for currents projects role applications
   const [myApplicationsData, setMyApplicationsData] = useState([]);
 
   useEffect(() => {
@@ -75,14 +90,17 @@ export const useDashboardData = () => {
     }
   }, [searchTerm, navigate, location.pathname]);
 
+  // Url for the backend API in render
   let url = "https://pathexplorer-backend.onrender.com/api";
+
+  // Configuration for axios requests
   const config = {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
     params: filterOptions,
   };
-  
+
   useEffect(() => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
@@ -102,7 +120,8 @@ export const useDashboardData = () => {
     fetchProjects();
   }, [filterOptions]);
 
-  //fetch roles, clients, top projects, my applications and my skills
+
+  // Fetch Roles, clients, top projects, my applications and my skills once
   useEffect(() => {
     //fetch roles
     axios
@@ -146,20 +165,21 @@ export const useDashboardData = () => {
     axios
       .get(`${url}/habilidades/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
-        setUserSkills(res.data.data);
+        setUserSkills(res.data.data.map((skill) => skill.nombre));
       })
       .catch((err) => console.error("Error fetching user skills", err));
   }, []);
 
+  // Handle the skills selection
   const handleApplySkillFilters = (selectedSkills) => {
     setSelectedSkillFilters(selectedSkills);
     setSkillSelected(
       selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
     );
   };
-  
-  console.log(myApplicationsData);
-  
+
+  // Handle the project name in the search bar
+
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
       setFilterOptions((prev) => ({ ...prev, projectName: nameProject }));
@@ -175,7 +195,7 @@ export const useDashboardData = () => {
       setFilterOptionsMyProjects(restMyProjects);
     }
   };
-
+  // Handle the client selection
   const handleApplyClientFilters = (clientName, selectedClientId) => {
     if (clientName && selectedClientId) {
       setClientNameSelected(clientName);
@@ -196,6 +216,7 @@ export const useDashboardData = () => {
     }
   };
 
+  // Handle the role selection
   const handleApplyRoleFilters = (roleName, selectedRoleId) => {
     if (roleName && selectedRoleId) {
       setRoleNameSelected(roleName);
@@ -209,90 +230,101 @@ export const useDashboardData = () => {
     }
   };
 
+  // Remove specific skill filter
   const removeSkillFilter = (skillToRemove) => {
     handleApplySkillFilters(
       selectedSkillFilters.filter((skill) => skill !== skillToRemove)
     );
   };
 
+  // Remove client selection
   const removeClientFilter = () => {
-    handleApplyClientFilters("Clients", null);
+    handleApplyClientFilters();
   };
-
+  // Remove role selection
   const removeRoleFilter = () => {
-    handleApplyRoleFilters("Roles", null);
+    handleApplyRoleFilters();
   };
-
+  // Clear all skill filters
   const clearAllSkillFilters = () => {
     handleApplySkillFilters([]);
   };
 
-  const sortProjects = (projects, option) => {
+  // Sort projects based on selected option
+  const sortProjects = (projects, option, activeTab) => {
     if (!Array.isArray(projects)) return [];
     const sorted = [...projects];
     switch (option) {
       case "name_asc":
-        return sorted.sort((a, b) => a.pnombre.localeCompare(b.pnombre));
+        // Sort by name ascending
+        if (activeTab !== "My Projects") {
+          // Use the role name when is not in "My Projects" tab
+          return sorted.sort((a, b) => a.nombrerol.localeCompare(b.nombrerol));
+        } else {
+          // Use the project name when in "My Projects" tab
+          return sorted.sort((a, b) => a.pnombre.localeCompare(b.pnombre));
+        }
       case "name_desc":
-        return sorted.sort((a, b) => b.pnombre.localeCompare(a.pnombre));
+        // Sort by name descending
+        if (activeTab !== "My Projects") {
+          // Use the role name when is not in "My Projects" tab
+          return sorted.sort((a, b) => b.nombrerol.localeCompare(a.nombrerol));
+        } else {
+          // Use the project name when in "My Projects" tab
+          return sorted.sort((a, b) => b.pnombre.localeCompare(a.pnombre));
+        }
       case "date_desc":
+        // Sort by convenience descending the id of the project is created
         return sorted.sort((a, b) => b.idproyecto - a.idproyecto);
       case "date_asc":
+        // Sort by convenience ascending the id of the project is created
         return sorted.sort((a, b) => a.idproyecto - b.idproyecto);
+      case "compatibility":
+        if (activeTab !== "My Projects") {
+          // Sort by compatibility descending only if not in "My Projects" tab
+          return sorted.sort((a, b) => b.compability - a.compability);
+        } else {
+          // Just in case of "My Projects" tab, return the same without sorting
+          return sorted;
+        }
       default:
         return sorted;
     }
   };
-
-  const flattenProjectsForList = (projects) => {
-    const timestamp = Date.now();
-    console.log(`[${timestamp}] flattenProjectsForList called with projects:`, projects);
-    
-    const finalResult = projects
+  // Flatten projects for list display
+ const flattenProjectsForList = (projects) => {
+    return projects
       .flatMap((project) => {
-        //defensive check for proyecto_roles
-        if (!project.proyecto_roles || !Array.isArray(project.proyecto_roles)) {
-          console.log(`[${timestamp}] project has no proyecto_roles:`, project.pnombre);
-          return [];
+        // When the tab is "My Projects", we need to flatten the roles
+        if (project.proyecto_roles) {
+          project.proyecto_roles?.map((proyecto_rol) => ({
+            project,
+            proyecto_rol,
+            hasSelectedSkills:
+              selectedSkillFilters.length === 0 ||
+              proyecto_rol.roles.requerimientos_roles.some((req_rol) =>
+                selectedSkillFilters.includes(
+                  req_rol.requerimientos.habilidades.nombre
+                )
+              ),
+          }));
+        } else {
+          // For other tabs, we just return the project
+          return {
+            project,
+            hasSelectedSkills:
+              selectedSkillFilters.length === 0 ||
+              project.requerimientos_roles.some((req_rol) =>
+                selectedSkillFilters.includes(
+                  req_rol.requerimientos.habilidades.nombre
+                )
+              ),
+          };
         }
-        
-        console.log(`[${timestamp}] processing project ${project.pnombre} with ${project.proyecto_roles.length} roles`);
-        
-        const filteredRoles = project.proyecto_roles
-          .filter((proyecto_rol) => {
-            //ensure we have complete data before filtering
-            if (!proyecto_rol.roles || proyecto_rol.roles.disponible === undefined) {
-              console.log(`[${timestamp}] role ${proyecto_rol.roles?.nombrerol || 'unknown'} has no disponible property: FILTERED OUT (incomplete data)`);
-              return false; //filter out incomplete data
-            }
-            const shouldInclude = proyecto_rol.roles.disponible === true;
-            console.log(`[${timestamp}] role ${proyecto_rol.roles?.nombrerol || 'unknown'} with disponible ${proyecto_rol.roles.disponible}: ${shouldInclude ? 'INCLUDED' : 'FILTERED OUT'}`);
-            return shouldInclude;
-          });
-          
-        console.log(`[${timestamp}] after filtering: ${filteredRoles.length} roles remaining for ${project.pnombre}`);
-        
-        return filteredRoles.map((proyecto_rol) => ({
-          project,
-          proyecto_rol,
-          hasSelectedSkills:
-            selectedSkillFilters.length === 0 ||
-            proyecto_rol.roles.requerimientos_roles.some((req_rol) =>
-              selectedSkillFilters.includes(
-                req_rol.requerimientos.habilidades.nombre
-              )
-            ),
-        }));
       })
       .filter((item) => item.hasSelectedSkills);
-      
-    console.log(`[${timestamp}] flattenProjectsForList final result:`, finalResult);
-    console.log(`[${timestamp}] flattenProjectsForList final result length:`, finalResult.length);
-    
-    return finalResult;
   };
-  
-  console.log("projectsData", myApplicationsData);
+
   
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
@@ -304,7 +336,6 @@ export const useDashboardData = () => {
     setSearchTerm,
     selectedSkillFilters,
     userSkills,
-    currentUserId,
     handleApplySkillFilters,
     clientNameSelected,
     clientId,

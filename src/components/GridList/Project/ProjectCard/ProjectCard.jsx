@@ -63,7 +63,8 @@ const ProjectCard = ({
 
     //proyecto_rol.nombrerol ||
     return {
-      roleName: proyecto_rol?.roles?.nombrerol || proyecto_rol?.nombrerol || 'Developer',
+      roleName: project.nombrerol || 'Developer',
+
       projectName: project.pnombre || 'Project',
       duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD"
     };
@@ -74,26 +75,27 @@ const ProjectCard = ({
     if (isProjectCard || isApplyCard) {
       return [];
     }
-    
-    if (!proyecto_rol?.roles?.requerimientos_roles && !proyecto_rol?.requerimientos_roles) {
-      return [
-        /*{ id: 'demo-1', name: 'JavaScript', isUser: true },
-        { id: 'demo-2', name: 'React', isUser: false },
-        { id: 'demo-3', name: 'Python', isUser: false },
-        { id: 'demo-4', name: 'Node.js', isUser: true }*/
-      ];
+    if (!project.requerimientos_roles || project.requerimientos_roles.length === 0) {
+      return [];
     }
-    
-    const requerimientos = proyecto_rol?.roles?.requerimientos_roles || proyecto_rol?.requerimientos_roles || [];
-    
-    return requerimientos.map(req_rol => ({
-      id: req_rol.requerimientos.habilidades.idhabilidad,
-      name: req_rol.requerimientos.habilidades.nombre,
-      isUser: userSkills.includes(req_rol.requerimientos.habilidades.nombre) ||
-        selectedSkillFilters.includes(req_rol.requerimientos.habilidades.nombre)
-    }));
-  };
 
+
+    const skills = project.requerimientos_roles.map(req_roles => {
+      const habilidad = req_roles.requerimientos?.habilidades;
+      if (!habilidad) {
+        return null;
+      }
+      const skillName = habilidad.nombre || 'Unknown Skill';
+      const isUserSkill = userSkills.includes(skillName) || selectedSkillFilters.includes(skillName);
+      return {
+        id: habilidad.idhabilidad,
+        name: skillName,
+        isUser: isUserSkill
+      };
+    });
+
+    return skills;
+  };
   const roleData = ensureRoleData();
   const skillsData = ensureSkillsData();
 
@@ -145,7 +147,7 @@ const ProjectCard = ({
       <div className={styles.cardHeader}>
         <img
           className={styles.cardAvatar}
-          src={project.imagen || "/images/ImagenProyectoDefault.png"}
+          src={project.cliente?.fotodecliente_url || project.fotodecliente_url || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
         {!isApplyCard && (<>
@@ -235,7 +237,7 @@ const ProjectCard = ({
       <div className={styles.cardHeader}>
         <img
           className={styles.cardAvatar}
-          src={project.imagen || "/images/ImagenProyectoDefault.png"}
+          src={project.cliente?.fotodecliente_url || "/images/ImagenProyectoDefault.png"}
           alt={`${project.pnombre} logo`}
         />
       </div>

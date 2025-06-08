@@ -30,7 +30,7 @@ export const useDashboardHeaderConfig = (props) => {
       label: "View Applicants",
       type: "primary",
       icon: "bi-people-fill",
-      onClick: handleViewApplicants
+      onClick: handleViewApplicants,
     },
     {
       label: "Filter By",
@@ -39,32 +39,31 @@ export const useDashboardHeaderConfig = (props) => {
       hasDropdown: true,
       isFilterButton: true,
       dropdownItems: [
-        { 
-          label: 'Skills', 
-          action: 'skills', 
-          icon: 'bi-tools'
+        {
+          label: "Skills",
+          action: "skills",
+          icon: "bi-tools",
         },
-        { 
-          label: 'Clients', 
-          action: 'clients', 
-          icon: 'bi bi-person-circle' 
+        {
+          label: "Clients",
+          action: "clients",
+          icon: "bi bi-person-circle",
         },
-        { 
-          label: 'Roles', 
-          action: 'roles', 
-          icon: 'bi bi-person-workspace' 
-        }
+        {
+          label: "Roles",
+          action: "roles",
+          icon: "bi bi-person-workspace",
+        },
       ],
       onDropdownItemClick: (item) => {
-        if (item.action === 'skills') {
+        if (item.action === "skills") {
           toggleSkillsFilterModal();
-        }
-        else if (item.action === 'clients') {
+        } else if (item.action === "clients") {
           toggleClientsFilterModal();
-        } else if (item.action === 'roles') {
+        } else if (item.action === "roles") {
           toggleRolesFilterModal();
         }
-      }
+      },
     },
     {
       label: "Sort By",
@@ -73,29 +72,39 @@ export const useDashboardHeaderConfig = (props) => {
       hasDropdown: true,
       isFilterButton: true,
       dropdownItems: [
-        { label: 'Name (A to Z)', value: 'name_asc', icon: 'bi-sort-alpha-down' },
-        { label: 'Name (Z to A)', value: 'name_desc', icon: 'bi-sort-alpha-down-alt' },
-        { label: 'Newest First', value: 'date_desc', icon: 'bi-calendar-date' },
-        { label: 'Oldest First', value: 'date_asc', icon: 'bi-calendar2-date' },
-        { label: 'Compatibility (High to Low)', value: 'match_desc', icon: 'bi-star-fill' },
-        { label: 'Compatibility (Low to High)', value: 'match_asc', icon: 'bi-star' }
+        {
+          label: "Name (A to Z)",
+          value: "name_asc",
+          icon: "bi-sort-alpha-down",
+        },
+        {
+          label: "Name (Z to A)",
+          value: "name_desc",
+          icon: "bi-sort-alpha-down-alt",
+        },
+        { label: "Newest First", value: "date_desc", icon: "bi-calendar-date" },
+        { label: "Oldest First", value: "date_asc", icon: "bi-calendar2-date" },
       ],
       onDropdownItemClick: (item) => {
         setSortOption(item.value);
-      }
-    }
+      },
+    },
   ];
 
   const filterButtons = [];
-  
+
   //only show compatibility button if not on my projects tab
   if (activeTab !== "My Projects") {
     filterButtons.push({
       label: "Compatibility",
-      onClick: toggleCompatibility,
-      type: 'primary',
-      variant: 'compatibility',
-      isActive: showCompatibility
+      onClick: () => {
+        toggleCompatibility();
+        setSortOption("compatibility");
+      },
+      type: "primary",
+      variant: "compatibility",
+      isActive: showCompatibility,
+      value: "compatibility",
     });
   }
 
@@ -109,8 +118,9 @@ export const useDashboardHeaderConfig = (props) => {
     onClearFilters: handleClearFilters,
     customButtons,
     filterButtons,
+    setSortOption,
     placeholder: "Search by Name...",
-    searchName: "searchProjects"
+    searchName: "searchProjects",
   });
 };
 

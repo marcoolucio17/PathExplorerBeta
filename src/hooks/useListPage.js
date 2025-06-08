@@ -28,6 +28,8 @@ export const useListPage = ({
   tabConfig = {},
   filterConfig = {},
   sortFunction = null,
+  removeClientFilter,
+  removeRoleFilter,
   baseUrl = "/",
   itemIdField = "id",
 }) => {
@@ -139,7 +141,8 @@ export const useListPage = ({
         }
       }
     });
-
+    removeClientFilter();
+    removeRoleFilter();
     setSearchTerm("");
   };
 
