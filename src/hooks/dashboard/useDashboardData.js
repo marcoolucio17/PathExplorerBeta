@@ -38,6 +38,8 @@ export const useDashboardData = () => {
   const [projectsData, setProjectsData] = useState([]);
   // State for boolean loading projects All
   const [projectsLoading, setProjectsLoading] = useState(true);
+  // State for boolean loading apply projects
+  const [applyLoading, setApplyLoading] = useState(true);
   // State for clients data
   const [clientsData, setClientsData] = useState([]);
   // State for roles data
@@ -94,7 +96,7 @@ export const useDashboardData = () => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    params: filterOptions, // 👈 correct way to send query parameters
+    params: filterOptions, // parameters
   };
   // Fetch projects All data when filter options change
   useEffect(() => {
@@ -135,7 +137,10 @@ export const useDashboardData = () => {
     // Fetch user applications
     axios
       .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
-      .then((res) => setMyApplicationsData(res.data))
+      .then((res) => {
+        setMyApplicationsData(res.data);
+        setApplyLoading(false);
+      })
       .catch((err) => console.error("Error fetching my applications", err));
 
     // Fetch user skills

@@ -28,6 +28,7 @@ export const useEmpleadoDashboardPage = () => {
   // Modal controls
   const { modals, openModal, closeModal, toggleModal } = useModalControl({
     skillsFilter: false,
+    viewApplication: false,
     clientsFilter: false,
     rolesFilter: false,
   });
@@ -242,7 +243,7 @@ export const useEmpleadoDashboardPage = () => {
 
     return counts;
   }, [dashboardData.projects, dashboardData.projectsApp]);
-
+  console.log("Corrected tab counts:", correctedTabCounts);
   return {
     ...listPage,
     ...dashboardData,
