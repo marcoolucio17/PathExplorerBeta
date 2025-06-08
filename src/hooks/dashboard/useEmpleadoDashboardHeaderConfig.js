@@ -16,10 +16,12 @@ export const useEmpleadoDashboardHeaderConfig = (props) => {
     getActiveFilters,
     handleClearFilters,
     toggleSkillsFilterModal,
+    toggleClientsFilterModal,
+    toggleRolesFilterModal,
     setSortOption,
     toggleCompatibility,
     showCompatibility,
-    handleRemoveFilter
+    handleRemoveFilter,
   } = props;
 
   // Employee version - only Filter By and Sort By buttons (no "View Applicants" or "New Project")
@@ -96,11 +98,14 @@ export const useEmpleadoDashboardHeaderConfig = (props) => {
   const filterButtons = [
     {
       label: "Compatibility",
-      onClick: toggleCompatibility,
-      type: 'primary',
-      variant: 'compatibility',
-      isActive: showCompatibility
-    }
+      onClick: () => {
+        toggleCompatibility();
+        setSortOption("compatibility");
+      },
+      type: "primary",
+      variant: "compatibility",
+      isActive: showCompatibility,
+    },
   ];
 
   return useHeaderConfig({
