@@ -17,7 +17,6 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {Function} props.calculateMatchPercentage - Function to calculate match percentage
  * @param {Function} props.onClearFilters - Function called when Clear Filters button is clicked
  * @param {boolean} props.isLoading - Whether items are currently loading
- * @param {Function} props.onViewApplication - Function called when View Request button is clicked
  */
 const ProjectList = ({
   tabSelected = "All",
@@ -28,7 +27,6 @@ const ProjectList = ({
   userSkills = [],
   onClearFilters,
   isLoading = false,
-  onViewApplication,
 }) => {
 
   // Safety check for undefined/null projects array
@@ -86,22 +84,23 @@ const ProjectList = ({
         // For project cards (My Projects tab), we don't have proyecto_rol
         const isProjectCard = item.isProjectCard || false;
         const isApplyCard = item.isApplyCard || false;
-        const projectId = item.project.idproyecto || item.project.proyecto.idproyecto || "unknown";
+        const projectId = item.idproject || item.project.idproyecto || item.project.proyecto.idproyecto || "unknown";
 
         if (!isProjectCard && !isApplyCard) {
 
           if (Array.isArray(item.proyecto_rol)) {
-            return item.proyecto_rol?.map((rol, rolindex) => {
+
+            return item.proyecto_rol.map((rol, rolindex) => {
 
               // Fix role ID extraction - check the nested structure
               let roleId = null;
 
               if (!isProjectCard && rol) {
-                roleId = rol.roles?.idrol || null;
+                roleId = rol.idrol || null;
               }
               let compatibilityValue = null;
               if (!isProjectCard && rol) {
-                compatibilityValue = rol.roles?.compability || rol.compability || 0; // Default to 0 if not available
+                compatibilityValue = rol.roles.compability || 0; // Default to 0 if not available
               }
               // Force cards to always re-render when filter changes with a unique key
               const renderKey = `${projectId}-${roleId || 'project'}-${index}-${rolindex}`;
@@ -122,7 +121,6 @@ const ProjectList = ({
                     userSkills={userSkills}
                     index={index}
                     isProjectCard={isProjectCard}
-                    onViewApplication={onViewApplication}
                   />
                 </div>
               );
@@ -131,13 +129,20 @@ const ProjectList = ({
           } else {
             // Fix role ID extraction - check the nested structure
             let roleId = null;
+
             if (!isProjectCard && item.proyecto_rol) {
-              roleId = item.proyecto_rol.roles?.idrol || null;
+              roleId = item.proyecto_rol.idrol || null;
+            } else {
+              roleId = item.project.idrol || null; // Fallback to idrol if proyecto_rol is not available
             }
             let compatibilityValue = null;
-            if (!isProjectCard && item.proyecto_rol) {
-              compatibilityValue = item.proyecto_rol.roles?.compability || item.proyecto_rol.compability || 0; //default to 0 if not available
+            if (!isProjectCard && item.proyect) {
+              compatibilityValue = item.proyect.compability || 0; // Default to 0 if not available
+            } else {
+
+              compatibilityValue = item.project.compability || 0; // Default to 0 if not available
             }
+
             const renderKey = `${projectId}-${roleId || 'project'}`;
             return (
 
@@ -150,7 +155,7 @@ const ProjectList = ({
                   id={projectId}
                   idrol={roleId}
                   project={item.project}
-                  proyecto_rol={item.proyecto_rol.roles}
+                  proyecto_rol={item.proyecto_rol ? item.proyecto_rol : null}
                   viewMode={viewMode}
                   compatibilityValue={compatibilityValue}
                   showCompatibility={showCompatibility}
@@ -159,7 +164,6 @@ const ProjectList = ({
                   index={index}
                   isProjectCard={isProjectCard}
                   tabActive={tabSelected}
-                  onViewApplication={onViewApplication}
                 />
               </div>
             );
@@ -167,6 +171,7 @@ const ProjectList = ({
         }
         else if (isProjectCard && !isApplyCard) {
           // For project cards, we only have the project object
+
           return (
             <div key={`${projectId}-${index}`} className={styles.item}>
               <ProjectCard
@@ -178,17 +183,18 @@ const ProjectList = ({
                 userSkills={userSkills}
                 isProjectCard={true} // Indicate this is a project-level card
                 tabActive={tabSelected}
-                onViewApplication={onViewApplication}
               />
             </div>
           );
         } else if (isApplyCard && !isProjectCard) {
           // For applied to cards, we only have the project object
+
           console.log("isApplyCard", item);
           const applicationId = item.project.idaplicacion || index;
           const roleId = item.project.roles?.idrol || 'unknown';
+
           return (
-            <div key={`${projectId}-${applicationId}-${roleId}`} className={styles.item}>
+            <div key={`${projectId}-${item.idaplicacion}-${item.project.roles.idrol}`} className={styles.item}>
               <ProjectCard
                 id={projectId}
                 project={item.project}
@@ -198,40 +204,11 @@ const ProjectList = ({
                 userSkills={userSkills}
                 isApplyCard={true} // Indicate this is an applied to card
                 tabActive={tabSelected}
-                onViewApplication={onViewApplication}
               />
             </div>
           );
         }
 
-
-        // Force cards to always re-render when filter changes with a unique key
-        const renderKey = `${projectId}-${roleId || 'project'}-${index}`;
-
-
-        return (
-          <div key={renderKey} className={styles.item}>
-
-            <ProjectCard
-
-              id={projectId}
-              idrol={roleId}
-
-              project={item.project}
-              proyecto_rol={item.proyecto_rol}
-              viewMode={viewMode}
-              compatibilityValue={compatibilityValue}
-              showCompatibility={showCompatibility}
-              selectedSkillFilters={selectedSkillFilters}
-              userSkills={userSkills}
-              index={index}
-              isProjectCard={isProjectCard}
-              isApplyCard={isApplyCard} // Indicate this is an applied to card
-              tabActive={tabSelected}
-              onViewApplication={onViewApplication}
-            />
-          </div>
-        );
       })}
     </div>
   );

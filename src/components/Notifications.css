@@ -50,7 +50,7 @@
   padding: clamp(0.75rem, 1.5vw, 1.25rem);
   color: var(--text-light);
   position: absolute;
-  top: 100%;
+  top: 110%;
   right: 0;
   width: 320px;
   max-height: 400px;

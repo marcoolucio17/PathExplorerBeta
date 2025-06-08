@@ -1,52 +1,64 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-
 /**
- * Hook simple para GET con loading, error y data
- * @param {string} ruta - Parte final de la URL (después de /api/)
- * @returns {Object} - { data, loading, error, refetch }
+ * hook simple para GET con loading, error y data
+ * @param {string} ruta
+ * @returns data, loading & error
  */
 export const useFetch = (ruta, body = null) => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = useCallback(async () => {
+  useEffect(() => {
+    //dont fetch if ruta is null or undefined
     if (!ruta) {
       setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
-    const url = `https://pathexplorer-backend.onrender.com/api/${ruta}`;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    };
-
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      let url = `https://pathexplorer-backend.onrender.com/api/${ruta}`;
     try {
       let response;
+      const config = {
+        headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
       if (body && typeof body === "string") {
         response = await axios.get(url, body, config);
       } else {
         response = await axios.get(url, config);
       }
       setData(response.data);
-    } catch (err) {
-      setError(err);
-    } finally {
+      setLoading(false);
+    } catch (error) {
+      setError(error);
       setLoading(false);
     }
-  }, [ruta, body]);
-
-  useEffect(() => {
+      try {
+        let response;
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        };
+      response = await axios.get(url, config);
+        setData(response.data);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    };
     fetchData();
-  }, [fetchData]);
+  }, [ruta]);
 
-  return { data, error, loading, refetch: fetchData };
+  return { data, error, loading };
 };
 
 export default useFetch;
