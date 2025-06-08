@@ -29,6 +29,9 @@ export const useEmpleadoDashboardPage = () => {
   const { modals, openModal, closeModal, toggleModal } = useModalControl({
     skillsFilter: false,
     viewApplication: false,
+    clientsFilter: false,
+    rolesFilter: false,
+
   });
 
   // Toggle for compatibility view
@@ -49,6 +52,8 @@ export const useEmpleadoDashboardPage = () => {
     },
     filterConfig: {},
     sortFunction: dashboardData.sortProjects,
+    removeClientFilter: dashboardData.removeClientFilter,
+    removeRoleFilter: dashboardData.removeRoleFilter,
     baseUrl: "/empleado/dashboard",
   });
 
@@ -77,7 +82,9 @@ export const useEmpleadoDashboardPage = () => {
   const toggleSkillsFilterModal = () => {
     toggleModal("skillsFilter");
   };
+  // Helper to toggle clients filter modals
   const toggleClientsFilterModal = () => toggleModal("clientsFilter");
+  // Helper to toggle roles filter modals
   const toggleRolesFilterModal = () => toggleModal("rolesFilter");
 
   // Handle viewing application details
@@ -117,6 +124,7 @@ export const useEmpleadoDashboardPage = () => {
 
     switch (listPage.activeTab) {
       case "All":
+        // Projects with roles available for the user
         filteredProjects = dashboardData.projects ? dashboardData.projects : [];
         break;
       case "Applied to":
@@ -142,7 +150,7 @@ export const useEmpleadoDashboardPage = () => {
   // Generate active filters for header
   const getActiveFilters = useCallback(() => {
     const filters = {};
-
+    // Check if any skills are selected
     if (dashboardData.selectedSkillFilters.length > 0) {
       filters.skills = {
         label: "Skill",
@@ -151,6 +159,7 @@ export const useEmpleadoDashboardPage = () => {
         borderColor: "rgba(139, 92, 246, 0.5)",
       };
     }
+    // Check if a client is selected
     if (dashboardData.clientNameSelected !== "Clients") {
       filters.clients = {
         label: "Client",
@@ -159,7 +168,7 @@ export const useEmpleadoDashboardPage = () => {
         borderColor: "rgba(0, 123, 255, 0.5)",
       };
     }
-
+    // Check if a role is selected
     if (dashboardData.roleNameSelected !== "Roles") {
       filters.roles = {
         label: "Role",
@@ -168,6 +177,7 @@ export const useEmpleadoDashboardPage = () => {
         borderColor: "rgba(0, 123, 255, 0.5)",
       };
     }
+
     return filters;
   }, [
     dashboardData.selectedSkillFilters,
@@ -192,43 +202,33 @@ export const useEmpleadoDashboardPage = () => {
   // Handle clear filters action
   const handleClearFilters = useCallback(() => {
     dashboardData.clearAllSkillFilters();
-    listPage.handleClearFilters();
     dashboardData.removeRoleFilter();
     dashboardData.removeClientFilter();
+    listPage.handleClearFilters();
   }, [dashboardData, listPage]);
 
   // Compute flattened projects for display
   const displayProjects = useMemo(() => {
     const tabProjects = getTabProjects();
-    console.log("computing displayProjects for tab:", listPage.activeTab);
-    console.log("tabProjects:", tabProjects);
+    
 
     if (listPage.activeTab === "All") {
-      //use flattenProjectsForList to filter out roles with estado "Aceptado"
-      const result = dashboardData.flattenProjectsForList(tabProjects);
-      console.log("all tab displayProjects result:", result);
-      console.log("all tab displayProjects length:", result.length);
-      if (result.length > 0) {
-        console.log("first item in result:", result[0]);
-        console.log("first item project:", result[0]?.project);
-        console.log("first item proyecto_rol:", result[0]?.proyecto_rol);
-      }
-      return result;
+
+      return tabProjects.map((project) => ({
+        project: project,
+        proyecto_rol: null,
+      }));
+
     } else if (listPage.activeTab === "Applied to") {
       //for applied to tab, flatten roles but keep project structure
-      console.log("processing applied to tab, count:", tabProjects.length);
-      const result = tabProjects.map((project) => ({
+      return tabProjects.map((project) => ({
         project: project,
         proyecto_rol: null, //indicate this is a role card
         isApplyCard: true, //indicate this is an applied to card
       }));
-      console.log("applied to tab displayProjects count:", result.length);
-      return result;
     }
 
-    const result = dashboardData.flattenProjectsForList(tabProjects);
-    console.log("default tab displayProjects:", result);
-    return result;
+    return dashboardData.flattenProjectsForList(tabProjects);
   }, [dashboardData, getTabProjects, listPage.activeTab]);
 
   // Determine the loading
@@ -244,6 +244,7 @@ export const useEmpleadoDashboardPage = () => {
     dashboardData.projectsLoading,
     dashboardData.applyLoading,
   ]);
+
   // Get top three projects based on compatibility for HOME
   const getTopProjects = () => {
     let filteredProjects;
@@ -255,7 +256,6 @@ export const useEmpleadoDashboardPage = () => {
       default:
         filteredProjects = dashboardData.top;
     }
-
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
   };
 
@@ -289,7 +289,6 @@ export const useEmpleadoDashboardPage = () => {
     ...dashboardData,
     displayProjects,
     topProjects,
-
     tabNames,
     showCompatibility,
     toggleCompatibility,
@@ -297,6 +296,8 @@ export const useEmpleadoDashboardPage = () => {
     openModal,
     closeModal,
     toggleSkillsFilterModal,
+    toggleClientsFilterModal,
+    toggleRolesFilterModal,
     getActiveFilters,
     handleRemoveFilter,
     handleClearFilters,
