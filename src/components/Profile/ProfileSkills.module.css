@@ -64,10 +64,9 @@
 .skillsContent {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1.5rem;
   width: 100%;
   box-sizing: border-box;
-  align-items: center;
 }
 
 .skillCategory {

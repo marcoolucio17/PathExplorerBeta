@@ -56,10 +56,7 @@ function transformBackendProject(projectData, roleId = null) {
         primaryRole = roleObj;
       }
 
-      //only add roles that are available (estado: "pendiente")
-      if (proyectoRole.estado === "Pendiente") {
-        availableRoles.push(roleObj);
-      }
+      availableRoles.push(roleObj);
     });
   }
   else if (project.roles) {
@@ -77,10 +74,7 @@ function transformBackendProject(projectData, roleId = null) {
           primaryRole = roleObj;
         }
 
-        //only add roles that are available (estado: "pendiente")
-        if (role.estado === "Pendiente") {
-          availableRoles.push(roleObj);
-        }
+        availableRoles.push(roleObj);
       });
     }
     else if (project.roles.nombrerol && project.roles.idrol) {
@@ -425,7 +419,7 @@ const useEmpleadoProyectoPage = () => {
     return Math.round((matchingSkills / totalSkills) * 100);
   }, [enhancedProjectData?.requiredSkills, userSkills]);
 
-  // update browser tab title with project and role names
+  //update browser tab title with project and role names
   useEffect(() => {
     if (enhancedProjectData?.title && enhancedProjectData?.primaryRole?.name) {
       document.title = `${enhancedProjectData.title} - ${enhancedProjectData.primaryRole.name}`;

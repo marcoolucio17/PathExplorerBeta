@@ -21,11 +21,9 @@ const ProjectCard = ({
   userSkills = [],
   isProjectCard = false, //new prop to indicate project-level card
   isApplyCard = false, //new prop to indicate applied to card
-  onViewApplication,
 }) => {
 
   const navigate = useNavigate();
-  
   const cardClass = viewMode === 'grid'
     ? styles.cardGrid
     : `${styles.cardList} ${customStyles.cardList}`;
@@ -61,10 +59,11 @@ const ProjectCard = ({
       }
     }
 
+
+
     //proyecto_rol.nombrerol ||
     return {
       roleName: project.nombrerol || 'Developer',
-
       projectName: project.pnombre || 'Project',
       duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD"
     };
@@ -75,10 +74,10 @@ const ProjectCard = ({
     if (isProjectCard || isApplyCard) {
       return [];
     }
+
     if (!project.requerimientos_roles || project.requerimientos_roles.length === 0) {
       return [];
     }
-
 
     const skills = project.requerimientos_roles.map(req_roles => {
       const habilidad = req_roles.requerimientos?.habilidades;
@@ -98,6 +97,7 @@ const ProjectCard = ({
   };
   const roleData = ensureRoleData();
   const skillsData = ensureSkillsData();
+
 
   const renderSkills = () => {
     //don't render skills for project cards
@@ -145,6 +145,7 @@ const ProjectCard = ({
       )}
 
       <div className={styles.cardHeader}>
+
         <img
           className={styles.cardAvatar}
           src={project.cliente?.fotodecliente_url || project.fotodecliente_url || "/images/ImagenProyectoDefault.png"}
@@ -161,7 +162,9 @@ const ProjectCard = ({
         {isApplyCard && (
           <div className={styles.cardInfo}>
             <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
+
           </div>
+
         )}
       </div>
 
@@ -169,9 +172,11 @@ const ProjectCard = ({
         <p className={styles.descriptionText}>
           {project.descripcion || 'This project aims to develop a comprehensive solution that meets client requirements while leveraging modern technologies...'}
         </p>
+
       </div>}
 
       <div className={styles.cardDetails}>
+
         {!isApplyCard && <div className={styles.detailRow}>
           <span className={styles.detailLabel}>
             <i className="bi bi-clock"></i> Duration:
@@ -182,6 +187,7 @@ const ProjectCard = ({
           {(roleData.duration === "< 1") && <span className={styles.detailValue}>
             {roleData.duration} month
           </span>}
+
         </div>}
 
         {isApplyCard && (
@@ -191,12 +197,15 @@ const ProjectCard = ({
             </span>
             <span className={styles.detailValue}>{roleData.projectName}</span>
           </div>
-        )}
+        )
+        }
 
         {isApplyCard && (
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>
-              <i className="bi bi-clock"></i> Status:
+              <i className="bi bi-clock"></i> {
+                'Status:'
+              }
             </span>
             <span className={styles.detailValue}>
               {roleData.status}
@@ -212,12 +221,7 @@ const ProjectCard = ({
             variant="view"
             icon="bi-file-earmark-text"
             onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              //open modal with application data
-              if (onViewApplication) {
-                onViewApplication(project);
-              }
+              ;
             }}
           >
             View Request
@@ -248,6 +252,7 @@ const ProjectCard = ({
         {isProjectCard && !isApplyCard && roleData.roleCount > 0 && (
           <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
         )}
+
       </div>
 
       <div className={customStyles.floatingDescription}>
@@ -256,10 +261,12 @@ const ProjectCard = ({
         </p>
       </div>
 
+
       {isProjectCard && (
         <div className={customStyles.skillsCircleContainer}>
           <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
             {renderSkills()}
+
           </div>
 
           {!showCompatibility && (

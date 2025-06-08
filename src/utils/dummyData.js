@@ -5,7 +5,7 @@
  */
 export const generateDummyApplicants = (count = 20) => {
   const statuses = ['Pending', 'In Review', 'Accepted', 'Denied'];
-  const skills = [];
+  const skills = ['React', 'JavaScript', 'TypeScript', 'Node.js', 'CSS', 'HTML', 'Redux', 'Python', 'Java', 'C#'];
   const projects = ['PathExplorer', 'DataViz', 'TechConnect', 'CloudSync', 'MobileFirst'];
   
   return Array.from({ length: count }, (_, i) => {

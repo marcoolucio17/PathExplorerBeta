@@ -16,7 +16,6 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
-  justify-content: center;
   border: 1px solid var(--modal-input-border);
 }
 
@@ -214,7 +213,6 @@
   .userInfo {
     flex-direction: column;
     text-align: center;
-    justify-content: center;
     gap: 10px;
   }
   

@@ -13,7 +13,7 @@ const Login = () => {
       
       <div id="image-background" className="imageBackground">
         <div id="image-header-main-div" className="imageHeaderMainDiv">
-          <div id="image-header-div" className="mb-3">
+          <div id="image-header-div">
             <h1
               className="page-title"
               style={{ width: "30%", fontSize: "72px" }}

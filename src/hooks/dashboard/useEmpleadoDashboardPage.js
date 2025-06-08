@@ -28,20 +28,14 @@ export const useEmpleadoDashboardPage = () => {
   // Modal controls
   const { modals, openModal, closeModal, toggleModal } = useModalControl({
     skillsFilter: false,
-
     viewApplication: false,
-
     clientsFilter: false,
     rolesFilter: false,
-
   });
 
   // Toggle for compatibility view
   const { state: showCompatibility, toggle: toggleCompatibility } =
     useToggleState(false);
-
-  // State for selected application to view
-  const [selectedApplication, setSelectedApplication] = useState(null);
 
   // Setup list page logic
   const listPage = useListPage({
@@ -89,37 +83,6 @@ export const useEmpleadoDashboardPage = () => {
   // Helper to toggle roles filter modals
   const toggleRolesFilterModal = () => toggleModal("rolesFilter");
 
-  // Handle viewing application details
-  const handleViewApplication = useCallback((applicationData) => {
-    console.log("opening view application modal with data:", applicationData);
-    setSelectedApplication(applicationData);
-    openModal('viewApplication');
-  }, [openModal]);
-
-  // Transform application data to match modal format
-  const transformApplicationData = useCallback((appData) => {
-    if (!appData) return null;
-    
-    return {
-      id: appData.idaplicacion,
-      userId: null, //no user data available in this structure
-      name: 'You', //since this is the user viewing their own application
-      email: '', //not available in application data
-      role: appData.roles?.nombrerol || 'Unknown Role',
-      project: appData.proyecto?.pnombre || 'Unknown Project',
-      message: appData.message || 'No message provided',
-      appliedDate: appData.fechaaplicacion || 'Unknown Date',
-      status: appData.estatus || 'Unknown',
-      avatar: null //not available
-    };
-  }, []);
-
-  // Handle closing view application modal
-  const handleCloseViewApplication = useCallback(() => {
-    closeModal('viewApplication');
-    setSelectedApplication(null);
-  }, [closeModal]);
-
   // Get filtered projects for the current tab
   const getTabProjects = useCallback(() => {
     let filteredProjects;
@@ -131,9 +94,8 @@ export const useEmpleadoDashboardPage = () => {
         break;
       case "Applied to":
         // Projects where the user has applied to a role
-        // Filter out applications where role has been assigned (RolAsignado)
         filteredProjects = dashboardData.projectsApp
-          ? dashboardData.projectsApp.filter(app => app.estatus !== "RolAsignado")
+          ? dashboardData.projectsApp
           : [];
         break;
       default:
@@ -212,7 +174,6 @@ export const useEmpleadoDashboardPage = () => {
   // Compute flattened projects for display
   const displayProjects = useMemo(() => {
     const tabProjects = getTabProjects();
-   
 
     if (listPage.activeTab === "All") {
       return tabProjects.map((project) => ({
@@ -227,6 +188,7 @@ export const useEmpleadoDashboardPage = () => {
         isApplyCard: true, //indicate this is an applied to card
       }));
     }
+
     return dashboardData.flattenProjectsForList(tabProjects);
   }, [dashboardData, getTabProjects, listPage.activeTab]);
 
@@ -268,21 +230,20 @@ export const useEmpleadoDashboardPage = () => {
 
     // Initial counts
     const counts = {
-      All: 0, // Will be calculated using filtered results
+      All: 0, // Will be set to 0 to hide notification badge
       "Applied to": 0,
     };
 
     // Calculate flattened projects (roles) for each tab
-    // All projects - use same filtering logic as display
-    const filteredAllProjects = dashboardData.flattenProjectsForList(dashboardData.projects);
-    counts["All"] = filteredAllProjects.length;
+    // All projects - set to 0 to hide notification badge as requested
+    counts["All"] = dashboardData.projects.length;
 
-    // Applied to projects - exclude RolAsignado status
-    counts["Applied to"] = dashboardData.projectsApp.filter(app => app.estatus !== "RolAsignado").length;
+    // Applied to projects
+    counts["Applied to"] = dashboardData.projectsApp.length;
 
     return counts;
   }, [dashboardData.projects, dashboardData.projectsApp]);
-
+  console.log("Corrected tab counts:", correctedTabCounts);
   return {
     ...listPage,
     ...dashboardData,
@@ -306,11 +267,6 @@ export const useEmpleadoDashboardPage = () => {
     tabCounts: correctedTabCounts,
     isLoading,
     currentUserId,
-    //view application modal
-    selectedApplication,
-    transformApplicationData,
-    handleViewApplication,
-    handleCloseViewApplication,
   };
 };
 

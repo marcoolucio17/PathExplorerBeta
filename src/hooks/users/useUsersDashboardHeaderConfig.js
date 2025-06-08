@@ -16,13 +16,13 @@ export const useUsersDashboardHeaderConfig = (props) => {
     getActiveFilters,
     handleClearFilters,
     toggleSkillsFilterModal,
-    toggleRoleFilterModal,
     setSortOption,
     toggleCompatibility,
     showCompatibility,
     handleRemoveFilter
   } = props;
 
+  //users version - filter by and sort by buttons
   const customButtons = [
     {
       label: "Filter By",
@@ -35,12 +35,14 @@ export const useUsersDashboardHeaderConfig = (props) => {
           label: 'Role', 
           action: 'role', 
           icon: 'bi-person-badge'
+        },
+        { 
+          label: 'Status', 
+          action: 'status', 
+          icon: 'bi-toggle-on'
         }
       ],
       onDropdownItemClick: (item) => {
-        if (item.action === 'role') {
-          toggleRoleFilterModal();
-        }
       }
     },
     {

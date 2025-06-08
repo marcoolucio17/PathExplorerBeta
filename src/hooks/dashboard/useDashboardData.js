@@ -38,11 +38,9 @@ export const useDashboardData = () => {
   const [projectsData, setProjectsData] = useState([]);
   // State for boolean loading projects All
   const [projectsLoading, setProjectsLoading] = useState(true);
-   // State for boolean loading apply projects
+  // State for boolean loading apply projects
   const [applyLoading, setApplyLoading] = useState(true);
-
   // State for clients data
-
   const [clientsData, setClientsData] = useState([]);
   // State for roles data
   const [rolesData, setRolesData] = useState([]);
@@ -98,18 +96,14 @@ export const useDashboardData = () => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    params: filterOptions,
+    params: filterOptions, // parameters
   };
-
+  // Fetch projects All data when filter options change
   useEffect(() => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
-        console.log("fetching all projects with config:", config);
         const { data } = await axios.get(`${url}/projects`, config);
-        console.log("all projects fetched:", data);
-        console.log("all projects count:", data?.length);
-        console.log("sample project structure:", data?.[0]);
         setProjectsData(data);
       } catch (err) {
         console.error("Error fetching projects", err);
@@ -120,16 +114,14 @@ export const useDashboardData = () => {
     fetchProjects();
   }, [filterOptions]);
 
-
   // Fetch Roles, clients, top projects, my applications and my skills once
   useEffect(() => {
-    //fetch roles
+    // Fetch Roles
     axios
       .get(`${url}/roles`, config)
       .then((res) => setRolesData(res.data))
       .catch((err) => console.error("Error fetching roles", err));
-    
-    //get user top 3 projects compability
+    // Get user top 3 projects compability
     const userId = localStorage.getItem("id");
     if (userId) {
       axios
@@ -137,26 +129,21 @@ export const useDashboardData = () => {
         .then((res) => setTopData(res.data))
         .catch((err) => console.error("Error fetching top projects", err));
     }
-    
-    //fetch clients
+    // Fetch clients
     axios
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
       .catch((err) => console.error("Error fetching clients", err));
-    
-    //fetch user applications
-    console.log("fetching user applications for user:", localStorage.getItem("id"));
-    console.log("dashboard data: --------------------------------------------------", projectsData);
+    // Fetch user applications
     axios
       .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
         setMyApplicationsData(res.data);
         setApplyLoading(false);
       })
-      .catch((err) => { console.error("Error fetching my applications", err);
-      setApplyLoading(false); });
+      .catch((err) => console.error("Error fetching my applications", err));
 
-    //fetch user skills
+    // Fetch user skills
     axios
       .get(`${url}/habilidades/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
@@ -172,9 +159,7 @@ export const useDashboardData = () => {
       selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
     );
   };
-
   // Handle the project name in the search bar
-
   const handdlyApplyNameProject = (nameProject) => {
     if (nameProject !== "") {
       setFilterOptions((prev) => ({ ...prev, projectName: nameProject }));
@@ -287,7 +272,7 @@ export const useDashboardData = () => {
     }
   };
   // Flatten projects for list display
- const flattenProjectsForList = (projects) => {
+  const flattenProjectsForList = (projects) => {
     return projects
       .flatMap((project) => {
         // When the tab is "My Projects", we need to flatten the roles
@@ -320,7 +305,6 @@ export const useDashboardData = () => {
       .filter((item) => item.hasSelectedSkills);
   };
 
-  
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],
@@ -351,7 +335,6 @@ export const useDashboardData = () => {
     filterOptionsMyProjects,
     setFilterOptionsMyProjects,
     projectsLoading,
-    applyLoading,
   };
 };
 

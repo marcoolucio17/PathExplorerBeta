@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import styles from 'src/styles/Modals/Modal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import { usePost } from 'src/hooks/usePost';
-import useFetch from 'src/hooks/useFetch';
 import axios from 'axios';
 
 export const EditProjectModal = ({ isOpen, onClose, projectData, onUpdateProject }) => {
   const { triggerPost, loading, error } = usePost();
-  const { data: habilidades } = useFetch("habilidades");
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   
@@ -17,7 +15,6 @@ export const EditProjectModal = ({ isOpen, onClose, projectData, onUpdateProject
     startDate: '',
     endDate: '',
     deliverables: [],
-    roles: [],
     RfpPreview: null,
     projectRFP: null
   });
@@ -43,17 +40,6 @@ export const EditProjectModal = ({ isOpen, onClose, projectData, onUpdateProject
         startDate: formatDateForInput(projectData.fechainicio) || '',
         endDate: formatDateForInput(projectData.fechafin) || '',
         deliverables: projectData.deliverables || [],
-        roles: projectData.proyecto_roles ? projectData.proyecto_roles.map(pr => ({
-          idrol: pr.idrol, // preserve existing role ID
-          nombrerol: pr.roles?.nombrerol || '',
-          nivelrol: pr.roles?.nivelrol ? pr.roles.nivelrol.toString() : '1',
-          descripcionrol: pr.roles?.descripcionrol || '',
-          disponible: pr.estado !== "Aceptado",
-          requerimientos: pr.roles?.requerimientos_roles?.map(rr => ({
-            tiempoexperiencia: rr.requerimientos?.tiempoexperiencia || '',
-            idhabilidad: rr.requerimientos?.habilidades?.idhabilidad ? rr.requerimientos.habilidades.idhabilidad.toString() : ''
-          })) || []
-        })) : [],
         RfpPreview: null,
         projectRFP: null
       });
@@ -130,67 +116,6 @@ export const EditProjectModal = ({ isOpen, onClose, projectData, onUpdateProject
     }));
   };
 
-  //role management functions
-  const handleAddRole = () => {
-    setFormData(prev => ({
-      ...prev,
-      roles: [
-        ...prev.roles,
-        {
-          // no idrol for new roles
-          nombrerol: '',
-          nivelrol: '1',
-          descripcionrol: '',
-          disponible: true,
-          requerimientos: [
-            {
-              tiempoexperiencia: '',
-              idhabilidad: '' // start empty, user must select
-            }
-          ]
-        }
-      ]
-    }));
-  };
-
-  const handleRemoveRole = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      roles: prev.roles.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleRoleChange = (index, field, value) => {
-    const updatedRoles = [...formData.roles];
-    updatedRoles[index][field] = value;
-    setFormData(prev => ({
-      ...prev,
-      roles: updatedRoles
-    }));
-  };
-
-  //requirements management functions
-  const handleAddRequerimiento = (roleIndex) => {
-    const updatedRoles = [...formData.roles];
-    updatedRoles[roleIndex].requerimientos.push({
-      tiempoexperiencia: '',
-      idhabilidad: '' // start empty, user must select
-    });
-    setFormData(prev => ({ ...prev, roles: updatedRoles }));
-  };
-
-  const handleRemoveRequerimiento = (roleIndex, reqIndex) => {
-    const updatedRoles = [...formData.roles];
-    updatedRoles[roleIndex].requerimientos.splice(reqIndex, 1);
-    setFormData(prev => ({ ...prev, roles: updatedRoles }));
-  };
-
-  const handleRequerimientoChange = (roleIndex, reqIndex, field, value) => {
-    const updatedRoles = [...formData.roles];
-    updatedRoles[roleIndex].requerimientos[reqIndex][field] = value;
-    setFormData(prev => ({ ...prev, roles: updatedRoles }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -212,59 +137,13 @@ export const EditProjectModal = ({ isOpen, onClose, projectData, onUpdateProject
       fechainicio: formatDate(formData.startDate),
       fechafin: formatDate(formData.endDate),
       projectdeliverables: (formData.deliverables || []).filter(d => d.trim()).join(', '),
-      roles: formData.roles
-        .filter(rol => rol.nombrerol && rol.nombrerol.trim()) // only include roles with names
-        .map((rol) => {
-          const roleData = {
-            nombrerol: rol.nombrerol || '',
-            nivelrol: rol.nivelrol && !isNaN(parseInt(rol.nivelrol)) ? parseInt(rol.nivelrol) : 1,
-            descripcionrol: rol.descripcionrol || '',
-            disponible: rol.disponible !== false,
-            requerimientos: (rol.requerimientos || [])
-              .filter(req => req.idhabilidad && req.tiempoexperiencia) // only include complete requirements
-              .map(req => ({
-                tiempoexperiencia: req.tiempoexperiencia,
-                idhabilidad: parseInt(req.idhabilidad)
-              }))
-          };
-          
-          // include idrol only for existing roles (not new ones)
-          if (rol.idrol) {
-            roleData.idrol = parseInt(rol.idrol);
-          }
-          
-          return roleData;
-        })
+      roles: [] //send empty roles array to prevent "roles is not iterable" error
     };
 
     //remove null values to avoid sending them
     Object.keys(updateData).forEach(key => {
       if (updateData[key] === null) {
         delete updateData[key];
-      }
-    });
-
-    console.log("Final updateData being sent:", updateData);
-    console.log("Roles data:", JSON.stringify(updateData.roles, null, 2));
-    console.log("Number of roles:", updateData.roles.length);
-    
-    // check for any undefined values in roles
-    updateData.roles.forEach((role, index) => {
-      console.log(`Role ${index}:`, role);
-      Object.keys(role).forEach(key => {
-        if (role[key] === undefined) {
-          console.warn(`Role ${index} has undefined ${key}`);
-        }
-      });
-      if (role.requerimientos) {
-        role.requerimientos.forEach((req, reqIndex) => {
-          console.log(`Role ${index} requirement ${reqIndex}:`, req);
-          Object.keys(req).forEach(key => {
-            if (req[key] === undefined) {
-              console.warn(`Role ${index} requirement ${reqIndex} has undefined ${key}`);
-            }
-          });
-        });
       }
     });
 
@@ -624,358 +503,6 @@ export const EditProjectModal = ({ isOpen, onClose, projectData, onUpdateProject
                         color: 'var(--text-muted)'
                       }}>
                         Click "Add Deliverable" to get started
-                      </small>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Project Roles Section */}
-              <div style={{ marginBottom: '2rem' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  marginBottom: '1rem' 
-                }}>
-                  <h3 style={{ 
-                    fontSize: '1.2rem',
-                    fontWeight: '600',
-                    color: 'var(--text-light)',
-                    margin: 0,
-                    fontFamily: 'var(--font-medium)'
-                  }}>
-                    Project Roles
-                  </h3>
-                  <button 
-                    type="button" 
-                    onClick={handleAddRole}
-                    style={{
-                      background: 'var(--primary-color)',
-                      color: 'var(--text-light)',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '0.75rem 1rem',
-                      fontSize: '0.9rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      fontFamily: 'var(--font-medium)'
-                    }}
-                  >
-                    <i className="bi bi-plus-lg"></i>
-                    Add Role
-                  </button>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {(formData.roles || []).map((role, index) => (
-                    <div 
-                      key={index} 
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '12px',
-                        padding: '1.5rem',
-                        position: 'relative'
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveRole(index)}
-                        style={{
-                          position: 'absolute',
-                          top: '0.75rem',
-                          right: '0.75rem',
-                          background: 'rgba(255, 0, 0, 0.1)',
-                          border: '1px solid rgba(255, 0, 0, 0.2)',
-                          borderRadius: '6px',
-                          color: 'var(--text-light)',
-                          width: '28px',
-                          height: '28px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          fontSize: '1rem'
-                        }}
-                      >
-                        ×
-                      </button>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: '1rem', marginBottom: '1rem' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                          <label style={{ 
-                            fontSize: '0.9rem',
-                            color: 'var(--text-muted)',
-                            fontFamily: 'var(--font-primary)'
-                          }}>
-                            Role Name
-                          </label>
-                          <input
-                            type="text"
-                            value={role.nombrerol}
-                            onChange={(e) => handleRoleChange(index, 'nombrerol', e.target.value)}
-                            placeholder="e.g. Frontend Developer"
-                            style={{
-                              padding: '0.75rem',
-                              background: 'rgba(255, 255, 255, 0.05)',
-                              border: '1px solid rgba(255, 255, 255, 0.1)',
-                              borderRadius: '8px',
-                              color: 'var(--text-light)',
-                              fontSize: '0.9rem',
-                              fontFamily: 'var(--font-primary)'
-                            }}
-                          />
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                          <label style={{ 
-                            fontSize: '0.9rem',
-                            color: 'var(--text-muted)',
-                            fontFamily: 'var(--font-primary)'
-                          }}>
-                            Level
-                          </label>
-                          <input
-                            type="number"
-                            value={role.nivelrol}
-                            onChange={(e) => handleRoleChange(index, 'nivelrol', e.target.value)}
-                            placeholder="1-5"
-                            min="1"
-                            max="5"
-                            style={{
-                              padding: '0.75rem',
-                              background: 'rgba(255, 255, 255, 0.05)',
-                              border: '1px solid rgba(255, 255, 255, 0.1)',
-                              borderRadius: '8px',
-                              color: 'var(--text-light)',
-                              fontSize: '0.9rem',
-                              fontFamily: 'var(--font-primary)'
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
-                        <label style={{ 
-                          fontSize: '0.9rem',
-                          color: 'var(--text-muted)',
-                          fontFamily: 'var(--font-primary)'
-                        }}>
-                          Description
-                        </label>
-                        <textarea
-                          value={role.descripcionrol}
-                          onChange={(e) => handleRoleChange(index, 'descripcionrol', e.target.value)}
-                          placeholder="Describe the role responsibilities..."
-                          rows="2"
-                          style={{
-                            padding: '0.75rem',
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '8px',
-                            color: 'var(--text-light)',
-                            fontSize: '0.9rem',
-                            fontFamily: 'var(--font-primary)',
-                            resize: 'vertical'
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <div style={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center', 
-                          marginBottom: '0.75rem' 
-                        }}>
-                          <h4 style={{ 
-                            color: 'var(--text-light)', 
-                            margin: 0,
-                            fontSize: '1rem',
-                            fontFamily: 'var(--font-medium)'
-                          }}>
-                            Required Skills
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={() => handleAddRequerimiento(index)}
-                            style={{
-                              background: 'rgba(74, 144, 226, 0.1)',
-                              color: 'var(--primary-color)',
-                              border: '1px solid rgba(74, 144, 226, 0.2)',
-                              borderRadius: '6px',
-                              padding: '0.5rem 0.75rem',
-                              fontSize: '0.8rem',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.25rem',
-                              fontFamily: 'var(--font-primary)'
-                            }}
-                          >
-                            <i className="bi bi-plus"></i>
-                            Add Skill
-                          </button>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                          {(role.requerimientos || []).map((req, reqIndex) => (
-                            <div 
-                              key={reqIndex}
-                              style={{
-                                background: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                borderRadius: '8px',
-                                padding: '1rem',
-                                position: 'relative'
-                              }}
-                            >
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: '0.75rem' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                  <label style={{ 
-                                    fontSize: '0.85rem',
-                                    color: 'var(--text-muted)',
-                                    fontFamily: 'var(--font-primary)'
-                                  }}>
-                                    Skill
-                                  </label>
-                                  <select
-                                    value={req.idhabilidad}
-                                    onChange={(e) => handleRequerimientoChange(index, reqIndex, 'idhabilidad', e.target.value)}
-                                    style={{
-                                      padding: '0.6rem',
-                                      background: 'rgba(255, 255, 255, 0.05)',
-                                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                                      borderRadius: '6px',
-                                      color: 'var(--text-light)',
-                                      fontSize: '0.85rem',
-                                      fontFamily: 'var(--font-primary)'
-                                    }}
-                                  >
-                                    <option value="">Select a skill</option>
-                                    {[...habilidades || []]
-                                      .sort((a, b) => a.nombre.localeCompare(b.nombre))
-                                      .map((hab) => (
-                                        <option key={hab.idhabilidad} value={hab.idhabilidad}>
-                                          {hab.nombre}
-                                        </option>
-                                      ))}
-                                  </select>
-                                </div>
-
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                  <label style={{ 
-                                    fontSize: '0.85rem',
-                                    color: 'var(--text-muted)',
-                                    fontFamily: 'var(--font-primary)'
-                                  }}>
-                                    Experience
-                                  </label>
-                                  <select
-                                    value={req.tiempoexperiencia}
-                                    onChange={(e) => handleRequerimientoChange(index, reqIndex, 'tiempoexperiencia', e.target.value)}
-                                    style={{
-                                      padding: '0.6rem',
-                                      background: 'rgba(255, 255, 255, 0.05)',
-                                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                                      borderRadius: '6px',
-                                      color: 'var(--text-light)',
-                                      fontSize: '0.85rem',
-                                      fontFamily: 'var(--font-primary)'
-                                    }}
-                                  >
-                                    <option value="">Select experience</option>
-                                    <option>3 months</option>
-                                    <option>6 months</option>
-                                    <option>1 year</option>
-                                    <option>2 years</option>
-                                    <option>3 years</option>
-                                    <option>4 years</option>
-                                    <option>5 years</option>
-                                  </select>
-                                </div>
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveRequerimiento(index, reqIndex)}
-                                style={{
-                                  position: 'absolute',
-                                  top: '0.5rem',
-                                  right: '0.5rem',
-                                  background: 'rgba(255, 0, 0, 0.1)',
-                                  border: '1px solid rgba(255, 0, 0, 0.2)',
-                                  borderRadius: '4px',
-                                  color: 'var(--text-light)',
-                                  width: '20px',
-                                  height: '20px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  cursor: 'pointer',
-                                  fontSize: '0.7rem'
-                                }}
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ))}
-
-                          {(!role.requerimientos || role.requerimientos.length === 0) && (
-                            <div style={{
-                              padding: '1.5rem',
-                              textAlign: 'center',
-                              color: 'var(--text-muted)',
-                              background: 'rgba(255, 255, 255, 0.02)',
-                              border: '2px dashed rgba(255, 255, 255, 0.1)',
-                              borderRadius: '8px'
-                            }}>
-                              <i className="bi bi-code-slash" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}></i>
-                              <p style={{ 
-                                margin: '0.25rem 0',
-                                fontFamily: 'var(--font-primary)',
-                                fontSize: '0.9rem'
-                              }}>
-                                No skills added yet
-                              </p>
-                              <small style={{ 
-                                fontFamily: 'var(--font-light)',
-                                fontSize: '0.8rem'
-                              }}>
-                                Click "Add Skill" to add requirements
-                              </small>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {(!formData.roles || formData.roles.length === 0) && (
-                    <div style={{
-                      padding: '2rem',
-                      textAlign: 'center',
-                      color: 'var(--text-muted)',
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '2px dashed rgba(255, 255, 255, 0.2)',
-                      borderRadius: '12px'
-                    }}>
-                      <i className="bi bi-person-gear" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}></i>
-                      <p style={{ 
-                        margin: '0.5rem 0',
-                        fontFamily: 'var(--font-primary)',
-                        color: 'var(--text-light)'
-                      }}>
-                        No roles added yet
-                      </p>
-                      <small style={{ 
-                        fontFamily: 'var(--font-light)',
-                        color: 'var(--text-muted)'
-                      }}>
-                        Click "Add Role" to get started
                       </small>
                     </div>
                   )}
