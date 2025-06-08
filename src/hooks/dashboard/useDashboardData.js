@@ -173,6 +173,7 @@ export const useDashboardData = () => {
   // Handle the client selection
   const handleApplyClientFilters = (clientName, selectedClientId) => {
     if (clientName && selectedClientId) {
+      console.log("Selected Client:", clientName, selectedClientId);
       setClientNameSelected(clientName);
       setClientId(selectedClientId);
       setFilterOptions((prev) => ({ ...prev, idcliente: selectedClientId }));
@@ -181,6 +182,7 @@ export const useDashboardData = () => {
         idcliente: selectedClientId,
       }));
     } else {
+      console.log("Selected Client:", clientName, selectedClientId);
       setClientNameSelected("Clients");
       setClientId(null);
       const { idcliente, ...rest } = filterOptions;
@@ -201,9 +203,11 @@ export const useDashboardData = () => {
       setRoleNameSelected("Roles");
       setRoleId(null);
       const { nombrerol, ...rest } = filterOptions;
+      console.log("Rest:", rest);
       setFilterOptions(rest);
     }
   };
+
   // Remove specific skill filter
   const removeSkillFilter = (skillToRemove) => {
     handleApplySkillFilters(
@@ -213,16 +217,17 @@ export const useDashboardData = () => {
 
   // Remove client selection
   const removeClientFilter = () => {
-    handleApplyClientFilters("Clients", null);
+    handleApplyClientFilters();
   };
   // Remove role selection
   const removeRoleFilter = () => {
-    handleApplyRoleFilters("Roles", null);
+    handleApplyRoleFilters();
   };
   // Clear all skill filters
   const clearAllSkillFilters = () => {
     handleApplySkillFilters([]);
   };
+
   // Sort projects based on selected option
   const sortProjects = (projects, option, activeTab) => {
     if (!Array.isArray(projects)) return [];

@@ -74,6 +74,8 @@ export const EmpleadoDashboardPage = () => {
       <ClientsModal
         isOpen={dashboardPage.modals.clientsFilter}
         onClose={() => dashboardPage.closeModal('clientsFilter')}
+        clientNameStatus={dashboardPage.clientNameSelected}
+        clientIdStatus={dashboardPage.clientId}
         selectedClients={dashboardPage.selectedClientFilters}
         onClientSelected={dashboardPage.handleApplyClientFilters}
         clients={dashboardPage.clients}
@@ -81,6 +83,8 @@ export const EmpleadoDashboardPage = () => {
       <RolesModal
         isOpen={dashboardPage.modals.rolesFilter}
         onClose={() => dashboardPage.closeModal('rolesFilter')}
+        roleNameStatus={dashboardPage.roleNameSelected}
+        roleIdStatus={dashboardPage.roleId}
         onRoleSelected={dashboardPage.handleApplyRoleFilters}
         roles={dashboardPage.roles}
       />

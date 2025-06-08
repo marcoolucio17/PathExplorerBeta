@@ -96,6 +96,8 @@ export const ManagerDashboardPage = () => {
       <RolesModal
         isOpen={dashboardPage.modals.rolesFilter}
         onClose={() => dashboardPage.closeModal('rolesFilter')}
+        roleNameStatus={dashboardPage.roleNameSelected}
+        roleIdStatus={dashboardPage.roleId}
         onRoleSelected={dashboardPage.handleApplyRoleFilters}
         roles={dashboardPage.roles}
       />
