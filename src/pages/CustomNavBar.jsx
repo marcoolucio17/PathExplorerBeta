@@ -48,7 +48,7 @@ function CustomNavbar() {
         return [
           { key: 'people', label: 'People', icon: 'people' },
           { key: 'projects', label: 'Projects', icon: 'projects' },
-          { key: 'applicants', label: 'Applicants', icon: 'people' }
+          { key: 'applicants', label: 'Applicants', icon: 'applicants' }
         ];
       default:
         return [
@@ -170,7 +170,7 @@ function CustomNavbar() {
             <SearchHeader
               searchTerm={searchTerm}
               setSearchTerm={handleSearch}
-              placeholder="  Search..."
+              placeholder="Search..."
               searchName="navSearch"
               inSearchBar={true}
               onSearchResultClick={handleSearchResultClick}
