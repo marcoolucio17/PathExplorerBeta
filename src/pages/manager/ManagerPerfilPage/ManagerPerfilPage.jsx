@@ -129,7 +129,7 @@ export const ManagerPerfilPage = () => {
       <div className={styles.profileContent}>
         {/* Left Column - Profile info and tabs */}
         <div className={styles.profileColumnLeft}>
-          <ProfileHeaderCard user={profilePage.userProfile} />
+          <ProfileHeaderCard user={profilePage.userProfile} url = {profilePage.pic}/>
 
           <Tabs
             tabs={profilePage.tabNames.map((tab) => ({
