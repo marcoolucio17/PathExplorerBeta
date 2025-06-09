@@ -130,9 +130,11 @@ export const useEmpleadoDashboardPage = () => {
       case "Applied to":
         // Projects where the user has applied to a role
         // Filter out applications where role has been assigned (RolAsignado)
-        filteredProjects = dashboardData.projectsApp
-          ? dashboardData.projectsApp.filter(app => app.estatus !== "RolAsignado")
-          : [];
+        return (filteredProjects = dashboardData.projectsApp
+          ? dashboardData.projectsApp.filter(
+              (app) => app.estatus !== "RolAsignado"
+            )
+          : []);
         break;
       default:
         filteredProjects = dashboardData.projects;

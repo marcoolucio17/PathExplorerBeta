@@ -230,14 +230,14 @@ export const useManagerDashboardPage = () => {
     //for my projects tab, don't flatten - show each project as one card
     else if (listPage.activeTab === "My Projects") {
       //create project cards without flattening roles
-      tabProjects.map((project) => ({
+      return tabProjects.map((project) => ({
         project: project,
         //no specific role for project-level cards
         isProjectCard: true, //flag to indicate this is a project card, not role card*/
       }));
     } else if (listPage.activeTab === "Applied To") {
       //for applied to tab, flatten roles but keep project structure
-      tabProjects.map((project) => ({
+      return tabProjects.map((project) => ({
         project: project,
         //indicate this is a role card
         isApplyCard: true, //indicate this is an applied to card
