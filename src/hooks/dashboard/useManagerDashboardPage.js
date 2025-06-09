@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, use } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useDashboardData from "./useDashboardData";
@@ -6,10 +6,18 @@ import useListPage from "../useListPage";
 import useModalControl from "../useModalControl";
 import useToggleState from "../useToggleState";
 import useGetFetchProjectsFilters from "../useGetFetchProjectsFilters";
+import axios from "axios";
 
+/**
+ * Manager-specific Dashboard hook
+ * Tabs: "All", "Applied To", "My Projects"
+ * @returns {Object} Complete state and functions for the Manager Dashboard page
+ */
 export const useManagerDashboardPage = () => {
   const navigate = useNavigate();
+  // Get dashboard data
   const dashboardData = useDashboardData();
+  // Manager-specific tab names
   const tabNames = ["All", "Applied To", "My Projects"];
 
   //get current user id from localStorage
@@ -18,15 +26,41 @@ export const useManagerDashboardPage = () => {
     []
   );
 
-  const {
-    data: myProjectsData,
-    error: myProjectsError,
-    loading: myProjectsLoading,
-  } = useGetFetchProjectsFilters({
-    rutaApi: "projects",
-    filters: dashboardData.filterOptionsMyProjects,
-  });
+  // Variables to fetch projects for "My Projects" tab
+  // This for the projects created by the user
+  const [myProjectsData, setMyProjectsData] = useState([]);
+  // Loading and error states for "My Projects" tab
+  const [myProjectsLoading, setMyProjectsLoading] = useState(true);
+  const [myProjectsError, setMyProjectsError] = useState(null);
 
+  // Configuration for fetching my projects
+  let url = "https://pathexplorer-backend.onrender.com/api";
+  const config = {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    params: dashboardData.filterOptionsMyProjects, // 👈 correct way to send query parameters
+  };
+  // Fetch projects for "My Projects" tab
+  useEffect(() => {
+    const fetchMyProjects = async () => {
+      setMyProjectsLoading(true);
+
+      try {
+        const response = await axios.get(`${url}/projects`, config);
+        setMyProjectsData(response.data);
+      } catch (error) {
+        console.error("Error fetching my projects:", error);
+        setMyProjectsError(error);
+      } finally {
+        setMyProjectsLoading(false);
+      }
+    };
+
+    fetchMyProjects();
+  }, [dashboardData.filterOptionsMyProjects]);
+
+  // Modal controls
   const { modals, openModal, closeModal, toggleModal } = useModalControl({
     skillsFilter: false,
     createProject: false,
@@ -34,9 +68,11 @@ export const useManagerDashboardPage = () => {
     rolesFilter: false,
   });
 
+  // Toggle for compatibility view
   const { state: showCompatibility, toggle: toggleCompatibility } =
     useToggleState(false);
 
+  // Setup list page logic
   const listPage = useListPage({
     data: dashboardData.projects,
     defaultSortOption: "date_desc",
@@ -47,9 +83,12 @@ export const useManagerDashboardPage = () => {
     },
     filterConfig: {},
     sortFunction: dashboardData.sortProjects,
-    baseUrl: "/manager/bNamdashboard",
+    removeClientFilter: dashboardData.removeClientFilter,
+    removeRoleFilter: dashboardData.removeRoleFilter,
+    baseUrl: "/manager/dashboard",
   });
 
+  // Override toggleViewMode to ensure animation works consistently
   const toggleViewMode = useCallback(() => {
     listPage.toggleViewMode();
     setTimeout(() => {
@@ -60,45 +99,54 @@ export const useManagerDashboardPage = () => {
         if (listPage.triggerAnimationSequence) {
           listPage.triggerAnimationSequence();
         }
-      });
-    });
+      }, 50);
+    }, 50);
   }, [listPage]);
 
+  // Helper to toggle skills filter modal
   const toggleSkillsFilterModal = () => toggleModal("skillsFilter");
+  // Helper to toggle clients filter modals
   const toggleClientsFilterModal = () => toggleModal("clientsFilter");
+  // Helper to toggle roles filter modals
   const toggleRolesFilterModal = () => toggleModal("rolesFilter");
 
+  // Function to navigate to applicants page
   const handleViewApplicants = useCallback(() => {
-    console.log("Navigating to applicants page...");
     try {
       navigate("/manager/applicants", { replace: false });
     } catch (error) {
-      console.error("Navigation error:", error);
       window.location.href = "/manager/applicants";
     }
   }, [navigate]);
 
+  // Get filtered projects for the current tab
   const getTabProjects = useCallback(() => {
     let filteredProjects;
 
     switch (listPage.activeTab) {
       case "All":
-        filteredProjects = dashboardData.projects;
+        // Projects with roles available for the user
+        filteredProjects = dashboardData.projects ? dashboardData.projects : [];
         break;
       case "Applied To":
-        filteredProjects = dashboardData.projects.filter(
-          (project) => project.userHasApplied === true
-        );
+        // Projects where the user has applied to a role
+        filteredProjects = dashboardData.projectsApp
+          ? dashboardData.projectsApp
+          : [];
         break;
       case "My Projects":
-        //use projects from /creador endpoint
+        // Projects created by the user
         filteredProjects = myProjectsData ? myProjectsData : [];
         break;
       default:
         filteredProjects = dashboardData.projects;
     }
 
-    return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
+    return dashboardData.sortProjects(
+      filteredProjects,
+      listPage.sortOption,
+      listPage.activeTab
+    );
   }, [
     dashboardData.projects,
     myProjectsData,
@@ -107,9 +155,10 @@ export const useManagerDashboardPage = () => {
     dashboardData.sortProjects,
   ]);
 
+  // Generate active filters for header
   const getActiveFilters = useCallback(() => {
     const filters = {};
-
+    // Check if there are any skill filters selected
     if (dashboardData.selectedSkillFilters.length > 0) {
       filters.skills = {
         label: "Skill",
@@ -118,7 +167,7 @@ export const useManagerDashboardPage = () => {
         borderColor: "rgba(139, 92, 246, 0.5)",
       };
     }
-
+    // Check if a client is selected
     if (dashboardData.clientNameSelected !== "Clients") {
       filters.clients = {
         label: "Client",
@@ -127,7 +176,7 @@ export const useManagerDashboardPage = () => {
         borderColor: "rgba(0, 123, 255, 0.5)",
       };
     }
-
+    // Check if a role is selected
     if (dashboardData.roleNameSelected !== "Roles") {
       filters.roles = {
         label: "Role",
@@ -136,6 +185,7 @@ export const useManagerDashboardPage = () => {
         borderColor: "rgba(0, 123, 255, 0.5)",
       };
     }
+    
     return filters;
   }, [
     dashboardData.selectedSkillFilters,
@@ -156,24 +206,26 @@ export const useManagerDashboardPage = () => {
     [dashboardData]
   );
 
+  // Handle clear filters action
   const handleClearFilters = useCallback(() => {
     dashboardData.clearAllSkillFilters();
-    listPage.handleClearFilters();
     dashboardData.removeRoleFilter();
     dashboardData.removeClientFilter();
+    listPage.handleClearFilters();
   }, [dashboardData, listPage]);
 
   const handleCreateProject = useCallback(() => {
     //add project creation logic
   }, []);
 
+  // Compute flattened projects for display
   const displayProjects = useMemo(() => {
     const tabProjects = getTabProjects();
 
     if (listPage.activeTab === "All") {
       return tabProjects.map((project) => ({
-        project,
-        proyecto_rol: project.proyecto_roles,
+        project: project,
+        proyecto_rol: null,
       }));
     }
     //for my projects tab, don't flatten - show each project as one card
@@ -183,6 +235,13 @@ export const useManagerDashboardPage = () => {
         project: project,
         proyecto_rol: null, //no specific role for project-level cards
         isProjectCard: true, //flag to indicate this is a project card, not role card*/
+      }));
+    } else if (listPage.activeTab === "Applied To") {
+      //for applied to tab, flatten roles but keep project structure
+      return tabProjects.map((project) => ({
+        project: project,
+        proyecto_rol: null, //indicate this is a role card
+        isApplyCard: true, //indicate this is an applied to card
       }));
     }
 
@@ -195,9 +254,16 @@ export const useManagerDashboardPage = () => {
       return dashboardData.projectsLoading;
     } else if (listPage.activeTab === "My Projects") {
       return myProjectsLoading;
+    } else if (listPage.activeTab === "Applied To") {
+      return dashboardData.applyLoading;
     }
-    return dashboardData.isLoading || false;
-  }, [listPage.activeTab, myProjectsLoading, dashboardData.projectsLoading]);
+    return false;
+  }, [
+    listPage.activeTab,
+    myProjectsLoading,
+    dashboardData.projectsLoading,
+    dashboardData.applyLoading,
+  ]);
 
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
@@ -206,12 +272,8 @@ export const useManagerDashboardPage = () => {
 
     const counts = { All: 0, "Applied To": 0, "My Projects": 0 };
 
-    const appliedToProjects = dashboardData.projects.filter(
-      (project) => project.userHasApplied === true
-    );
     counts["All"] = dashboardData.projects.length;
-    counts["Applied To"] =
-      dashboardData.flattenProjectsForList(appliedToProjects).length;
+    counts["Applied To"] = dashboardData.projectsApp.length;
 
     //for my projects, count actual projects (not flattened roles)
     if (Array.isArray(myProjectsData)) {
@@ -219,18 +281,14 @@ export const useManagerDashboardPage = () => {
     }
 
     return counts;
-  }, [
-    dashboardData.projects,
-    dashboardData.flattenProjectsForList,
-    myProjectsData,
-  ]);
+  }, [dashboardData.projects, dashboardData.projectsApp, myProjectsData]);
 
   return {
     ...listPage,
     ...dashboardData,
     displayProjects,
     tabNames,
-    showCompatibility: listPage.activeTab === "My Projects" ? false : showCompatibility,
+    showCompatibility,
     toggleCompatibility,
     modals,
     openModal,

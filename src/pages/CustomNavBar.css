@@ -6,12 +6,11 @@
   z-index: 1000;    
   height: 115px;
   padding: 0 1.5rem;
-  background: var(--navbar-bg);
+  background: rgba(255, 255, 255, 0.114);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: none;
   border-bottom: 2px solid var(--border-light);
-  box-shadow: var(--shadow-outer-subtle);
 }
 
 .nav-logo {
@@ -112,25 +111,19 @@
 
 .sidebar {
   position: fixed;
-  top: 0;
+  top: 100px;
   left: 0;
   width: 64px;
-  height: 100vh;
-  background-color: #111;
-  padding-top: 120px;
+  height: calc(110vh - 103px);
+  background-color: #15151576;
+  box-shadow: var(--shadow-dropdown);
+  padding-top: 10px;
   overflow-x: hidden;
   z-index: 100;
-  transform: translateX(-100%);
-  opacity: 0;
-  pointer-events: none;
+  pointer-events: auto;
   transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
 }
 
-.sidebar.sidebar-visible {
-  transform: translateX(0);
-  opacity: 1;
-  pointer-events: auto;
-}
 
 .sidebar.open {
   width: 130px;
@@ -152,10 +145,41 @@
 }
 
 .sidebar-menu li:hover {
-  background-color: #222;
+  background-color: #0000003d;
 }
 
 .sidebar-menu i {
   font-size: 1.5rem;
   margin-right: 1rem;
+}
+
+
+.nav-search-container input[class*="inSearchBarInput"] {
+  background: #15151575 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  padding-left: 2.5rem;
+}
+
+.nav-search-container input[class*="inSearchBarInput"]:focus {
+  background: rgba(94, 94, 94, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+}
+
+.nav-search-container input[class*="inSearchBarInput"]::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.nav-search-container i[class*="searchIconNavbar"] {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-search-container div[class*="searchResultsDropdown"] {
+  background: rgba(20, 20, 30, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.nav-search-container div[class*="searchResultItem"]:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
 }

@@ -232,6 +232,17 @@
   font-family: var(--font-primary);
 }
 
+.enhanceButton {
+  background: rgba(119, 0, 255, 0.1);
+  color: var(--text-light);
+  border: 1px solid rgba(47, 0, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: var(--font-primary);
+}
+
 /* action buttons */
 .formActions {
   display: flex;

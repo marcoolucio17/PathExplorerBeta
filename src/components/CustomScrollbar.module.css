@@ -41,7 +41,7 @@
 /* Firefox scrollbar - always visible */
 .scrollContainer {
   scrollbar-width: thin;
-  scrollbar-color: rgba(139, 146, 255, 0.2) rgba(255, 255, 255, 0.03);
+  scrollbar-color: rgba(139, 147, 255, 0.484) rgba(255, 255, 255, 0);
 }
 
 /* Smooth scrolling */

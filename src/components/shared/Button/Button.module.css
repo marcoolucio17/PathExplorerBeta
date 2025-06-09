@@ -6,7 +6,7 @@
   cursor: pointer;
   font-weight: 500;
   font-size: var(--btn-font-size);
-  font-family: var(--btn-font-family);
+  font-family: 'Graphik Light', sans-serif;
   color: var(--text-light);
   text-shadow: var(--shadow-text);
   border: 1px solid var(--border-light);

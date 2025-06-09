@@ -13,55 +13,62 @@ import useToggleState from '../useToggleState';
  */
 export const useEmpleadoDashboardPage = () => {
   const navigate = useNavigate();
-  
+
   // Get dashboard data
   const dashboardData = useDashboardData();
-  
+
   // Employee-specific tab names
-  const tabNames = ['All', 'Applied to'];
-  
+  const tabNames = ["All", "Applied to"];
+
+  // Get current user ID from localStorage or sessionStorage
+  const currentUserId = useMemo(
+    () => localStorage.getItem("id") || sessionStorage.getItem("id"),
+    []
+  );
   // Modal controls
-  const { 
-    modals, 
-    openModal, 
-    closeModal, 
-    toggleModal 
-  } = useModalControl({
-    skillsFilter: false
+  const { modals, openModal, closeModal, toggleModal } = useModalControl({
+    skillsFilter: false,
+    viewApplication: false,
+    clientsFilter: false,
+    rolesFilter: false,
+
   });
-  
+
   // Toggle for compatibility view
-  const { 
-    state: showCompatibility,
-    toggle: toggleCompatibility 
-  } = useToggleState(false);
-  
+  const { state: showCompatibility, toggle: toggleCompatibility } =
+    useToggleState(false);
+
+  // State for selected application to view
+  const [selectedApplication, setSelectedApplication] = useState(null);
+
   // Setup list page logic
   const listPage = useListPage({
     data: dashboardData.projects,
-    defaultSortOption: 'date_desc',
-    defaultViewMode: 'grid',
-    tabConfig: { 
-      defaultTab: 'All', 
-      tabNameField: 'status' 
+    defaultSortOption: "date_desc",
+    defaultViewMode: "grid",
+    tabConfig: {
+      defaultTab: "All",
+      tabNameField: "status",
     },
     filterConfig: {},
     sortFunction: dashboardData.sortProjects,
-    baseUrl: '/empleado/dashboard'
+    removeClientFilter: dashboardData.removeClientFilter,
+    removeRoleFilter: dashboardData.removeRoleFilter,
+    baseUrl: "/empleado/dashboard",
   });
-  
+
   // Override toggleViewMode to ensure animation works consistently
   const toggleViewMode = useCallback(() => {
     // Toggle view mode using the original function
     listPage.toggleViewMode();
-    
+
     // Force animation refresh for the newly displayed items
     setTimeout(() => {
       // Reset any placeholders immediately
       if (listPage.resetAnimation) {
         listPage.resetAnimation();
       }
-      
+
       // Trigger a full animation sequence after a short delay
       setTimeout(() => {
         if (listPage.triggerAnimationSequence) {
@@ -70,113 +77,212 @@ export const useEmpleadoDashboardPage = () => {
       }, 50);
     }, 50);
   }, [listPage]);
-  
+
   // Helper to toggle skills filter modal
   const toggleSkillsFilterModal = () => {
-    toggleModal('skillsFilter');
+    toggleModal("skillsFilter");
   };
-  
-  // Get filtered projects for the current tab
-  const getTabProjects = () => {
-    let filteredProjects;
+  // Helper to toggle clients filter modals
+  const toggleClientsFilterModal = () => toggleModal("clientsFilter");
+  // Helper to toggle roles filter modals
+  const toggleRolesFilterModal = () => toggleModal("rolesFilter");
+
+  // Handle viewing application details
+  const handleViewApplication = useCallback((applicationData) => {
+    console.log("opening view application modal with data:", applicationData);
+    setSelectedApplication(applicationData);
+    openModal('viewApplication');
+  }, [openModal]);
+
+  // Transform application data to match modal format
+  const transformApplicationData = useCallback((appData) => {
+    if (!appData) return null;
     
+    return {
+      id: appData.idaplicacion,
+      userId: null, //no user data available in this structure
+      name: 'You', //since this is the user viewing their own application
+      email: '', //not available in application data
+      role: appData.roles?.nombrerol || 'Unknown Role',
+      project: appData.proyecto?.pnombre || 'Unknown Project',
+      message: appData.message || 'No message provided',
+      appliedDate: appData.fechaaplicacion || 'Unknown Date',
+      status: appData.estatus || 'Unknown',
+      avatar: null //not available
+    };
+  }, []);
+
+  // Handle closing view application modal
+  const handleCloseViewApplication = useCallback(() => {
+    closeModal('viewApplication');
+    setSelectedApplication(null);
+  }, [closeModal]);
+
+  // Get filtered projects for the current tab
+  const getTabProjects = useCallback(() => {
+    let filteredProjects;
+
     switch (listPage.activeTab) {
-      case 'All':
-        filteredProjects = dashboardData.projects;
+      case "All":
+        // Projects with roles available for the user
+        filteredProjects = dashboardData.projects ? dashboardData.projects : [];
         break;
-      case 'Applied to':
+      case "Applied to":
         // Projects where the user has applied to a role
-        filteredProjects = dashboardData.projects.filter(project => 
-          project.userHasApplied === true
-        );
+        // Filter out applications where role has been assigned (RolAsignado)
+        filteredProjects = dashboardData.projectsApp
+          ? dashboardData.projectsApp.filter(app => app.estatus !== "RolAsignado")
+          : [];
         break;
       default:
         filteredProjects = dashboardData.projects;
     }
-    
+
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
-  };
-  
+  }, [
+    dashboardData.projects,
+    dashboardData.projectsApp,
+    listPage.activeTab,
+    listPage.sortOption,
+    dashboardData.sortProjects,
+  ]);
+
   // Generate active filters for header
-  const getActiveFilters = () => {
+  const getActiveFilters = useCallback(() => {
     const filters = {};
-    
+    // Check if any skills are selected
     if (dashboardData.selectedSkillFilters.length > 0) {
       filters.skills = {
-        label: 'Skill',
+        label: "Skill",
         values: dashboardData.selectedSkillFilters,
-        color: 'rgba(139, 92, 246, 0.2)',
-        borderColor: 'rgba(139, 92, 246, 0.5)'
+        color: "rgba(139, 92, 246, 0.2)",
+        borderColor: "rgba(139, 92, 246, 0.5)",
       };
     }
-    
-    return filters;
-  };
-  
-  // Handle removing a specific filter
-  const handleRemoveFilter = (filterType, value) => {
-    if (filterType === 'skills') {
-      dashboardData.removeSkillFilter(value);
+    // Check if a client is selected
+    if (dashboardData.clientNameSelected !== "Clients") {
+      filters.clients = {
+        label: "Client",
+        values: [dashboardData.clientNameSelected],
+        color: "rgba(0, 123, 255, 0.2)",
+        borderColor: "rgba(0, 123, 255, 0.5)",
+      };
     }
-  };
-  
-  // Handle clear filters action
-  const handleClearFilters = () => {
-    dashboardData.clearAllSkillFilters();
-    listPage.handleClearFilters();
-  };
-  
-  // Compute flattened projects for display
-  const displayProjects = dashboardData.flattenProjectsForList(getTabProjects());
+    // Check if a role is selected
+    if (dashboardData.roleNameSelected !== "Roles") {
+      filters.roles = {
+        label: "Role",
+        values: [dashboardData.roleNameSelected],
+        color: "rgba(0, 123, 255, 0.2)",
+        borderColor: "rgba(0, 123, 255, 0.5)",
+      };
+    }
 
-    // Get top three projects based on compatibility for HOME
+    return filters;
+  }, [
+    dashboardData.selectedSkillFilters,
+    dashboardData.clientNameSelected,
+    dashboardData.roleNameSelected,
+  ]);
+
+  // Handle removing a specific filter
+  const handleRemoveFilter = useCallback(
+    (filterType, value) => {
+      if (filterType === "skills") {
+        dashboardData.removeSkillFilter(value);
+      } else if (filterType === "clients") {
+        dashboardData.removeClientFilter();
+      } else if (filterType === "roles") {
+        dashboardData.removeRoleFilter();
+      }
+    },
+    [dashboardData]
+  );
+
+  // Handle clear filters action
+  const handleClearFilters = useCallback(() => {
+    dashboardData.clearAllSkillFilters();
+    dashboardData.removeRoleFilter();
+    dashboardData.removeClientFilter();
+    listPage.handleClearFilters();
+  }, [dashboardData, listPage]);
+
+  // Compute flattened projects for display
+  const displayProjects = useMemo(() => {
+    const tabProjects = getTabProjects();
+    
+
+    if (listPage.activeTab === "All") {
+
+      return tabProjects.map((project) => ({
+        project: project,
+        proyecto_rol: null,
+      }));
+
+    } else if (listPage.activeTab === "Applied to") {
+      //for applied to tab, flatten roles but keep project structure
+      return tabProjects.map((project) => ({
+        project: project,
+        proyecto_rol: null, //indicate this is a role card
+        isApplyCard: true, //indicate this is an applied to card
+      }));
+    }
+
+    return dashboardData.flattenProjectsForList(tabProjects);
+  }, [dashboardData, getTabProjects, listPage.activeTab]);
+
+  // Determine the loading
+  const isLoading = useMemo(() => {
+    if (listPage.activeTab === "All") {
+      return dashboardData.projectsLoading;
+    } else if (listPage.activeTab === "Applied to") {
+      return dashboardData.applyLoading;
+    }
+    return false;
+  }, [
+    listPage.activeTab,
+    dashboardData.projectsLoading,
+    dashboardData.applyLoading,
+  ]);
+
+  // Get top three projects based on compatibility for HOME
   const getTopProjects = () => {
     let filteredProjects;
-    
+
     switch (listPage.activeTab) {
-      case 'All':
+      case "All":
         filteredProjects = dashboardData.top;
-        break;
-      case 'Applied to':
-        // Projects where the user has applied to a role
-        filteredProjects = dashboardData.top.filter(project => 
-          project.userHasApplied === true
-        );
         break;
       default:
         filteredProjects = dashboardData.top;
     }
-    
     return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
   };
 
   const topProjects = dashboardData.flattenProjectsForList(getTopProjects());
-  
+
   // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
     if (!dashboardData.projects || dashboardData.projects.length === 0) {
-      return { 'All': 0, 'Applied to': 0 };
+      return { All: 0, "Applied to": 0 };
     }
-    
+
     // Initial counts
     const counts = {
-      'All': 0, // Will be set to 0 to hide notification badge
-      'Applied to': 0
+      All: 0, // Will be calculated using filtered results
+      "Applied to": 0,
     };
-    
+
     // Calculate flattened projects (roles) for each tab
-    // All projects - set to 0 to hide notification badge as requested
-    counts['All'] = 0;
-    
-    // Applied to projects
-    const appliedToProjects = dashboardData.projects.filter(project => 
-      project.userHasApplied === true
-    );
-    counts['Applied to'] = dashboardData.flattenProjectsForList(appliedToProjects).length;
-    
+    // All projects - use same filtering logic as display
+    const filteredAllProjects = dashboardData.flattenProjectsForList(dashboardData.projects);
+    counts["All"] = filteredAllProjects.length;
+
+    // Applied to projects - exclude RolAsignado status
+    counts["Applied to"] = dashboardData.projectsApp.filter(app => app.estatus !== "RolAsignado").length;
+
     return counts;
-  }, [dashboardData.projects, dashboardData.flattenProjectsForList]);
-  
+  }, [dashboardData.projects, dashboardData.projectsApp, dashboardData.flattenProjectsForList]);
 
   return {
     ...listPage,
@@ -190,13 +296,22 @@ export const useEmpleadoDashboardPage = () => {
     openModal,
     closeModal,
     toggleSkillsFilterModal,
+    toggleClientsFilterModal,
+    toggleRolesFilterModal,
     getActiveFilters,
     handleRemoveFilter,
     handleClearFilters,
     // Override toggleViewMode with our custom implementation
     toggleViewMode,
     // Override tab counts with our corrected counts
-    tabCounts: correctedTabCounts
+    tabCounts: correctedTabCounts,
+    isLoading,
+    currentUserId,
+    //view application modal
+    selectedApplication,
+    transformApplicationData,
+    handleViewApplication,
+    handleCloseViewApplication,
   };
 };
 

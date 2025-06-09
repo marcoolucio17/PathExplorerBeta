@@ -29,6 +29,12 @@ const SkillsIcon = () => (
   </svg>
 );
 
+const ApplicantIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className={styles.customIcon} viewBox="0 0 16 16">
+    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664z"/>
+    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/>
+  </svg>
+);
 /**
  * SearchHeader component
  * @param {Object} props - Component props
@@ -72,7 +78,8 @@ export const SearchHeader = ({
     { key: 'certificates', label: 'Certificates', icon: 'certificates' },
     { key: 'skills', label: 'Skills', icon: 'skills' },
     { key: 'clients', label: 'Clients', icon: 'clients' },
-    { key: 'roles', label: 'Roles', icon: 'roles' }
+    { key: 'roles', label: 'Roles', icon: 'roles' },
+    { key: 'applicants', label: 'Applicants', icon: 'applicants' }
   ]
 }) => {
   // State to track input focus
@@ -96,18 +103,33 @@ export const SearchHeader = ({
   }, [searchTerm, inSearchBar]);
 
   // Handle click outside to close dropdown
-  /*useEffect(() => {
+  useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowResults(false);
+        setIsFocused(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);*/
+    if (showResults) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [showResults]);
+
+  // Function to handle search result click - closes dropdown
+  const handleSearchResultClick = (searchValue, category) => {
+    // Close the dropdown first
+    setShowResults(false);
+    setIsFocused(false);
+    
+    // Then call the original handler
+    if (onSearchResultClick) {
+      onSearchResultClick(searchValue, category);
+    }
+  };
 
   // Function to render the appropriate icon
   const renderIcon = (iconType) => {
@@ -120,6 +142,8 @@ export const SearchHeader = ({
         return <CertificatesIcon />;
       case 'skills':
         return <SkillsIcon />;
+      case 'applicants':
+        return <ApplicantIcon />;
       default:
         return null;
     }
@@ -169,6 +193,11 @@ export const SearchHeader = ({
               if (inSearchBar && searchTerm.length > 0) {
                 setShowResults(true);
               }
+              // Close dropdown when escape is pressed
+              if (e.key === 'Escape') {
+                setShowResults(false);
+                setIsFocused(false);
+              }
             }}
           />
 
@@ -180,7 +209,7 @@ export const SearchHeader = ({
                 <div
                   key={category.key}
                   className={styles.searchResultItem}
-                  onClick={() => onSearchResultClick(searchTerm, category.key)}
+                  onClick={() => handleSearchResultClick(searchTerm, category.key)}
                 >
                   <div className={styles.iconWrapper}>
                     {renderIcon(category.icon)}

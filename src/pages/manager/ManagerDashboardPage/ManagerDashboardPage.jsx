@@ -1,9 +1,8 @@
-import React, { use, useEffect, useState } from "react";
-
+// Custom Hooks
 import useManagerDashboardPage from '../../../hooks/dashboard/useManagerDashboardPage';
 import useDashboardHeaderConfig from '../../../hooks/dashboard/useDashboardHeaderConfig';
-import useGetFetch from "../../../hooks/useGetFetch";
-import useGetFetchProjectsFilters from "../../../hooks/useGetFetchProjectsFilters";
+
+// Components
 import ProjectList from '../../../components/GridList/Project/ProjectList';
 import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
@@ -14,16 +13,19 @@ import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
 import { NavLink } from "react-router";
 
-
+// CCS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
+/**
+ * Dashboard component for Manager role
+ * 
+ */
 export const ManagerDashboardPage = () => {
+  // Use the manager-specific dashboard hook
   const dashboardPage = useManagerDashboardPage();
+  // Get manager-specific header configuration
   const headerProps = useDashboardHeaderConfig({...dashboardPage, activeTab: dashboardPage.activeTab});
 
-  const handleCreateProject = () => {
-    dashboardPage.toggleCreateProjectModal()
-  };  
 
   return (
     <div className={styles.dashboardContainer}>
@@ -31,9 +33,9 @@ export const ManagerDashboardPage = () => {
         <div className={styles.pageHeader}>
           <h1 className={styles.pageTitle}>Project Dashboard</h1>
         </div>
-
+        {/* Search header with filters */}
         <SearchHeader {...headerProps} />
-
+        {/* Tabs for different project statuses */}
         <Tabs
           tabs={dashboardPage.tabNames.map(tab => ({
             name: tab,
@@ -42,8 +44,9 @@ export const ManagerDashboardPage = () => {
           activeTab={dashboardPage.activeTab}
           onTabClick={dashboardPage.setActiveTab}
         />
-
+        {/* Main content area with projects list with the create project button */}
         <div className={styles.cardsContainer}>
+          {/* The create project button appears only in the My Projects active tab */}
           {dashboardPage.activeTab === 'My Projects' && (
             <div className={styles.tabActionSimple}>
               <NavLink to="/manager/create-project">
@@ -76,7 +79,7 @@ export const ManagerDashboardPage = () => {
           </CustomScrollbar>
         </div>
       </div>
-
+      {/* Modals */}
       <SkillsModal
         isOpen={dashboardPage.modals.skillsFilter}
         onClose={() => dashboardPage.closeModal('skillsFilter')}
@@ -93,6 +96,8 @@ export const ManagerDashboardPage = () => {
       <RolesModal
         isOpen={dashboardPage.modals.rolesFilter}
         onClose={() => dashboardPage.closeModal('rolesFilter')}
+        roleNameStatus={dashboardPage.roleNameSelected}
+        roleIdStatus={dashboardPage.roleId}
         onRoleSelected={dashboardPage.handleApplyRoleFilters}
         roles={dashboardPage.roles}
       />

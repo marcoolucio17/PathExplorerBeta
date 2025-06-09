@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 // Custom Hooks
 import useProfilePage from '../../../hooks/profile/useProfilePage';
@@ -27,6 +27,8 @@ import { EditExperienceModal } from "../../../components/Modals/EditExperienceMo
 import { EditObjectivesModal } from "../../../components/Modals/EditObjectivesModal";
 import { EditProfileDetailsModal } from "../../../components/Modals/EditProfileDetailsModal";
 
+import LoadingSpinner from "src/components/LoadingSpinner";
+
 // CSS
 import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
 
@@ -34,9 +36,27 @@ import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
  * Profile page component for Employee role
  */
 export const EmpleadoPerfilPage = () => {
+  // this is for triggering reloads from modals
+  const [load, setLoad] = useState(false);
+
   // Use the custom hook to handle all logic
-  const profilePage = useProfilePage();
-  console.log('Hola');
+  const profilePage = useProfilePage(load);
+
+  const skills = [...profilePage.categorizedSkills["softSkills"], ...profilePage.categorizedSkills["hardSkills"]];
+  
+  //loading state
+  if (profilePage.isLoading) {
+
+    return (
+      <LoadingSpinner 
+        overlay={true}
+        size="large"
+        message="Loading profile details..."
+        variant="default"
+      />
+    );
+  }
+
   const renderTabContent = () => {
     switch (profilePage.activeTab) {
       case "Experience":
@@ -54,7 +74,17 @@ export const EmpleadoPerfilPage = () => {
     }
   };
 
-  useEffect(() => { }, [profilePage.isLoading]);
+  //loading state
+  if (profilePage.loading || profilePage.isLoading) {
+    return (
+      <LoadingSpinner 
+        overlay={true}
+        size="large"
+        message="Loading project details..."
+        variant="default"
+      />
+    );
+  }
 
   const handleEditSection = (section) => {
     // Handle editing specific sections
@@ -110,16 +140,12 @@ export const EmpleadoPerfilPage = () => {
     profilePage.handleRemoveCertificate(certificateId);
   };
 
-  if (profilePage.loading) {
-    return <>loading..</>;
-  }
-
   return (
     <div className={styles.profileContainer}>
       <div className={styles.profileContent}>
         {/* Left Column - Profile info and tabs */}
         <div className={styles.profileColumnLeft}>
-          <ProfileHeaderCard user={profilePage.userProfile} />
+          <ProfileHeaderCard user={profilePage.userProfile} url = {profilePage.pic} />
 
           <Tabs
             tabs={profilePage.tabNames.map(tab => ({
@@ -163,6 +189,7 @@ export const EmpleadoPerfilPage = () => {
             className={styles.sidebarSection}
             categorizedSkills={profilePage.categorizedSkills}
             onSkillsClick={profilePage.handleSkillsClick}
+            setIsLoading = {setLoad}
           />
 
           <ProfileCertificates
@@ -193,12 +220,15 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('skills')}
         userSkills={profilePage.userSkills}
         onUpdateSkills={profilePage.handleUpdateSkills}
+        disabledSkills={skills}
+        setLoad={setLoad}
       />
 
       <AddCertificateModal
         isOpen={profilePage.modals.addCertificate}
         onClose={() => profilePage.closeModal('addCertificate')}
         onAddCertificate={profilePage.handleAddCertificate}
+        setLoad={setLoad}
       />
 
       <EditProfileModal
@@ -212,6 +242,7 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('editContact')}
         contactInfo={profilePage.userProfile}
         onSave={handleSaveContact}
+        setLoad={setLoad}
       />
 
       <EditExperienceModal
@@ -226,6 +257,7 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('editObjectives')}
         objectives={profilePage.objectives}
         onSave={handleSaveObjectives}
+        setLoad={setLoad}
       />
 
       <EditProfileDetailsModal
@@ -233,6 +265,7 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('editProfileDetails')}
         profileData={profilePage.userProfile}
         onSave={handleSaveProfileDetails}
+        setLoad={setLoad}
       />
     </div>
   );
