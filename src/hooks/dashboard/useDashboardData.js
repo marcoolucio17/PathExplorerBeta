@@ -222,8 +222,12 @@ export const useDashboardData = () => {
 
   // Remove specific skill filter
   const removeSkillFilter = (skillToRemove) => {
-    handleApplySkillFilters(
-      selectedSkillFilters.filter((skill) => skill !== skillToRemove)
+    const newSkills = selectedSkillFilters.filter(
+      (skill) => skill !== skillToRemove
+    );
+    setSelectedSkillFilters(newSkills);
+    setSkillSelected(
+      newSkills.length > 0 ? `${newSkills.length} skills` : "Skills"
     );
   };
 
@@ -237,7 +241,7 @@ export const useDashboardData = () => {
   };
   // Clear all skill filters
   const clearAllSkillFilters = () => {
-    handleApplySkillFilters([]);
+    setSelectedSkillFilters([]);
   };
 
   // Sort projects based on selected option
