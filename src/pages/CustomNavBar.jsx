@@ -143,9 +143,13 @@ function CustomNavbar() {
             <i className="bi bi-house"></i>
             {isSidebarOpen && <span className="title-light">Home</span>}
           </li>
-          <li onClick={() => navigate(`/${authState}/dashboard`)}>
+          <li onClick={() => navigate(`/${authState}/${authState === "tfs" ? "applicants" : "dashboard"}`)}>
             <i className="bi bi-clipboard"></i>
-            {isSidebarOpen && <span className="title-light">Projects</span>}
+
+            {isSidebarOpen && <span className="title-light">
+              { authState === "tfs" ? "Requests" : "Projects"}
+            </span>}
+
           </li>
           <li onClick={handleLogout}>
             <i className="bi bi-box-arrow-left"></i>
