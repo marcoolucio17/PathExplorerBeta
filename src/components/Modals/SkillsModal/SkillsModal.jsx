@@ -66,8 +66,9 @@ export const SkillsModal = ({
   onClose,
   userSkills = [],
   onUpdateSkills,
+  onUpdateSkillsFilter = () => { },
   disabledSkills = [],
-  setLoad,
+  setLoad = () => { },
 }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -138,6 +139,7 @@ export const SkillsModal = ({
   const handleSave = async () => {
     setLoad(true);
     await onUpdateSkills(Array.from(selectedSkills));
+    onUpdateSkillsFilter(Array.from(selectedSkills));
     handleClose();
     setLoad(false);
   };

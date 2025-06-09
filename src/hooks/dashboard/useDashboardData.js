@@ -103,11 +103,8 @@ export const useDashboardData = () => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
-        console.log("fetching all projects with config:", config);
         const { data } = await axios.get(`${url}/projects`, config);
-        console.log("all projects fetched:", data);
-        console.log("all projects count:", data?.length);
-        console.log("sample project structure:", data?.[0]);
+
         setProjectsData(data);
       } catch (err) {
         console.error("Error fetching projects", err);
@@ -118,7 +115,6 @@ export const useDashboardData = () => {
     fetchProjects();
   }, [filterOptions]);
 
-
   // Fetch Roles, clients, top projects, my applications and my skills once
 
   useEffect(() => {
@@ -127,7 +123,7 @@ export const useDashboardData = () => {
       .get(`${url}/roles`, config)
       .then((res) => setRolesData(res.data))
       .catch((err) => console.error("Error fetching roles", err));
-    
+
     //get user top 3 projects compability
     const userId = localStorage.getItem("id");
     if (userId) {
@@ -136,20 +132,17 @@ export const useDashboardData = () => {
         .then((res) => setTopData(res.data))
         .catch((err) => console.error("Error fetching top projects", err));
     }
-    
+
     //fetch clients
     axios
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
       .catch((err) => console.error("Error fetching clients", err));
-    
+
     //fetch user applications
-    console.log("fetching user applications for user:", localStorage.getItem("id"));
-    console.log("dashboard data: --------------------------------------------------", projectsData);
     axios
       .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
-       
         setMyApplicationsData(res.data);
         setApplyLoading(false);
       })
@@ -168,9 +161,11 @@ export const useDashboardData = () => {
 
   // Handle the skills selection
   const handleApplySkillFilters = (selectedSkills) => {
-    setSelectedSkillFilters(selectedSkills);
+    setSelectedSkillFilters((prevSkills) => [...prevSkills, ...selectedSkills]);
     setSkillSelected(
-      selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
+      selectedSkillFilters.length > 0
+        ? `${selectedSkillFilters.length} skills`
+        : "Skills"
     );
   };
 
