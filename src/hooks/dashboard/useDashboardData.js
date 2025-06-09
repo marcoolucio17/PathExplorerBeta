@@ -103,11 +103,8 @@ export const useDashboardData = () => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
-        console.log("fetching all projects with config:", config);
         const { data } = await axios.get(`${url}/projects`, config);
-        console.log("all projects fetched:", data);
-        console.log("all projects count:", data?.length);
-        console.log("sample project structure:", data?.[0]);
+
         setProjectsData(data);
       } catch (err) {
         console.error("Error fetching projects", err);
@@ -118,7 +115,6 @@ export const useDashboardData = () => {
     fetchProjects();
   }, [filterOptions]);
 
-
   // Fetch Roles, clients, top projects, my applications and my skills once
 
   useEffect(() => {
@@ -127,7 +123,7 @@ export const useDashboardData = () => {
       .get(`${url}/roles`, config)
       .then((res) => setRolesData(res.data))
       .catch((err) => console.error("Error fetching roles", err));
-    
+
     //get user top 3 projects compability
     const userId = localStorage.getItem("id");
     if (userId) {
@@ -136,20 +132,17 @@ export const useDashboardData = () => {
         .then((res) => setTopData(res.data))
         .catch((err) => console.error("Error fetching top projects", err));
     }
-    
+
     //fetch clients
     axios
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
       .catch((err) => console.error("Error fetching clients", err));
-    
+
     //fetch user applications
-    console.log("fetching user applications for user:", localStorage.getItem("id"));
-    console.log("dashboard data: --------------------------------------------------", projectsData);
     axios
       .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
-       
         setMyApplicationsData(res.data);
         setApplyLoading(false);
       })
@@ -169,9 +162,11 @@ export const useDashboardData = () => {
   // Handle the skills selection
   const handleApplySkillFilters = (selectedSkills) => {
     setSelectedSkillFilters(selectedSkills);
-    setSkillSelected(
-      selectedSkills.length > 0 ? `${selectedSkills.length} skills` : "Skills"
-    );
+    if (selectedSkills.length > 0) {
+      setSkillSelected(`${selectedSkills.length} skills`);
+    } else {
+      setSkillSelected("Skills");
+    }
   };
 
   // Handle the project name in the search bar
@@ -227,8 +222,12 @@ export const useDashboardData = () => {
 
   // Remove specific skill filter
   const removeSkillFilter = (skillToRemove) => {
-    handleApplySkillFilters(
-      selectedSkillFilters.filter((skill) => skill !== skillToRemove)
+    const newSkills = selectedSkillFilters.filter(
+      (skill) => skill !== skillToRemove
+    );
+    setSelectedSkillFilters(newSkills);
+    setSkillSelected(
+      newSkills.length > 0 ? `${newSkills.length} skills` : "Skills"
     );
   };
 
@@ -242,7 +241,7 @@ export const useDashboardData = () => {
   };
   // Clear all skill filters
   const clearAllSkillFilters = () => {
-    handleApplySkillFilters([]);
+    setSelectedSkillFilters([]);
   };
 
   // Sort projects based on selected option
@@ -290,8 +289,10 @@ export const useDashboardData = () => {
   const flattenProjectsForList = (projects) => {
     return projects
       .flatMap((project) => {
+        console.log("Project:", project);
         // When the tab is "My Projects", we need to flatten the roles
         if (project.proyecto_roles) {
+          console.log("Punto A");
           project.proyecto_roles?.map((proyecto_rol) => ({
             project,
             proyecto_rol,
@@ -304,25 +305,26 @@ export const useDashboardData = () => {
               ),
           }));
         } else {
+          console.log("Punto B");
+          const hasSelectedSkills =
+            selectedSkillFilters.length === 0 ||
+            project.requerimientos_roles.some((req_rol) =>
+              selectedSkillFilters.includes(
+                req_rol.requerimientos.habilidades.nombre
+              )
+            );
+          console.log(hasSelectedSkills);
           // For other tabs, we just return the project
           return {
             project,
-            hasSelectedSkills:
-              selectedSkillFilters.length === 0 ||
-              project.requerimientos_roles.some((req_rol) =>
-                selectedSkillFilters.includes(
-                  req_rol.requerimientos.habilidades.nombre
-                )
-              ),
+            proyecto_rol: null,
+            hasSelectedSkills: hasSelectedSkills,
           };
         }
-
       })
       .filter((item) => item.hasSelectedSkills);
-      
-
   };
-
+  console.log("Selected Skill Filters:", selectedSkillFilters);
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],
