@@ -142,6 +142,7 @@
   text-align: center;
   flex-shrink: 0;
   font-family: 'Graphik Light';
+  margin-bottom: 1rem;
 }
 
 .projectCardsWrapper {
@@ -249,7 +250,7 @@
   overflow: visible;
   display: flex;
   flex-direction: column;
-  height: 22.9rem;
+  height: 25.25rem;
 }
 
 .mainbarCard {

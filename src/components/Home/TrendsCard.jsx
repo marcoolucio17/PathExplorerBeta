@@ -42,7 +42,7 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
       <div className={styles.skillsScrollContainer}>
         <CustomScrollbar fadeBackground="transparent" fadeHeight={40}>
           <div className={styles.skillsContent}>
-            <h3 className={styles.categoryHeader}>Most Popular Skills</h3>
+            <h3 className="subtitle">Most Popular Skills</h3>
             <div className={styles.divider}></div>
             {hasNoSkills ? (
               <div className={styles.placeholder}>
