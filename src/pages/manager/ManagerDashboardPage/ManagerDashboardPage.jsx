@@ -88,6 +88,7 @@ export const ManagerDashboardPage = () => {
         isOpen={dashboardPage.modals.skillsFilter}
         onClose={() => dashboardPage.closeModal('skillsFilter')}
         userSkills={dashboardPage.selectedSkillFilters}
+
         onUpdateSkillsFilter={dashboardPage.handleApplySkillFilters}
         setLoad={setLoad}
       />

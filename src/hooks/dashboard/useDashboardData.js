@@ -161,12 +161,12 @@ export const useDashboardData = () => {
 
   // Handle the skills selection
   const handleApplySkillFilters = (selectedSkills) => {
-    setSelectedSkillFilters((prevSkills) => [...prevSkills, ...selectedSkills]);
-    setSkillSelected(
-      selectedSkillFilters.length > 0
-        ? `${selectedSkillFilters.length} skills`
-        : "Skills"
-    );
+    setSelectedSkillFilters(selectedSkills);
+    if (selectedSkills.length > 0) {
+      setSkillSelected(`${selectedSkills.length} skills`);
+    } else {
+      setSkillSelected("Skills");
+    }
   };
 
   // Handle the project name in the search bar
@@ -289,8 +289,10 @@ export const useDashboardData = () => {
   const flattenProjectsForList = (projects) => {
     return projects
       .flatMap((project) => {
+        console.log("Project:", project);
         // When the tab is "My Projects", we need to flatten the roles
         if (project.proyecto_roles) {
+          console.log("Punto A");
           project.proyecto_roles?.map((proyecto_rol) => ({
             project,
             proyecto_rol,
@@ -303,25 +305,26 @@ export const useDashboardData = () => {
               ),
           }));
         } else {
+          console.log("Punto B");
+          const hasSelectedSkills =
+            selectedSkillFilters.length === 0 ||
+            project.requerimientos_roles.some((req_rol) =>
+              selectedSkillFilters.includes(
+                req_rol.requerimientos.habilidades.nombre
+              )
+            );
+          console.log(hasSelectedSkills);
           // For other tabs, we just return the project
           return {
             project,
-            hasSelectedSkills:
-              selectedSkillFilters.length === 0 ||
-              project.requerimientos_roles.some((req_rol) =>
-                selectedSkillFilters.includes(
-                  req_rol.requerimientos.habilidades.nombre
-                )
-              ),
+            proyecto_rol: null,
+            hasSelectedSkills: hasSelectedSkills,
           };
         }
-
       })
       .filter((item) => item.hasSelectedSkills);
-      
-
   };
-
+  console.log("Selected Skill Filters:", selectedSkillFilters);
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],
