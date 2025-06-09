@@ -13,6 +13,7 @@ export const EditProfileDetailsModal = ({
   onClose,
   profileData,
   onSave,
+  setLoad
 }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -88,6 +89,7 @@ export const EditProfileDetailsModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoad(true);
 
     try {
       const config = {
@@ -116,11 +118,11 @@ export const EditProfileDetailsModal = ({
         config
       );
 
-      window.location.reload();
-
       handleClose();
+      setLoad(false);
     } catch (error) {
       console.error("Error updating profile details:", error);
+      setLoad(false);
       // TODO: Add error handling UI
     }
   };

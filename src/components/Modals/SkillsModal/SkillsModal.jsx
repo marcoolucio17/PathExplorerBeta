@@ -44,7 +44,7 @@ const getFilteredCategories = (data, selectedCategory, searchTerm) => {
       // Then filter skills by search term if there is one
       if (searchTerm) {
         const filteredSkills = skills.filter((skill) =>
-          skill.toLowerCase().includes(searchTerm.toLowerCase())
+          skill.nombre.toLowerCase().includes(searchTerm.toLowerCase())
         );
         if (filteredSkills.length > 0) {
           filtered[category] = filteredSkills;
