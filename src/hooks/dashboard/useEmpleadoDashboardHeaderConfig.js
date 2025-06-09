@@ -78,16 +78,6 @@ export const useEmpleadoDashboardHeaderConfig = (props) => {
         },
         { label: "Newest First", value: "date_desc", icon: "bi-calendar-date" },
         { label: "Oldest First", value: "date_asc", icon: "bi-calendar2-date" },
-        {
-          label: "Compatibility (High to Low)",
-          value: "match_desc",
-          icon: "bi-star-fill",
-        },
-        {
-          label: "Compatibility (Low to High)",
-          value: "match_asc",
-          icon: "bi-star",
-        },
       ],
       onDropdownItemClick: (item) => {
         setSortOption(item.value);

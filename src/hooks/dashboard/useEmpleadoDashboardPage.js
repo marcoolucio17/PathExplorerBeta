@@ -130,9 +130,11 @@ export const useEmpleadoDashboardPage = () => {
       case "Applied to":
         // Projects where the user has applied to a role
         // Filter out applications where role has been assigned (RolAsignado)
-        filteredProjects = dashboardData.projectsApp
-          ? dashboardData.projectsApp.filter(app => app.estatus !== "RolAsignado")
-          : [];
+        return (filteredProjects = dashboardData.projectsApp
+          ? dashboardData.projectsApp.filter(
+              (app) => app.estatus !== "RolAsignado"
+            )
+          : []);
         break;
       default:
         filteredProjects = dashboardData.projects;
@@ -214,14 +216,14 @@ export const useEmpleadoDashboardPage = () => {
 
     if (listPage.activeTab === "All") {
 
-      return tabProjects.map((project) => ({
+     tabProjects.map((project) => ({
         project: project,
         proyecto_rol: null,
       }));
 
     } else if (listPage.activeTab === "Applied to") {
       //for applied to tab, flatten roles but keep project structure
-      return tabProjects.map((project) => ({
+      tabProjects.map((project) => ({
         project: project,
         proyecto_rol: null, //indicate this is a role card
         isApplyCard: true, //indicate this is an applied to card
@@ -275,14 +277,23 @@ export const useEmpleadoDashboardPage = () => {
 
     // Calculate flattened projects (roles) for each tab
     // All projects - use same filtering logic as display
-    const filteredAllProjects = dashboardData.flattenProjectsForList(dashboardData.projects);
+    const filteredAllProjects = dashboardData.flattenProjectsForList(
+      dashboardData.projects
+    );
     counts["All"] = filteredAllProjects.length;
 
     // Applied to projects - exclude RolAsignado status
-    counts["Applied to"] = dashboardData.projectsApp.filter(app => app.estatus !== "RolAsignado").length;
+    counts["Applied to"] = dashboardData.projectsApp.filter(
+      (app) => app.estatus !== "RolAsignado"
+    ).length;
 
     return counts;
-  }, [dashboardData.projects, dashboardData.projectsApp, dashboardData.flattenProjectsForList]);
+  }, [
+    displayProjects,
+    dashboardData.projects,
+    dashboardData.projectsApp,
+    dashboardData.flattenProjectsForList,
+  ]);
 
   return {
     ...listPage,

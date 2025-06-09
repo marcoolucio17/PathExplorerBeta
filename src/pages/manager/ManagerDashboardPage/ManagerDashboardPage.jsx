@@ -16,6 +16,8 @@ import { NavLink } from "react-router";
 // CCS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
+// Package imports
+import { useState } from "react";
 /**
  * Dashboard component for Manager role
  * 
@@ -25,6 +27,8 @@ export const ManagerDashboardPage = () => {
   const dashboardPage = useManagerDashboardPage();
   // Get manager-specific header configuration
   const headerProps = useDashboardHeaderConfig({...dashboardPage, activeTab: dashboardPage.activeTab});
+  // this is for triggering reloads from modals
+  const [load, setLoad] = useState(false);
 
 
   return (
@@ -84,7 +88,9 @@ export const ManagerDashboardPage = () => {
         isOpen={dashboardPage.modals.skillsFilter}
         onClose={() => dashboardPage.closeModal('skillsFilter')}
         userSkills={dashboardPage.selectedSkillFilters}
-        onUpdateSkills={dashboardPage.handleApplySkillFilters}
+
+        onUpdateSkillsFilter={dashboardPage.handleApplySkillFilters}
+        setLoad={setLoad}
       />
       <ClientsModal
         isOpen={dashboardPage.modals.clientsFilter}

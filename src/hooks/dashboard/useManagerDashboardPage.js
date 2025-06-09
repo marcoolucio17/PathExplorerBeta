@@ -223,9 +223,8 @@ export const useManagerDashboardPage = () => {
     const tabProjects = getTabProjects();
 
     if (listPage.activeTab === "All") {
-      return tabProjects.map((project) => ({
+      tabProjects.map((project) => ({
         project: project,
-        proyecto_rol: null,
       }));
     }
     //for my projects tab, don't flatten - show each project as one card
@@ -233,14 +232,14 @@ export const useManagerDashboardPage = () => {
       //create project cards without flattening roles
       return tabProjects.map((project) => ({
         project: project,
-        proyecto_rol: null, //no specific role for project-level cards
+        //no specific role for project-level cards
         isProjectCard: true, //flag to indicate this is a project card, not role card*/
       }));
     } else if (listPage.activeTab === "Applied To") {
       //for applied to tab, flatten roles but keep project structure
       return tabProjects.map((project) => ({
         project: project,
-        proyecto_rol: null, //indicate this is a role card
+        //indicate this is a role card
         isApplyCard: true, //indicate this is an applied to card
       }));
     }
@@ -271,8 +270,8 @@ export const useManagerDashboardPage = () => {
     }
 
     const counts = { All: 0, "Applied To": 0, "My Projects": 0 };
-
-    counts["All"] = dashboardData.projects.length;
+    console.log("displayProjects", displayProjects.length);
+    counts["All"] = displayProjects.length;
     counts["Applied To"] = dashboardData.projectsApp.length;
 
     //for my projects, count actual projects (not flattened roles)
@@ -281,7 +280,12 @@ export const useManagerDashboardPage = () => {
     }
 
     return counts;
-  }, [dashboardData.projects, dashboardData.projectsApp, myProjectsData]);
+  }, [
+    displayProjects,
+    dashboardData.projects,
+    dashboardData.projectsApp,
+    myProjectsData,
+  ]);
 
   return {
     ...listPage,

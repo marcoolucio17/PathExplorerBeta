@@ -11,7 +11,7 @@ export const ProfileCertificates = ({
   certificates = [],
   onCertificateClick,
   onAddCertificateClick,
-  onRemoveCertificate
+  onRemoveCertificate,
 }) => {
   const [certsWithImages, setCertsWithImages] = useState([]);
 

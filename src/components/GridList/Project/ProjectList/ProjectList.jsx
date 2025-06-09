@@ -18,6 +18,7 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {Function} props.onClearFilters - Function called when Clear Filters button is clicked
  * @param {boolean} props.isLoading - Whether items are currently loading
  * @param {Function} props.onViewApplication - Function called when View Request button is clicked
+ * @param {number} props.skeletonCount - Number of skeleton cards to show when loading
  */
 const ProjectList = ({
   tabSelected = "All",
@@ -29,6 +30,7 @@ const ProjectList = ({
   onClearFilters,
   isLoading = false,
   onViewApplication,
+  skeletonCount = 6,
 }) => {
 
   // Safety check for undefined/null projects array
@@ -40,7 +42,7 @@ const ProjectList = ({
         message="Loading projects..." 
         viewMode={viewMode}
         showSkeletonCards={true}
-        skeletonCount={6}
+        skeletonCount={skeletonCount}
       />
     );
   }

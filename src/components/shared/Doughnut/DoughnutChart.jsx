@@ -7,6 +7,7 @@ import {
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels'; 
 import React from 'react';
+import "src/index.css";
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels); 
 
@@ -52,16 +53,26 @@ const DoughnutChart = ({ data }) => {
         bodyColor: '#dddddd',
         padding: 8,
         bodyFont: {
+          family: 'Graphik Medium, -apple-system, BlinkMacSystemFont, sans-serif',
           size: 12,
+          weight: '500',
+        },
+        titleFont: {
+          family: 'Graphik Medium, -apple-system, BlinkMacSystemFont, sans-serif',
+          size: 13,
+          weight: '600',
         },
       },
       datalabels: {
         color: '#ffffff',
         font: {
+          family: 'Graphik Semibold, -apple-system, BlinkMacSystemFont, sans-serif',
           weight: 'bold',
-          size: 10,
+          size: 11,
         },
         formatter: (value) => `${value}%`,
+        textShadowColor: 'rgba(0, 0, 0, 0.3)',
+        textShadowBlur: 2,
       },
     },
     layout: {
