@@ -136,8 +136,6 @@ const handleDownload = async () => {
     input.click();
   };
 
-  console.log(data);
-
 
   return (
     <div

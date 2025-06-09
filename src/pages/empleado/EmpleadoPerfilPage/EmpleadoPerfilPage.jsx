@@ -40,7 +40,7 @@ export const EmpleadoPerfilPage = () => {
   const [load, setLoad] = useState(false);
 
   // Use the custom hook to handle all logic
-  const profilePage = useProfilePage(load);
+  const profilePage = useProfilePage(load, setLoad);
 
   const skills = [...profilePage.categorizedSkills["softSkills"], ...profilePage.categorizedSkills["hardSkills"]];
   

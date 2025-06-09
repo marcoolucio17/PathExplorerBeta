@@ -6,8 +6,12 @@ import axios from "axios";
 const DB_URL = "https://pathexplorer-backend.onrender.com/";
 //const DB_URL = "http://localhost:8080/";
 
-
-export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate, setLoad }) => {
+export const AddCertificateModal = ({
+  isOpen,
+  onClose,
+  onAddCertificate,
+  setLoad,
+}) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -131,20 +135,20 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate, setLoad
 
       if (image) {
         formData.append("file", image);
+        // upload an image to the bucket
+        const imageAssignResponse = await axios.post(
+          `${DB_URL}api/certificaciones/upload-image/${certId}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log("Image assigned successfully:", userassign.data);
       }
 
-      // upload an image to the bucket
-      const imageAssignResponse = await axios.post(
-        `${DB_URL}api/certificaciones/upload-image/${certId}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      // assign the 
+      // assign the
       const userassign = await axios.post(
         `${DB_URL}api/certificados/asignar`,
         { idusuario: localStorage.getItem("id"), idcertificaciones: certId },
@@ -154,8 +158,6 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate, setLoad
           },
         }
       );
-
-      console.log("Image assigned successfully:", userassign.data);
 
       handleClose();
       setLoad(false);
