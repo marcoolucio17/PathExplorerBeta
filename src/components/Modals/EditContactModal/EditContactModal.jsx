@@ -7,7 +7,7 @@ import axios from "axios";
 const DB_URL = "https://pathexplorer-backend.onrender.com/";
 // const DB_URL = "http://localhost:8080/";
 
-export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
+export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave, setLoad }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
@@ -58,6 +58,7 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoad(true);
 
     try {
       // For now, use the callback to update local state
@@ -86,6 +87,7 @@ export const EditContactModal = ({ isOpen, onClose, contactInfo, onSave }) => {
       console.error("Error updating contact info:", error);
       // TODO: Add error handling UI
     }
+    setLoad(false);
   };
 
   const isFormValid = () => {

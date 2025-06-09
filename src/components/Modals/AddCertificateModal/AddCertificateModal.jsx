@@ -7,7 +7,7 @@ const DB_URL = "https://pathexplorer-backend.onrender.com/";
 //const DB_URL = "http://localhost:8080/";
 
 
-export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
+export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate, setLoad }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -95,6 +95,7 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setLoad(true);
     const formatDate = (dateString) => {
       if (!dateString) return "";
       const date = new Date(dateString);
@@ -157,8 +158,10 @@ export const AddCertificateModal = ({ isOpen, onClose, onAddCertificate }) => {
       console.log("Image assigned successfully:", userassign.data);
 
       handleClose();
+      setLoad(false);
     } catch (error) {
       console.error("Error submitting certificate:", error);
+      setLoad(false);
     }
   };
 
