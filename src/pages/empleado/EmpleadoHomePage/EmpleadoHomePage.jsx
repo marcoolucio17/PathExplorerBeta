@@ -140,17 +140,37 @@ export const EmpleadoHomePage = () => {
     <>
       <style>{`
         .empleado-home-cards [class*="gridContainer"] {
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
-          gap: 1.5rem !important;
-          padding: 1rem !important;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+          gap: 1rem !important;
+          padding: 0.5rem !important;
+          max-width: 100% !important;
         }
         .empleado-home-cards [class*="item"] {
-          height: 280px !important;
+          height: 260px !important;
+          min-height: 260px !important;
         }
         .empleado-home-cards [class*="item"] > * {
           height: 100% !important;
         }
+        .empleado-home-cards [class*="item"] img {
+          width: 50px !important;
+          height: 50px !important;
+          object-fit: cover !important;
+        }
+        .empleado-home-cards [class*="item"] h3 {
+          font-size: 0.9rem !important;
+          line-height: 1.2 !important;
+        }
+        .empleado-home-cards [class*="item"] p {
+          font-size: 0.8rem !important;
+          line-height: 1.3 !important;
+        }
+        .empleado-home-cards [class*="skillChip"] {
+          font-size: 0.7rem !important;
+          padding: 0.2rem 0.4rem !important;
+        }
       `}</style>
+
       
       <div className={pageStyles.homeLayout}>
         <div className={pageStyles.mainContentWrapper}>
