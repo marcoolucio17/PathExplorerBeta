@@ -189,7 +189,7 @@ export function formatName(name) {
  *
  * @returns {Object} Complete state and functions for the Profile page
  */
-export const useProfilePage = (load = false) => {
+export const useProfilePage = (load = false, setLoad) => {
   const navigate = useNavigate();
 
   const [data, setData] = useState({});
@@ -351,6 +351,7 @@ export const useProfilePage = (load = false) => {
 
   // Handle remove certificate
   const handleRemoveCertificate = useCallback(async (certificateId) => {
+    setLoad(true);
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -363,6 +364,7 @@ export const useProfilePage = (load = false) => {
 
     // trigger re-render
     setIsLoading(false);
+    setLoad(false);
   }, []);
 
   // Modal handlers
