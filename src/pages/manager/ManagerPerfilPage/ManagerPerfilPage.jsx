@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 
 // Custom Hooks
 import useProfilePage from "../../../hooks/profile/useProfilePage";
@@ -36,8 +36,12 @@ import styles from "src/styles/Pages/Employee/EmpleadoPerfilPage.module.css";
  * Profile page component for Employee role
  */
 export const ManagerPerfilPage = () => {
+
+  // this is for triggering reloads from modals
+  const [load, setLoad] = useState(false);
+
   // Use the custom hook to handle all logic
-  const profilePage = useProfilePage();
+  const profilePage = useProfilePage(load);
   console.log("ProfilePage state:", profilePage);
   const renderTabContent = () => {
     switch (profilePage.activeTab) {
@@ -59,7 +63,7 @@ export const ManagerPerfilPage = () => {
     }
   };
 
-  if (profilePage.loading || profilePage.isLoading || profilePage.pic == null) {
+  if (profilePage.loading || profilePage.isLoading) {
     return (
       <LoadingSpinner
         overlay={true}
@@ -129,7 +133,10 @@ export const ManagerPerfilPage = () => {
       <div className={styles.profileContent}>
         {/* Left Column - Profile info and tabs */}
         <div className={styles.profileColumnLeft}>
-          <ProfileHeaderCard user={profilePage.userProfile} url = {profilePage.pic}/>
+          <ProfileHeaderCard
+            user={profilePage.userProfile}
+            url={profilePage.pic}
+          />
 
           <Tabs
             tabs={profilePage.tabNames.map((tab) => ({
@@ -173,6 +180,7 @@ export const ManagerPerfilPage = () => {
             className={styles.sidebarSection}
             categorizedSkills={profilePage.categorizedSkills}
             onSkillsClick={profilePage.handleSkillsClick}
+            setIsLoading = {setLoad}
           />
 
           <ProfileCertificates
@@ -203,6 +211,7 @@ export const ManagerPerfilPage = () => {
         onClose={() => profilePage.closeModal("skills")}
         userSkills={profilePage.userSkills}
         onUpdateSkills={profilePage.handleUpdateSkills}
+        setLoad = {setLoad}
       />
 
       <AddCertificateModal

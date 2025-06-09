@@ -36,7 +36,7 @@
   position: absolute;
   bottom: -2px;
   height: 3px;
-  background-color: #d0a0ff;
+  background-color: #8387ff;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
   border-radius: 3px 3px 0 0;
@@ -55,7 +55,7 @@
   border-bottom: none;
   transition: color 0.3s ease;
   text-align: center;
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Light', sans-serif;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -79,7 +79,7 @@
 }
 
 .tab.active {
-  color: #d0a0ff;
+  color: #ffffff;
   font-weight: 500;
 }
 
@@ -101,7 +101,7 @@
 
 .badgeNotif {
   position: relative;
-  font-family: 'Graphik Regular', sans-serif;
+  font-family: 'Graphik Light', sans-serif;
   top: 0;
   margin-left: 8px;
   width: 22px;
@@ -155,7 +155,7 @@
   
   /* Restore the border for active tabs on small screens */
   .tab.active {
-    border-bottom: 3px solid #d0a0ff;
+    border-bottom: 3px solid #ffffff;
   }
 }
 

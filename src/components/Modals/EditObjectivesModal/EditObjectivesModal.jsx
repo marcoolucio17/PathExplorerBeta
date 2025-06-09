@@ -15,6 +15,7 @@ export const EditObjectivesModal = ({
   onClose,
   objectives = [],
   onSave,
+  setLoad
 }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -23,6 +24,7 @@ export const EditObjectivesModal = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
+    id: 0,
     title: "",
     description: "",
     targetDate: "",
@@ -32,6 +34,7 @@ export const EditObjectivesModal = ({
 
   const resetForm = () => {
     setFormData({
+      id: 0,
       title: "",
       description: "",
       targetDate: "",
@@ -45,7 +48,6 @@ export const EditObjectivesModal = ({
       setIsVisible(true);
       setIsClosing(false);
       setObjectivesList([...objectives]);
-      console.log(objectivesList);
       setEditingIndex(null);
       // resetForm();
     }
@@ -124,8 +126,7 @@ export const EditObjectivesModal = ({
       return;
 
     const newObjective = {
-      id: editingIndex !== null ? objectivesList[editingIndex].id : Date.now(),
-      ...formData,
+      ...formData
     };
 
     if (editingIndex !== null) {
@@ -194,6 +195,8 @@ export const EditObjectivesModal = ({
   const handleSubmit = async () => {
     const req = [];
 
+    setLoad(true);
+
     // vamos a mandar todo lo que esté dentro de objectiveList
     objectivesList.forEach((obj) => {
       // la transformamos en el formato del back
@@ -205,7 +208,6 @@ export const EditObjectivesModal = ({
         completa: obj.completed,
         priority: obj.priority,
       };
-      console.log("added thin");
       req.push(formattedObj);
     });
 
@@ -225,6 +227,7 @@ export const EditObjectivesModal = ({
 
     setEditingIndex(null);
     handleClose();
+    setLoad(false);
   };
 
   const isFormValid = () => {
@@ -315,13 +318,13 @@ export const EditObjectivesModal = ({
                     )}
                   </div>
                   <div className={modalStyles.objectiveActions}>
-                    <button
+                    {/* <button
                       type="button"
                       onClick={() => handleEdit(index)}
                       className={modalStyles.editBtn}
                     >
                       <i className="bi bi-pencil"></i>
-                    </button>
+                    </button> */}
                     <button
                       type="button"
                       onClick={() => handleDelete(index)}

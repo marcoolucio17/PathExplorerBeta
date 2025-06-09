@@ -169,7 +169,6 @@ function transformBackendSkils(skills) {
   return res;
 }
 
-
 // the name doesn't come formatted so i need to apply this function
 export function formatName(name) {
   if (!name) return "";
@@ -190,13 +189,13 @@ export function formatName(name) {
  *
  * @returns {Object} Complete state and functions for the Profile page
  */
-export const useProfilePage = ( load = false ) => {
+export const useProfilePage = (load = false) => {
   const navigate = useNavigate();
 
   const [data, setData] = useState({});
 
   // aquí guardamos la pic
-  const [ pic, setPic ] = useState(null);
+  const [pic, setPic] = useState(null);
 
   // Tab names for the profile page
   const tabNames = ["Contact Information", "Experience", "Objectives"];
@@ -230,14 +229,14 @@ export const useProfilePage = ( load = false ) => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         };
-        const data  = await axios.get(
+        const data = await axios.get(
           DB_URL + "api/profile-url/" + localStorage.getItem("id"),
           config
         );
         setPic(data.data.url);
       } catch (err) {
         //console.error("Error fetching my applications", err);
-        setPic('/images/3d_avatar_6.png')
+        setPic("/images/3d_avatar_6.png");
       }
       //setIsLoading(false);
     };
@@ -250,7 +249,7 @@ export const useProfilePage = ( load = false ) => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         };
-        const data  = await axios.get(
+        const data = await axios.get(
           DB_URL + "api/usuario/" + localStorage.getItem("id"),
           config
         );
@@ -263,8 +262,7 @@ export const useProfilePage = ( load = false ) => {
 
     fetch();
     fetchData();
-
-  }, [load]);
+  }, [load, isLoading]);
 
   // User profile data
   const userProfile = transformBackendUser(data.user, data.proyectos);
@@ -296,6 +294,7 @@ export const useProfilePage = ( load = false ) => {
     let status = obj.completed ? false : true;
 
     setIsLoading(true);
+
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -310,7 +309,7 @@ export const useProfilePage = ( load = false ) => {
       config
     );
 
-    window.location.reload();
+    // trigger re-render
     setIsLoading(false);
   }, []);
 
@@ -351,11 +350,7 @@ export const useProfilePage = ( load = false ) => {
   }, []);
 
   // Handle remove certificate
-  // remove cert (no alert no cap no shit no fear)
   const handleRemoveCertificate = useCallback(async (certificateId) => {
-    // setUserCertificates(prev => prev.filter(cert => cert.id !== certificateId));
-
-    setIsLoading(true);
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -366,7 +361,7 @@ export const useProfilePage = ( load = false ) => {
       config
     );
 
-    window.location.reload();
+    // trigger re-render
     setIsLoading(false);
   }, []);
 

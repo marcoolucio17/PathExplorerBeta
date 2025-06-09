@@ -228,6 +228,7 @@ export const EmpleadoPerfilPage = () => {
         isOpen={profilePage.modals.addCertificate}
         onClose={() => profilePage.closeModal('addCertificate')}
         onAddCertificate={profilePage.handleAddCertificate}
+        setLoad={setLoad}
       />
 
       <EditProfileModal
@@ -241,6 +242,7 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('editContact')}
         contactInfo={profilePage.userProfile}
         onSave={handleSaveContact}
+        setLoad={setLoad}
       />
 
       <EditExperienceModal
@@ -255,6 +257,7 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('editObjectives')}
         objectives={profilePage.objectives}
         onSave={handleSaveObjectives}
+        setLoad={setLoad}
       />
 
       <EditProfileDetailsModal
@@ -262,6 +265,7 @@ export const EmpleadoPerfilPage = () => {
         onClose={() => profilePage.closeModal('editProfileDetails')}
         profileData={profilePage.userProfile}
         onSave={handleSaveProfileDetails}
+        setLoad={setLoad}
       />
     </div>
   );

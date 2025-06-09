@@ -14,6 +14,7 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 import CustomScrollbar from "src/components/CustomScrollbar";
 import { ProjectList } from "src/components/GridList/Project";
 import useGetFetch from "src/hooks/useGetFetch";
+import "src/index.css";
 
 const hardcodedSkillsData = {
   message: "Habilidades conseguidas fácilmente",
@@ -172,7 +173,7 @@ export const EmpleadoHomePage = () => {
                   Based on your profile, you'd be a great fit for these projects:
                 </h3>
                 
-                <div className="empleado-home-cards" style={{ display: 'block', width: '100%'}}>
+                <div className="empleado-home-cards" style={{ display: 'block', width: '100%', marginTop: '-0.78rem' }}>
                   <ProjectList 
                     projects={dashboardPage.topProjects}
                     viewMode={dashboardPage.viewMode}
@@ -190,7 +191,7 @@ export const EmpleadoHomePage = () => {
 
           <div className={pageStyles.sidebar}>
             <GlassCard className={pageStyles.sidebarCard}>
-              <h2 className={pageStyles.sectionTitle}>Quick Actions</h2>
+              <h2 className="sectionTitle">Quick Actions</h2>
               <div className={quickActionsStyles.actionsContainer}>
               {quickActions.map((action) => (
                 <button
@@ -200,7 +201,7 @@ export const EmpleadoHomePage = () => {
                 >
                   <div className={quickActionsStyles.actionInfo}>
                     <i className={`${action.icon} ${quickActionsStyles.actionIcon}`} />
-                    <span className={quickActionsStyles.actionTitle}>{action.title}</span>
+                    <span className="title-light">{action.title}</span>
                   </div>
                   <i className="bi bi-arrow-right-circle-fill" />
                 </button>
