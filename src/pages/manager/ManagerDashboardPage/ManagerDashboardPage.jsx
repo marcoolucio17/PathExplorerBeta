@@ -22,6 +22,9 @@ import { useState } from "react";
  * Dashboard component for Manager role
  * 
  */
+
+import Alert from "react-bootstrap/Alert";
+
 export const ManagerDashboardPage = () => {
   // Use the manager-specific dashboard hook
   const dashboardPage = useManagerDashboardPage();
@@ -29,8 +32,7 @@ export const ManagerDashboardPage = () => {
   const headerProps = useDashboardHeaderConfig({...dashboardPage, activeTab: dashboardPage.activeTab});
   // this is for triggering reloads from modals
   const [load, setLoad] = useState(false);
-
-
+  console.log(dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab])
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
@@ -48,6 +50,7 @@ export const ManagerDashboardPage = () => {
           activeTab={dashboardPage.activeTab}
           onTabClick={dashboardPage.setActiveTab}
         />
+
         {/* Main content area with projects list with the create project button */}
         <div className={styles.cardsContainer}>
           {/* The create project button appears only in the My Projects active tab */}
@@ -70,7 +73,12 @@ export const ManagerDashboardPage = () => {
             showHorizontalScroll={false}
           >
 
-            <ProjectList
+            {dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab] && <div className="login-error-container" style={{ width: "100%" }}>
+              <Alert className="login-error-alert" variant="danger">
+                {dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab]}
+              </Alert>
+            </div >}
+            {!dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab] && <ProjectList
               tabSelected={dashboardPage.activeTab}
               projects={dashboardPage.displayProjects}
               viewMode={dashboardPage.viewMode}
@@ -79,7 +87,7 @@ export const ManagerDashboardPage = () => {
               userSkills={dashboardPage.userSkills}
               onClearFilters={dashboardPage.handleClearFilters}
               isLoading={dashboardPage.isLoading}
-            />
+            />}
           </CustomScrollbar>
         </div>
       </div>

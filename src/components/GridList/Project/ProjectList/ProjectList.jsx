@@ -21,7 +21,7 @@ import { Navigate, Link, useNavigate, NavLink } from "react-router";
  * @param {number} props.skeletonCount - Number of skeleton cards to show when loading
  */
 const ProjectList = ({
-  tabSelected = "All",
+  tabSelected = "",
   projects = [],
   viewMode,
   showCompatibility,
@@ -32,6 +32,7 @@ const ProjectList = ({
   onViewApplication,
   skeletonCount = 6,
 }) => {
+
 
   // Safety check for undefined/null projects array
   const safeProjects = Array.isArray(projects) ? projects : [];
@@ -57,13 +58,14 @@ const ProjectList = ({
             className="bi bi-briefcase"
             style={{ fontSize: "2rem", marginBottom: "1rem" }}
           ></i>
-          <p>No projects match your selected filters</p>
-          <button
-            className={styles.clearFiltersButton}
-            onClick={onClearFilters}
-          >
-            Clear Filters
-          </button>
+          {tabSelected !== "topProjects" && <><p>No projects match your selected filters</p>
+            <button
+              className={styles.clearFiltersButton}
+              onClick={onClearFilters}
+            >
+              Clear Filters
+            </button></>}
+
         </div>
       </div>
     );

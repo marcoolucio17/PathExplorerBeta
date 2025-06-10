@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, act } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import axios, { all } from "axios";
 
 export const useDashboardData = () => {
   const navigate = useNavigate();
@@ -33,22 +33,38 @@ export const useDashboardData = () => {
   });
   // State for user skills
   const [userSkills, setUserSkills] = useState([]);
-
+  // State for error fetching user skills
+  const [errorUserSkills, setUserSkillsError] = useState(null);
   // State for currents projects All
   const [projectsData, setProjectsData] = useState([]);
+
   // State for boolean loading projects All
   const [projectsLoading, setProjectsLoading] = useState(true);
+  // State for currents projects role applications
+  const [myApplicationsData, setMyApplicationsData] = useState([]);
+
   // State for boolean loading projects Aplications
   const [applyLoading, setApplyLoading] = useState(true);
   // State for clients data
   const [clientsData, setClientsData] = useState([]);
+  // State for error fetching clients
+  const [errorClients, setClientsError] = useState(null);
   // State for roles data
   const [rolesData, setRolesData] = useState([]);
+  // State for error fetching roles
+  const [errorRoles, setRolesError] = useState(null);
   // State for top 3 projects data
   const [topData, setTopData] = useState([]);
-  // State for currents projects role applications
-  const [myApplicationsData, setMyApplicationsData] = useState([]);
 
+  // State for error fetching top projects
+  const [errorTopProjects, setTopError] = useState(null);
+  // State for all error in projects
+  const [allErrorProjectsDashboard, setAllErrorProjectsDashboard] = useState({
+    All: null,
+    "Applied To": null,
+    "My Projects": null,
+  });
+  console.log(allErrorProjectsDashboard);
   useEffect(() => {
     if (searchTerm) {
       const params = new URLSearchParams(location.search);
@@ -90,7 +106,7 @@ export const useDashboardData = () => {
 
   // Url for the backend API in render
   let url = "https://pathexplorer-backend.onrender.com/api";
-
+  let url2 = "http://localhost:8080/api";
   // Configuration for axios requests
   const config = {
     headers: {
@@ -103,11 +119,23 @@ export const useDashboardData = () => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
-        const { data } = await axios.get(`${url}/projects`, config);
+        const { data } = await axios.get(`${url2}/projects/`, config);
 
         setProjectsData(data);
+        setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          All: null, // Clear error for All projects
+        }));
       } catch (err) {
         console.error("Error fetching projects", err);
+
+        setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          All:
+            err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.response?.data,
+        }));
       } finally {
         setProjectsLoading(false);
       }
@@ -122,32 +150,57 @@ export const useDashboardData = () => {
     axios
       .get(`${url}/roles`, config)
       .then((res) => setRolesData(res.data))
-      .catch((err) => console.error("Error fetching roles", err));
+      .catch((err) => {
+        console.error("Error fetching roles", err);
+        setRolesError(err.response?.data?.message || err.response?.data?.error);
+      });
 
     //get user top 3 projects compability
     const userId = localStorage.getItem("id");
     if (userId) {
       axios
         .get(`${url}/projects/top/${userId}`, config)
-        .then((res) => setTopData(res.data))
-        .catch((err) => console.error("Error fetching top projects", err));
+        .then((res) => {
+          setTopData(res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching top projects", err);
+          setTopError(err.response?.data?.message || err.response?.data?.error);
+        });
     }
 
     //fetch clients
     axios
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
-      .catch((err) => console.error("Error fetching clients", err));
+      .catch((err) => {
+        console.error("Error fetching clients", err);
+        setClientsError(
+          err.response?.data?.message || err.response?.data?.error
+        );
+      });
 
     //fetch user applications
     axios
-      .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
+      .get(`${url2}/apps/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
         setMyApplicationsData(res.data);
         setApplyLoading(false);
+        setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          "Applied To": null, // Clear error for All projects
+        }));
       })
       .catch((err) => {
         setApplyLoading(false);
+
+        setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          "Applied To":
+            err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.response?.data,
+        }));
       });
 
     //fetch user skills
@@ -156,7 +209,12 @@ export const useDashboardData = () => {
       .then((res) => {
         setUserSkills(res.data.data.map((skill) => skill.nombre));
       })
-      .catch((err) => console.error("Error fetching user skills", err));
+      .catch((err) => {
+        console.error("Error fetching user skills", err);
+        setUserSkillsError(
+          err.response?.data?.message || err.response?.data?.error
+        );
+      });
   }, []);
 
   // Handle the skills selection
@@ -289,11 +347,9 @@ export const useDashboardData = () => {
   const flattenProjectsForList = (projects) => {
     return projects
       .flatMap((project) => {
-        console.log("Project:", project);
         // When the tab is "My Projects", we need to flatten the roles
         if (project.proyecto_roles) {
-          console.log("Punto A");
-          project.proyecto_roles?.map((proyecto_rol) => ({
+          return project.proyecto_roles?.map((proyecto_rol) => ({
             project,
             proyecto_rol,
             hasSelectedSkills:
@@ -305,7 +361,6 @@ export const useDashboardData = () => {
               ),
           }));
         } else {
-          console.log("Punto B");
           const hasSelectedSkills =
             selectedSkillFilters.length === 0 ||
             project.requerimientos_roles.some((req_rol) =>
@@ -313,7 +368,7 @@ export const useDashboardData = () => {
                 req_rol.requerimientos.habilidades.nombre
               )
             );
-          console.log(hasSelectedSkills);
+
           // For other tabs, we just return the project
           return {
             project,
@@ -324,13 +379,18 @@ export const useDashboardData = () => {
       })
       .filter((item) => item.hasSelectedSkills);
   };
-  console.log("Selected Skill Filters:", selectedSkillFilters);
+
   return {
     projects: Array.isArray(projectsData) ? projectsData : [],
     clients: Array.isArray(clientsData) ? clientsData : [],
+    errorClients: errorClients,
     roles: Array.isArray(rolesData) ? rolesData : [],
+    errorRoles: errorRoles,
     top: Array.isArray(topData) ? topData : [],
+    errorTopProjects: errorTopProjects,
     projectsApp: Array.isArray(myApplicationsData) ? myApplicationsData : [],
+    allErrorProjectsDashboard,
+    setAllErrorProjectsDashboard,
     searchTerm,
     setSearchTerm,
     selectedSkillFilters,

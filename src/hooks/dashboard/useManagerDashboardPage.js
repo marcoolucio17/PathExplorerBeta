@@ -31,10 +31,10 @@ export const useManagerDashboardPage = () => {
   const [myProjectsData, setMyProjectsData] = useState([]);
   // Loading and error states for "My Projects" tab
   const [myProjectsLoading, setMyProjectsLoading] = useState(true);
-  const [myProjectsError, setMyProjectsError] = useState(null);
 
   // Configuration for fetching my projects
   let url = "https://pathexplorer-backend.onrender.com/api";
+  let url2 = "http://localhost:8080/api"; // Use this for local development
   const config = {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -47,11 +47,21 @@ export const useManagerDashboardPage = () => {
       setMyProjectsLoading(true);
 
       try {
-        const response = await axios.get(`${url}/projects`, config);
+        const response = await axios.get(`${url2}/projects`, config);
         setMyProjectsData(response.data);
+        dashboardData.setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          "My Projects": null, // Clear error for All projects
+        }));
       } catch (error) {
         console.error("Error fetching my projects:", error);
-        setMyProjectsError(error);
+        dashboardData.setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          "My Projects":
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.response?.data,
+        }));
       } finally {
         setMyProjectsLoading(false);
       }
@@ -185,7 +195,7 @@ export const useManagerDashboardPage = () => {
         borderColor: "rgba(0, 123, 255, 0.5)",
       };
     }
-    
+
     return filters;
   }, [
     dashboardData.selectedSkillFilters,
@@ -271,7 +281,12 @@ export const useManagerDashboardPage = () => {
 
     const counts = { All: 0, "Applied To": 0, "My Projects": 0 };
     console.log("displayProjects", displayProjects.length);
-    counts["All"] = displayProjects.length;
+    if (listPage.activeTab === "All") {
+      counts["All"] = displayProjects.length;
+    } else {
+      counts["All"] = dashboardData.projects.length;
+    }
+
     counts["Applied To"] = dashboardData.projectsApp.length;
 
     //for my projects, count actual projects (not flattened roles)
@@ -310,7 +325,6 @@ export const useManagerDashboardPage = () => {
     isLoading,
     //expose my projects data for debugging
     myProjectsData,
-    myProjectsError,
     currentUserId,
   };
 };

@@ -15,6 +15,7 @@ import {
   ProfileCertificates,
   ProfileHeaderCard,
 } from "../../../components/Profile";
+import Alert from "react-bootstrap/Alert";
 
 // Modals
 import { CertificateModal } from "../../../components/Modals/CertificateModal";
@@ -42,7 +43,7 @@ export const ManagerPerfilPage = () => {
 
   // Use the custom hook to handle all logic
   const profilePage = useProfilePage(load);
-  console.log("ProfilePage state:", profilePage);
+
   const renderTabContent = () => {
     switch (profilePage.activeTab) {
       case "Experience":
@@ -129,6 +130,7 @@ export const ManagerPerfilPage = () => {
   };
 
   return (
+    <>
     <div className={styles.profileContainer}>
       <div className={styles.profileContent}>
         {/* Left Column - Profile info and tabs */}
@@ -257,7 +259,13 @@ export const ManagerPerfilPage = () => {
         onSave={handleSaveProfileDetails}
         setLoad={setLoad}
       />
-    </div>
+      </div>
+      {profilePage.error && profilePage.error.split('\n').map((line, index) => (<div className="login-error-container" style={{ width: "65%", marginLeft: "17.5%", marginRight: "17.5%" }}>
+        <Alert key={index} className="login-error-alert" variant="danger">
+          {line}
+        </Alert>
+      </div >))}
+    </>
   );
 };
 

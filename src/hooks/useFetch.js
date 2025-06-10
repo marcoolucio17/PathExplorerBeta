@@ -36,7 +36,9 @@ export const useFetch = (ruta, body = null) => {
       }
       setData(response.data);
     } catch (err) {
-      setError(err);
+      const errorMessage = err.response.data.error;
+      setError(errorMessage);
+      
     } finally {
       setLoading(false);
     }

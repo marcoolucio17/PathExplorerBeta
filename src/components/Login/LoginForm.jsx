@@ -142,7 +142,7 @@ export const LoginForm = () => {
 
       setTimeout(() => {
         setLoginError("");
-      }, 6000);
+      }, 6000);                                                      
     }
   };
 

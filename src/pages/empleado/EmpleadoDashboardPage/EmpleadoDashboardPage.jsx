@@ -1,4 +1,4 @@
-
+import React, { useState, useEffect, useRef } from "react";
 
 // Custom Hooks
 import useEmpleadoDashboardPage from '../../../hooks/dashboard/useEmpleadoDashboardPage';
@@ -13,7 +13,7 @@ import { RolesModal } from "../../../components/Modals/RolesModal";
 import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
-
+import Alert from "react-bootstrap/Alert";
 // CSS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
 
@@ -22,6 +22,7 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
  * 
  */
 export const EmpleadoDashboardPage = () => {
+
   // Use the employee-specific dashboard hook
   const dashboardPage = useEmpleadoDashboardPage();
 
@@ -30,6 +31,7 @@ export const EmpleadoDashboardPage = () => {
   const headerProps = useEmpleadoDashboardHeaderConfig(dashboardPage);
 
   return (
+    <>
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
         <div className={styles.pageHeader}>
@@ -38,7 +40,7 @@ export const EmpleadoDashboardPage = () => {
         
         {/* Search header with filters */}
         <SearchHeader {...headerProps} />
-        
+
         {/* Tabs for different project statuses */}
         <Tabs 
           tabs={dashboardPage.tabNames.map(tab => ({
@@ -51,18 +53,23 @@ export const EmpleadoDashboardPage = () => {
 
         {/* Main content area with projects list */}
         <div className={styles.cardsContainer}>
-          <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
-            <ProjectList 
-              tabSelected={dashboardPage.activeTab}
-              projects={dashboardPage.displayProjects}
-              viewMode={dashboardPage.viewMode}
-              showCompatibility={dashboardPage.showCompatibility}
-              selectedSkillFilters={dashboardPage.selectedSkillFilters}
-              userSkills={dashboardPage.userSkills}
-              onClearFilters={dashboardPage.handleClearFilters}
-              isLoading={dashboardPage.isLoading}
-              onViewApplication={dashboardPage.handleViewApplication}
-            />
+            <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
+              {dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab] && <div className="login-error-container" style={{ width: "100%" }}>
+                <Alert className="login-error-alert" variant="danger">
+                  {dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab]}
+                </Alert>
+              </div >}
+              {!dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab] && <ProjectList
+                tabSelected={dashboardPage.activeTab}
+                projects={dashboardPage.displayProjects}
+                viewMode={dashboardPage.viewMode}
+                showCompatibility={dashboardPage.showCompatibility}
+                selectedSkillFilters={dashboardPage.selectedSkillFilters}
+                userSkills={dashboardPage.userSkills}
+                onClearFilters={dashboardPage.handleClearFilters}
+                isLoading={dashboardPage.isLoading}
+                onViewApplication={dashboardPage.handleViewApplication}
+              />}
           </CustomScrollbar>
         </div>
       </div>
@@ -98,7 +105,10 @@ export const EmpleadoDashboardPage = () => {
         readOnly={true}
         messageOnly={true}
       />
-    </div>
+
+      </div>
+
+    </>
   );
 };
 

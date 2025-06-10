@@ -3,7 +3,7 @@ import modalStyles from "src/styles/Modals/Modal.module.css";
 import styles from "./SkillsModal.module.css";
 import { SkillChip } from "src/components/SkillChip";
 import ModalScrollbar from "src/components/Modals/ModalScrollbar";
-
+import Alert from "react-bootstrap/Alert";
 import axios from "axios";
 
 function groupSkillsByCategory(skillsArray) {
@@ -78,7 +78,8 @@ export const SkillsModal = ({
   const [expandedCategories, setExpandedCategories] = useState(new Set());
   const disabledSkillsSet = new Set(disabledSkills.map((skill) => skill.idhabilidad));
   const [SKILLS_DATA, setSkillsData] = useState([]);
-
+  const [loadingError, setLoadingError] = useState(true);
+  const [dataError, setDataError] = useState("Error fetching your data. Please try again later.");
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -213,7 +214,11 @@ export const SkillsModal = ({
             </button>
           </div>
         </div>
-
+        {loadingError && <div className="login-error-container" style={{ width: "90%", marginLeft: "5%", marginRight: "5%" }}>
+          <Alert className="login-error-alert" variant="danger">
+            {dataError}
+          </Alert>
+        </div >}
         <div
           className={modalStyles.modalBody}
           style={{ height: "calc(100% - 200px)" }}

@@ -4,7 +4,7 @@ import styles from './ClientsModal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
 import { ChipModalSelect } from '../ChipModalSelect';
-
+import Alert from "react-bootstrap/Alert";
 
 
 export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus, clients = [], onClientSelected }) => {
@@ -14,7 +14,8 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClient, setselectedClient] = useState('');
     const [selectedClientId, setSelectedClientId] = useState(null);
-
+    const [loadingError, setLoadingError] = useState(true);
+    const [dataError, setDataError] = useState("Error fetching your data. Please try again later.");
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
@@ -94,7 +95,11 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
 
 
                 </div>
-
+                {loadingError && <div className="login-error-container" style={{ width: "90%", marginLeft: "5%", marginRight: "5%" }}>
+                    <Alert className="login-error-alert" variant="danger">
+                        {dataError}
+                    </Alert>
+                </div >}
                 <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
                     <div className={styles.clientsList}>
 
