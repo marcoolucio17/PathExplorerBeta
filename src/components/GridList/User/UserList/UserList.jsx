@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import UserCard from "src/components/GridList/User/UserCard";
 import { ProjectLoadingState } from "src/components/LoadingSpinner";
 import styles from "src/styles/GridList/GridListContainer.module.css";
@@ -25,6 +26,16 @@ const UserList = ({
   onClearFilters,
   isLoading = false,
 }) => {
+  const navigate = useNavigate();
+
+  //handle user card click to navigate to employee profile
+  const handleUserClick = (user) => {
+    if (user && user.idusuario) {
+      const userRole = localStorage.getItem("role") || "empleado";
+      navigate(`/${userRole}/employee/${user.idusuario}`);
+    }
+  };
+
   //safety check for undefined/null users array
   const safeUsers = Array.isArray(users) ? users : [];
 
@@ -89,6 +100,7 @@ const UserList = ({
               selectedSkillFilters={selectedSkillFilters}
               userSkills={userSkills}
               index={index}
+              onClick={() => handleUserClick(user)}
             />
           </div>
         );

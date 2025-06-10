@@ -3,6 +3,7 @@ import { GlassCard } from "../shared/GlassCard";
 import { SkillChip } from "../SkillChip";
 import CustomScrollbar from "../CustomScrollbar";
 import styles from "./ProfileSkills.module.css";
+import "src/index.css";
 
 import axios from "axios";
 
@@ -15,18 +16,22 @@ const DB_URL = "https://pathexplorer-backend.onrender.com/";
  * ProfileSkills component for displaying skills with categories
  * @param {Object} categorizedSkills - Object with hardSkills and softSkills arrays
  * @param {Function} onSkillsClick - Function to handle skills button click
+ * @param {boolean} readOnly - Whether the component is in read-only mode
  * @returns {JSX.Element}
  */
 export const ProfileSkills = ({
   categorizedSkills = { hardSkills: [], softSkills: [] },
   onSkillsClick,
   setIsLoading,
+  readOnly = false,
 }) => {
   const { hardSkills, softSkills } = categorizedSkills;
   const hasNoSkills = hardSkills.length === 0 && softSkills.length === 0;
 
-  // función para eliminar una skill del usuario
+  //function to remove a skill from user
   const handleRemove = async (id) => {
+    if (readOnly) return;
+    
     setIsLoading(true);
 
     try {
@@ -54,10 +59,12 @@ export const ProfileSkills = ({
   return (
     <GlassCard className={styles.skillsCard}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>My Skills</h2>
-        <button className={styles.sectionAddBtn} onClick={onSkillsClick}>
-          <i className="bi bi-plus-lg" />
-        </button>
+        <h2 className="sectionTitle">My Skills</h2>
+        {!readOnly && (
+          <button className={styles.sectionAddBtn} onClick={onSkillsClick}>
+            <i className="bi bi-plus-lg" />
+          </button>
+        )}
       </div>
       <div className={styles.skillsScrollContainer}>
         <CustomScrollbar fadeBackground="transparent" fadeHeight={40}>
@@ -81,7 +88,7 @@ export const ProfileSkills = ({
                         <SkillChip
                           key={`hard-${index}`}
                           text={skill.nombre}
-                          onRemove={() => handleRemove(skill.idhabilidad)}
+                          onRemove={!readOnly ? () => handleRemove(skill.idhabilidad) : undefined}
                         />
                       ))}
                     </div>
@@ -95,9 +102,9 @@ export const ProfileSkills = ({
                     <div className={styles.skillChipsContainer}>
                       {softSkills.map((skill, index) => (
                         <SkillChip
-                          key={`hard-${index}`}
+                          key={`soft-${index}`}
                           text={skill.nombre}
-                          onRemove={() => handleRemove(skill.idhabilidad)}
+                          onRemove={!readOnly ? () => handleRemove(skill.idhabilidad) : undefined}
                         />
                       ))}
                     </div>

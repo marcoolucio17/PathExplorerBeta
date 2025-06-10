@@ -159,13 +159,13 @@
   font-size: 1rem;
   font-weight: 500;
   color: var(--text-muted);
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Light', sans-serif;
 }
 
 .placeholder span {
   font-size: 0.85rem;
   color: var(--text-muted-darker);
-  font-family: 'Graphik Regular', sans-serif;
+  font-family: 'Graphik Light', sans-serif;
   line-height: 1.4;
 }
 
@@ -182,14 +182,14 @@
   margin: 0;
   font-size: clamp(0.85rem, 1.1vw, 0.95rem);
   color: var(--text-light);
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Light', sans-serif;
 }
 
 .certificate p {
   margin: 0;
   font-size: clamp(0.7rem, 0.95vw, 0.8rem);
   color: var(--text-muted);
-  font-family: 'Graphik Regular', sans-serif;
+  font-family: 'Graphik Regular Italic', sans-serif;
 }
 
 /* Responsive adjustments */

@@ -32,6 +32,7 @@ import { TFSVistaPropuestas } from "./pages/tfs/TFSVistaPropuestas";
 
 // Imports de users  
 import { UsersDashboardPage } from "./pages/users/UsersDashboardPage/UsersDashboardPage";
+import { UsersEmployeePage } from "./pages/users/UsersEmployeePage/UsersEmployeePage";
 
 // Imports de manager project
 import { ManagerProjectPage } from "./pages/manager/ManagerProjectPage/ManagerProjectPage";
@@ -65,6 +66,7 @@ function App() {
         <Route path="manager/create-project" element={<ManagerCreateProjectPage/>}></Route>
         <Route path="manager/employee-dashboard" element={<UsersDashboardPage />} />
         <Route path="manager/project/:projectId" element={<ManagerProjectPage />} />
+        <Route path="manager/employee/:userId" element={<UsersEmployeePage />} />
       </Route>
 
       {/* rutas de tfs */}
@@ -76,6 +78,7 @@ function App() {
         <Route path="tfs/proyecto" element={<TFSProyecto />} />
         <Route path="tfs/vistaperfil" element={<TFSVistaPropuestas />} />
         <Route path="tfs/employee-dashboard" element={<UsersDashboardPage />} />
+        <Route path="tfs/employee/:userId" element={<UsersEmployeePage />} />
       </Route>
 
       {/* rutas de empleado */}
@@ -85,6 +88,7 @@ function App() {
         <Route path="empleado/perfil" element={<EmpleadoPerfil />} />
         <Route path="empleado/proyecto/:projectId/:roleId" element={<EmpleadoProyecto />} />
         <Route path="empleado/employee-dashboard" element={<UsersDashboardPage />} />
+        <Route path="empleado/employee/:userId" element={<UsersEmployeePage />} />
       </Route>
     </Routes>
   );

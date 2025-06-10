@@ -3,6 +3,7 @@ import { GlassCard } from "../shared/GlassCard";
 import CustomScrollbar from "../CustomScrollbar";
 import styles from "./ProfileCertificates.module.css";
 import axios from "axios";
+import "src/index.css";
 
 const DB_URL = "https://pathexplorer-backend.onrender.com/";
 //const DB_URL = "http://localhost:8080/";
@@ -12,6 +13,7 @@ export const ProfileCertificates = ({
   onCertificateClick,
   onAddCertificateClick,
   onRemoveCertificate,
+  readOnly = false,
 }) => {
   const [certsWithImages, setCertsWithImages] = useState([]);
 
@@ -53,6 +55,8 @@ export const ProfileCertificates = ({
   }, [certificates]);
 
   const handleRemoveClick = (e, certificateId) => {
+    if (readOnly) return;
+    
     e.stopPropagation();
     if (onRemoveCertificate) {
       onRemoveCertificate(certificateId);
@@ -62,10 +66,12 @@ export const ProfileCertificates = ({
   return (
     <GlassCard className={styles.certificatesCard}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>My certificates</h2>
-        <button className={styles.sectionAddBtn} onClick={onAddCertificateClick}>
-          <i className="bi bi-plus-lg" />
-        </button>
+        <h2 className="sectionTitle">My Certificates</h2>
+        {!readOnly && (
+          <button className={styles.sectionAddBtn} onClick={onAddCertificateClick}>
+            <i className="bi bi-plus-lg" />
+          </button>
+        )}
       </div>
       <div className={styles.certificatesScrollContainer}>
         <CustomScrollbar fadeBackground="transparent" fadeHeight={40}>
@@ -88,7 +94,7 @@ export const ProfileCertificates = ({
                     <h3>{cert.title}</h3>
                     <p>by {cert.issuer}</p>
                   </div>
-                  {onRemoveCertificate && (
+                  {!readOnly && onRemoveCertificate && (
                     <button 
                       className={styles.removeButton}
                       onClick={(e) => handleRemoveClick(e, cert.id)}
