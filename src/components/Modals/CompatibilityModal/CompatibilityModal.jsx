@@ -14,7 +14,9 @@ export const CompatibilityModal = ({
 }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-
+  console.log("Project Skills:", projectSkills);
+  console.log("User Skills:", userSkills);
+  console.log("Compatibility Percentage:", compatibilityPercentage);
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -40,11 +42,11 @@ export const CompatibilityModal = ({
   };
 
   const matchingSkills = projectSkills.filter(skill => 
-    userSkills.includes(skill.name)
+    userSkills.includes(skill.skill)
   );
   
   const missingSkills = projectSkills.filter(skill => 
-    !userSkills.includes(skill.name)
+    !userSkills.includes(skill.skill)
   );
 
   return (
@@ -96,7 +98,7 @@ export const CompatibilityModal = ({
                     {matchingSkills.map((skill, index) => (
                       <SkillChip 
                         key={index}
-                        text={skill.name} 
+                        text={skill.skill} 
                         isUserSkill={true}
                       />
                     ))}
@@ -115,7 +117,7 @@ export const CompatibilityModal = ({
                     {missingSkills.map((skill, index) => (
                       <SkillChip 
                         key={index}
-                        text={skill.name} 
+                        text={skill.skill} 
                         isUserSkill={false}
                       />
                     ))}

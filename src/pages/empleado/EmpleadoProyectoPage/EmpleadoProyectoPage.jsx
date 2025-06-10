@@ -39,7 +39,7 @@ export const EmpleadoProyectoPage = () => {
       />
     );
   }
-  console.log("Error:", error);
+
   //error state  
   if (error) {
     return (
@@ -71,7 +71,7 @@ export const EmpleadoProyectoPage = () => {
   const skillsArray = projectData?.requiredSkills || [];
   const visibleSkills = skillsArray.slice(0, maxVisibleSkills);
   const remainingSkillsCount = Math.max(0, skillsArray.length - maxVisibleSkills);
-
+  console.log("Visible Skills:", visibleSkills);
   return (
     <div className={styles.proyectoContainer}>
       <div className={styles.proyectoContent}>
@@ -247,9 +247,10 @@ export const EmpleadoProyectoPage = () => {
               <div className={skillsStyles.skillsContainer}>
                 <div className={skillsStyles.skillsList}>
                   {visibleSkills.map((skill, index) => (
+
                     <SkillChip 
                       key={index}
-                      text={skill.name} 
+                      text={skill.skill} 
                       isUserSkill={skill.isUserSkill} 
                     />
                   ))}

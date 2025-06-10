@@ -2,7 +2,7 @@ import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useModalControl from '../useModalControl';
 import { useFetch } from 'src/hooks/useFetch';
-
+import axios, { all } from "axios";
 
 function isNonTechnicalSkill(skillName) {
   const nonTechnicalSkills = [
@@ -275,17 +275,52 @@ function removeDuplicateSkills(skills) {
 //check if user has specific skills
 function checkUserSkills(requiredSkills, userSkills) {
   const userSkillsSet = new Set(userSkills);
-  return requiredSkills.map((skill) => ({
-    ...skill,
-    isUserSkill: userSkillsSet.has(skill.name),
+
+  const skills = requiredSkills.map((skill) => ({
+    skill,
+    isUserSkill: userSkillsSet.has(skill),
   }));
+  return skills;
 }
 
 //custom hook for empleadoproyectopage
 const useEmpleadoProyectoPage = () => {
   const { projectId: urlProjectId, roleId: urlRoleId } = useParams();
   const navigate = useNavigate();
-
+  // State for user skills
+  const [userSkillsNames, setUserSkillsNames] = useState([]);
+  // Parameters for All projects
+  const [filterOptions, setFilterOptions] = useState({
+    idCompatible: localStorage.getItem("id"),
+    type: true,
+  });
+  console.log("Names Skills:", userSkillsNames);
+  // Configuration for axios requests
+  const config = {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    params: filterOptions,
+  };
+  // Url for the backend API in render
+  let url = "https://pathexplorer-backend.onrender.com/api";
+  // Get userSkills
+  useEffect(() => {
+    //fetch user skills
+    axios
+      .get(`${url}/habilidades/usuario/${localStorage.getItem("id")}`, config)
+      .then((res) => {
+        setUserSkillsNames(res.data.data.map((skill) => skill.nombre));
+      })
+      .catch((err) => {
+        console.error("Error fetching user skills", err);
+        setUserSkillsError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.response?.data
+        );
+      });
+  }, []);
   //get ids from url params or fallback to localStorage
   const projectId = urlProjectId || localStorage.getItem("projectid");
   const roleId = urlRoleId || localStorage.getItem("idrol");
@@ -325,18 +360,21 @@ const useEmpleadoProyectoPage = () => {
   }, [data, roleId, projectId]);
 
   //user skills for compatibility calculation temp only
-  const [userSkills] = useState(["Python", "C#", "Figma"]);
+  const userSkills = userSkillsNames;
 
   //update required skills with user skill status
   const enhancedProjectData = useMemo(() => {
     if (!projectData) return null;
-
+    const getRequiredSkillsNames = projectData.requiredSkills.map(
+      (skill) => skill.name
+    );
     return {
       ...projectData,
-      requiredSkills: checkUserSkills(projectData.requiredSkills, userSkills),
+      requiredSkills: checkUserSkills(getRequiredSkillsNames, userSkills),
     };
   }, [projectData, userSkills]);
 
+  console.log("Enhanced Project Data:", enhancedProjectData);
   //check if user has applied to current project (must be after enhancedProjectData)
   const hasAppliedToProject = useMemo(() => {
     if (
@@ -411,9 +449,11 @@ const useEmpleadoProyectoPage = () => {
     }
 
     const totalSkills = enhancedProjectData.requiredSkills.length;
-    const userSkillsSet = new Set(userSkills);
+
+    const userSkillsSet = new Set(userSkills.map((skill) => skill));
+
     const matchingSkills = enhancedProjectData.requiredSkills.filter((skill) =>
-      userSkillsSet.has(skill.name)
+      userSkillsSet.has(skill.skill)
     ).length;
 
     return Math.round((matchingSkills / totalSkills) * 100);
