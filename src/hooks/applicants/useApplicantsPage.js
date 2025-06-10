@@ -18,6 +18,7 @@ export const useApplicantsPage = () => {
     error: apiError,
   } = useFetch(`creador/${managerId}/aplicaciones`);
   
+  console.log("API Data:", apiData);
   const mapStatusToTab = (estatus) => {
     console.log('mapping status:', estatus);
     const statusMap = {
