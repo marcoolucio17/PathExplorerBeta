@@ -8,7 +8,7 @@ import useGetFetch from 'src/hooks/useGetFetch';
 import { Spinner } from 'react-bootstrap';
 import { Alert } from 'react-bootstrap';
 
-export const CVModal = ({ isOpen, onClose }) => {
+export const CVModal = ({ isOpen, onClose, readOnly = false, userId = null }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const { triggerPost, loading, error } = usePost();
@@ -17,7 +17,7 @@ export const CVModal = ({ isOpen, onClose }) => {
   const [uploadAlert, setUploadAlert] = useState("");
 
   const { data, errorcv, loadingcv, refetch } = useFetch(
-    "cv-url/" + localStorage.getItem("id")
+    "cv-url/" + (userId || localStorage.getItem("id"))
   );
 
   useEffect(() => {
@@ -187,51 +187,62 @@ const handleDownload = async () => {
         </div>
 
         <div className={styles.buttonGroup} style={{ borderTop: '1px solid var(--border-light)', padding: '1.5rem' }}>
-          <button
-            onClick={handleDownload}
-            className={styles.primaryButton}
-          >
-            <i className="bi bi-download"></i>
-            Download CV
-          </button>
-
-          <button
-            onClick={handleCVUpload}
-            className={styles.secondaryButton}
-            disabled={isLoading}
-          >
-            <i className="bi bi-upload"></i>
-            Upload New
-            {isLoading && (
-            <Spinner
-              animation="border"
-              role="status"
-              size="sm"
-              className="ms-2"
+          {readOnly ? (
+            <button
+              onClick={handleClose}
+              className={styles.secondaryButton}
             >
-              <span className="visually-hidden">Uploading CV...</span>
-            </Spinner>
-            )}
-          </button>
+              Close
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleDownload}
+                className={styles.primaryButton}
+              >
+                <i className="bi bi-download"></i>
+                Download CV
+              </button>
 
-          <button
-            onClick={handleCVUploadWithAI}
-            className={styles.generateButton}
-            disabled={isLoading2}
-          >
-            <i className="bi bi-upload"></i>
-            Upload New With AI ✨
-            {isLoading2 && (
-            <Spinner
-              animation="border"
-              role="status"
-              size="sm"
-              className="ms-2"
-            >
-              <span className="visually-hidden">Uploading CV...</span>
-            </Spinner>
-            )}
-          </button>
+              <button
+                onClick={handleCVUpload}
+                className={styles.secondaryButton}
+                disabled={isLoading}
+              >
+                <i className="bi bi-upload"></i>
+                Upload New
+                {isLoading && (
+                <Spinner
+                  animation="border"
+                  role="status"
+                  size="sm"
+                  className="ms-2"
+                >
+                  <span className="visually-hidden">Uploading CV...</span>
+                </Spinner>
+                )}
+              </button>
+
+              <button
+                onClick={handleCVUploadWithAI}
+                className={styles.generateButton}
+                disabled={isLoading2}
+              >
+                <i className="bi bi-upload"></i>
+                Upload New With AI ✨
+                {isLoading2 && (
+                <Spinner
+                  animation="border"
+                  role="status"
+                  size="sm"
+                  className="ms-2"
+                >
+                  <span className="visually-hidden">Uploading CV...</span>
+                </Spinner>
+                )}
+              </button>
+            </>
+          )}
         </div>
       </div>
       {uploadAlert && (

@@ -71,6 +71,14 @@ const UserCard = ({
     );
   };
 
+  //handle card click
+  const handleCardClick = (e) => {
+    e.preventDefault();
+    if (onClick) {
+      onClick(user);
+    }
+  };
+
   const gridContent = (
     <>
       <div className={styles.cardHeader}>
@@ -145,16 +153,27 @@ const UserCard = ({
     </>
   );
 
+  //add clickable styling if onclick is provided
+  const cardStyle = onClick ? { cursor: 'pointer' } : {};
+
   if (viewMode === 'grid') {
     return (
-      <GlassCard className={cardClass} onClick={onClick}>
+      <GlassCard 
+        className={cardClass} 
+        onClick={handleCardClick}
+        style={cardStyle}
+      >
         {gridContent}
       </GlassCard>
     );
   }
 
   return (
-    <GlassCard className={cardClass} onClick={onClick}>
+    <GlassCard 
+      className={cardClass} 
+      onClick={handleCardClick}
+      style={cardStyle}
+    >
       {listContent}
     </GlassCard>
   );

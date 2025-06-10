@@ -5,14 +5,16 @@ import styles from "./ProfileObjectives.module.css";
  * ProfileObjectives component for displaying and managing objectives
  * @param {Array} objectives - Array of objective objects
  * @param {Function} onObjectiveToggle - Function to handle objective toggle
+ * @param {boolean} readOnly - Whether the component is in read-only mode
  * @returns {JSX.Element}
  */
 export const ProfileObjectives = ({
   objectives = [],
   onObjectiveToggle,
   isLoading,
+  readOnly = false,
 }) => {
-  // Format date for display
+  //format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -24,7 +26,7 @@ export const ProfileObjectives = ({
     return date.toLocaleDateString("en-US", options);
   };
 
-  // Get priority color
+  //get priority color
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high":
@@ -38,7 +40,7 @@ export const ProfileObjectives = ({
     }
   };
 
-  // Check if objective is overdue
+  //check if objective is overdue
   const isOverdue = (targetDate, completed) => {
     if (completed) return false;
     return new Date(targetDate) < new Date();
@@ -66,15 +68,16 @@ export const ProfileObjectives = ({
               }`}
             >
               <div className={styles.objectiveContent}>
-                {/* Left side: Checkbox, title, and description */}
+                {/* left side: checkbox, title, and description */}
                 <div className={styles.objectiveLeft}>
                   <div className={styles.objectiveCheckboxContainer}>
                     <input
                       type="checkbox"
                       id={`objective-${obj.id}`}
                       checked={obj.completed}
-                      onChange={() => onObjectiveToggle(obj)}
+                      onChange={!readOnly ? () => onObjectiveToggle(obj) : undefined}
                       className={styles.objectiveCheckbox}
+                      disabled={readOnly}
                     />
                     <div className={styles.objectiveTitleDescription}>
                       <label
@@ -90,7 +93,7 @@ export const ProfileObjectives = ({
                   </div>
                 </div>
 
-                {/* Right side: Priority and date badges */}
+                {/* right side: priority and date badges */}
                 <div className={styles.objectiveMeta}>
                   <span
                     className={styles.priorityBadge}
