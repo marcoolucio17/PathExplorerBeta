@@ -22,7 +22,7 @@ import { RFPModal } from "../../../components/Modals/RFPModal";
 import styles from "src/styles/Pages/Proyecto/EmpleadoProyectoPage.module.css";
 import peopleStyles from "src/styles/Pages/Proyecto/PeopleSection.module.css";
 import skillsStyles from "src/styles/Pages/Proyecto/SkillsSection.module.css";
-
+import Alert from "react-bootstrap/Alert";
 //project details page for empleado role
 export const EmpleadoProyectoPage = () => {
   const proyectoPage = useEmpleadoProyectoPage();
@@ -39,17 +39,15 @@ export const EmpleadoProyectoPage = () => {
       />
     );
   }
-
+  console.log("Error:", error);
   //error state  
   if (error) {
     return (
-      <div className={styles.proyectoContainer}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '50vh', justifyContent: 'center' }}>
-          <h2>Error loading project</h2>
-          <p>There was an error loading the project details. Please try again later.</p>
-          <p>Error: {error.message}</p>
-        </div>
-      </div>
+      <div className="login-error-container" style={{ width: "50%", marginLeft: "25%", marginRight: "25%", display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', justifyContent: 'center' }}>
+        <Alert className="login-error-alert" variant="danger">
+          {error}
+        </Alert>
+      </div >
     );
   }
 

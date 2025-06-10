@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GlassCard } from "../../../components/shared/GlassCard";
 import SkillChip from "../../../components/SkillChip/SkillChip";
 import Button from "../../../components/shared/Button/Button";
+import Alert from "react-bootstrap/Alert";
 import pageStyles from "./EmpleadoHomePage.module.css";
 import quickActionsStyles from "./QuickActions.module.css";
 import useFetch from "src/hooks/useFetch";
@@ -138,6 +139,7 @@ export const EmpleadoHomePage = () => {
   
   return (
     <>
+
       <style>{`
         .empleado-home-cards [class*="gridContainer"] {
           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
@@ -171,9 +173,15 @@ export const EmpleadoHomePage = () => {
         }
       `}</style>
 
-      
+      {error && <div className="login-error-container" style={{ width: "65%", marginLeft: "17.5%", marginRight: "17.5%" }}>
+        <Alert className="login-error-alert" variant="danger">
+          {error}
+        </Alert>
+      </div >}
       <div className={pageStyles.homeLayout}>
+
         <div className={pageStyles.mainContentWrapper}>
+
           <div className={pageStyles.headerSection}>
             <h1 className={pageStyles.mainTitle}>{`Welcome back, ${formatName(data?.user?.nombre) || "..."}!`}</h1>
           </div>
@@ -192,9 +200,12 @@ export const EmpleadoHomePage = () => {
                 <h3 className={pageStyles.recommendationTitle}>
                   Based on your profile, you'd be a great fit for these projects:
                 </h3>
-                
-                <div className="empleado-home-cards" style={{ display: 'block', width: '100%', marginTop: '-0.78rem' }}>
+                {dashboardPage.errorTopProjects && <Alert className="login-error-alert" variant="danger">
+                  {dashboardPage.errorTopProjects}
+                </Alert>}
+                {!dashboardPage.errorTopProjects && <div className="empleado-home-cards" style={{ display: 'block', width: '100%', marginTop: '-0.78rem' }}>
                   <ProjectList 
+                    tabSelected={"topProjects"}
                     projects={dashboardPage.topProjects}
                     viewMode={dashboardPage.viewMode}
                     showCompatibility={dashboardPage.showCompatibility}
@@ -204,7 +215,7 @@ export const EmpleadoHomePage = () => {
                     onClearFilters={dashboardPage.handleClearFilters}
                     isLoading={dashboardPage.isLoading}
                   />
-                </div>
+                </div>}
               </div>
             </div>
           </div>
@@ -230,14 +241,17 @@ export const EmpleadoHomePage = () => {
             </GlassCard>
 
             <div className={pageStyles.trendsContainer}>
+
               <TrendsCard 
                 className={pageStyles.sidebarSection}
                 data={data1.result} 
+                error={error1}
               />
             </div>
           </div>
         </div>
       </div>
+
     </>
   );
 };

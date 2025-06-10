@@ -193,6 +193,7 @@ export const useProfilePage = (load = false, setLoad) => {
   const navigate = useNavigate();
 
   const [data, setData] = useState({});
+  const [error, setError] = useState("");
 
   // aquí guardamos la pic
   const [pic, setPic] = useState(null);
@@ -237,6 +238,12 @@ export const useProfilePage = (load = false, setLoad) => {
       } catch (err) {
         //console.error("Error fetching my applications", err);
         setPic("/images/3d_avatar_6.png");
+        const errorMessage = err.response.data.error;
+        if (error !== "") {
+          setError(`${error} \n ${errorMessage}`);
+        } else {
+          setError(`${errorMessage}`);
+        }
       }
       //setIsLoading(false);
     };
@@ -256,6 +263,12 @@ export const useProfilePage = (load = false, setLoad) => {
         setData(data.data);
       } catch (err) {
         console.error("Error fetching my applications", err);
+        const errorMessage = err.response.data.error;
+        if (error !== "") {
+          setError(`${error} \n ${errorMessage}`);
+        } else {
+          setError(`${errorMessage}`);
+        }
       }
       setIsLoading(false);
     };
@@ -405,7 +418,8 @@ export const useProfilePage = (load = false, setLoad) => {
     userExperience,
     objectives,
     categorizedSkills,
-
+    // Error message
+    error,
     // Tab state
     tabNames,
     activeTab,

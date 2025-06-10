@@ -6,14 +6,14 @@ import styles from "/src/components/Profile/ProfileSkills.module.css";
 import certStyles from "src/components/Profile/ProfileCertificates.module.css";
 import "src/index.css";
 import DoughnutChart from "../shared/Doughnut/DoughnutChart";
-
+import Alert from "react-bootstrap/Alert";
 /**
  * ProfileSkills component for displaying skills with categories
  * @param {Object} data
  * @param {Function} onSkillsClick - Function to handle skills button click
  * @returns {JSX.Element}
  */
-export const TrendsCard = ({ data, onSkillsClick }) => {
+export const TrendsCard = ({ data, error, onSkillsClick }) => {
   const skills = Array.isArray(data) ? data : [];
   const hasNoSkills = skills.length === 0;
 
@@ -39,7 +39,12 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
       <div className={styles.sectionHeader}>
         <h2 className="sectionTitle">Trends</h2>
       </div>
-      <div className={styles.skillsScrollContainer}>
+      {error && <div className="login-error-container" style={{ width: "100%", marginLeft: "0%", marginRight: "0%" }}>
+        <Alert className="login-error-alert" variant="danger">
+          {error}
+        </Alert>
+      </div >}
+      {!error && <div className={styles.skillsScrollContainer}>
         <CustomScrollbar fadeBackground="transparent" fadeHeight={40}>
           <div className={styles.skillsContent}>
             <h3 className="subtitle">Most Popular Skills</h3>
@@ -98,7 +103,7 @@ export const TrendsCard = ({ data, onSkillsClick }) => {
             )}
           </div>
         </CustomScrollbar>
-      </div>
+      </div>}
     </GlassCard>
   );
 };

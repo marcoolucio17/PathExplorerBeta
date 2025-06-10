@@ -4,10 +4,10 @@ import styles from './ClientsModal.module.css';
 import ModalScrollbar from 'src/components/Modals/ModalScrollbar';
 import useGetFetch from 'src/hooks/useGetFetch';
 import { ChipModalSelect } from '../ChipModalSelect';
+import Alert from "react-bootstrap/Alert";
 
 
-
-export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus, clients = [], onClientSelected }) => {
+export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus, clients = [], onClientSelected, error }) => {
 
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -94,8 +94,12 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
 
 
                 </div>
-
-                <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
+                {error && <div className="login-error-container" style={{ width: "90%", marginLeft: "5%", marginRight: "5%" }}>
+                    <Alert className="login-error-alert" variant="danger">
+                        {error}
+                    </Alert>
+                </div >}
+                {!error && <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
                     <div className={styles.clientsList}>
 
 
@@ -110,8 +114,12 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
 
                         ))
                         }
+                        {clients.length === 0 && <div className={styles.noResults} style={{ textAlign: "center", width: "100%", padding: "2rem" }}>
+                            <i className="bi bi-search" style={{ fontSize: "2rem", marginBottom: "1rem", color: "#fff" }}></i>
+                            <p style={{ color: "#fff" }}>No clients match your search</p>
+                        </div>}
                     </div>
-                </div>
+                </div>}
 
                 <div className={modalStyles.buttonGroup}>
                     <button onClick={handleClose} className={modalStyles.cancelButton}>

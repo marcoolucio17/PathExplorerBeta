@@ -10,8 +10,16 @@ export const useTFSApplicantsPage = () => {
   const matchPercentagesRef = useRef({});
   
   //fetch both endpoints to get accurate tab counts
-  const { data: pendingData, loading: pendingLoading, error: pendingError } = useFetch('apps/estatus/Revision');
-  const { data: assignmentData, loading: assignmentLoading, error: assignmentError } = useFetch('apps/estatus/Asignado');
+  const {
+    data: pendingData,
+    loading: pendingLoading,
+    error: pendingError,
+  } = useFetch("apps/estatus/Revision");
+  const {
+    data: assignmentData,
+    loading: assignmentLoading,
+    error: assignmentError,
+  } = useFetch("apps/estatus/Asignado");
   
   //calculate tab counts from both datasets
   const tabCounts = useMemo(() => {

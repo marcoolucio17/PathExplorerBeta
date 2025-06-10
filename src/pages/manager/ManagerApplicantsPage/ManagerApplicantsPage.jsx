@@ -19,6 +19,7 @@ import { Tabs } from "../../../components/Tabs";
 
 // CSS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
+import Alert from "react-bootstrap/Alert";
 
 /**
  * Applicants component for Manager role
@@ -60,7 +61,10 @@ export const ManagerApplicantsPage = () => {
         />
 
         {/* Main content area with applicants list */}
-        <div className={styles.cardsContainer}>
+        {applicantsPage.apiError && <Alert className="login-error-alert" variant="danger">
+          {applicantsPage.apiError}
+        </Alert>}
+        {!applicantsPage.apiError && <div className={styles.cardsContainer}>
           <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
             <ApplicantsList 
               applicants={applicantsPage.visibleItems}
@@ -75,7 +79,7 @@ export const ManagerApplicantsPage = () => {
               onClearFilters={applicantsPage.handleClearFilters}
             />
           </CustomScrollbar>
-        </div>
+        </div>}
       </div>
       
       {/* Modals */}

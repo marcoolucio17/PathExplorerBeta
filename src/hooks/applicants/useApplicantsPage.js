@@ -12,7 +12,11 @@ export const useApplicantsPage = () => {
   const managerId = localStorage.getItem("id") || sessionStorage.getItem("id") || 4;
   console.log("Using manager ID:", managerId); //debug log
   
-  const { data: apiData, loading: apiLoading, error: apiError } = useFetch(`creador/${managerId}/aplicaciones`);
+  const {
+    data: apiData,
+    loading: apiLoading,
+    error: apiError,
+  } = useFetch(`creador/${managerId}/aplicaciones`);
   
   const mapStatusToTab = (estatus) => {
     console.log('mapping status:', estatus);

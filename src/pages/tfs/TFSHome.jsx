@@ -165,9 +165,11 @@ export const TfsHomePage = () => {
                 <h3 className={pageStyles.recommendationTitle}>
                   Based on your profile, you'd be a great fit for these projects:
                 </h3>
-                
-                <div className="empleado-home-cards" style={{ display: 'block', width: '100%'}}>
-                  <ProjectList 
+                {dashboardPage.errorTopProjects && <Alert className="login-error-alert" variant="danger">
+                  {dashboardPage.errorTopProjects}
+                </Alert>}
+                {!dashboardPage.errorTopProjects && <div className="empleado-home-cards" style={{ display: 'block', width: '100%' }}>
+                  <ProjectList
                     projects={dashboardPage.topProjects}
                     viewMode={dashboardPage.viewMode}
                     showCompatibility={dashboardPage.showCompatibility}
@@ -177,7 +179,7 @@ export const TfsHomePage = () => {
                     onClearFilters={dashboardPage.handleClearFilters}
                     isLoading={dashboardPage.isLoading}
                   />
-                </div>
+                </div>}
               </div>
             </div>
           </div>
@@ -205,7 +207,8 @@ export const TfsHomePage = () => {
             <div className={pageStyles.trendsContainer}>
               <TrendsCard 
                 className={pageStyles.sidebarSection}
-                data={data1.result} 
+                data={data1.result}
+                error={error1}
               />
             </div>
           </div>

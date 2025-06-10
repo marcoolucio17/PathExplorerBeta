@@ -31,10 +31,10 @@ export const useManagerDashboardPage = () => {
   const [myProjectsData, setMyProjectsData] = useState([]);
   // Loading and error states for "My Projects" tab
   const [myProjectsLoading, setMyProjectsLoading] = useState(true);
-  const [myProjectsError, setMyProjectsError] = useState(null);
 
   // Configuration for fetching my projects
   let url = "https://pathexplorer-backend.onrender.com/api";
+
   const config = {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -49,9 +49,19 @@ export const useManagerDashboardPage = () => {
       try {
         const response = await axios.get(`${url}/projects`, config);
         setMyProjectsData(response.data);
+        dashboardData.setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          "My Projects": null, // Clear error for All projects
+        }));
       } catch (error) {
         console.error("Error fetching my projects:", error);
-        setMyProjectsError(error);
+        dashboardData.setAllErrorProjectsDashboard((prev) => ({
+          ...prev,
+          "My Projects":
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.response?.data,
+        }));
       } finally {
         setMyProjectsLoading(false);
       }
@@ -64,6 +74,7 @@ export const useManagerDashboardPage = () => {
   const { modals, openModal, closeModal, toggleModal } = useModalControl({
     skillsFilter: false,
     createProject: false,
+    viewApplication: false,
     clientsFilter: false,
     rolesFilter: false,
   });
@@ -185,7 +196,7 @@ export const useManagerDashboardPage = () => {
         borderColor: "rgba(0, 123, 255, 0.5)",
       };
     }
-    
+
     return filters;
   }, [
     dashboardData.selectedSkillFilters,
@@ -265,18 +276,19 @@ export const useManagerDashboardPage = () => {
   ]);
 
   const correctedTabCounts = useMemo(() => {
-    if (!dashboardData.projects || dashboardData.projects.length === 0) {
-      return { All: 0, "Applied To": 0, "My Projects": 0 };
-    }
-
     const counts = { All: 0, "Applied To": 0, "My Projects": 0 };
     console.log("displayProjects", displayProjects.length);
-    counts["All"] = displayProjects.length;
-    counts["Applied To"] = dashboardData.projectsApp.length;
+    if (listPage.activeTab === "All") {
+      counts["All"] = displayProjects.length || 0;
+    } else {
+      counts["All"] = dashboardData.projects.length || 0;
+    }
+
+    counts["Applied To"] = dashboardData.projectsApp.length || 0;
 
     //for my projects, count actual projects (not flattened roles)
     if (Array.isArray(myProjectsData)) {
-      counts["My Projects"] = myProjectsData.length;
+      counts["My Projects"] = myProjectsData.length || 0;
     }
 
     return counts;
@@ -287,6 +299,39 @@ export const useManagerDashboardPage = () => {
     myProjectsData,
   ]);
 
+  // State for selected application to view
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  // Handle viewing application details
+  const handleViewApplication = useCallback(
+    (applicationData) => {
+      console.log("opening view application modal with data:", applicationData);
+      setSelectedApplication(applicationData);
+      openModal("viewApplication");
+    },
+    [openModal]
+  );
+  // Transform application data to match modal format
+  const transformApplicationData = useCallback((appData) => {
+    if (!appData) return null;
+
+    return {
+      id: appData.idaplicacion,
+      userId: null, //no user data available in this structure
+      name: "You", //since this is the user viewing their own application
+      email: "", //not available in application data
+      role: appData.roles?.nombrerol || "Unknown Role",
+      project: appData.proyecto?.pnombre || "Unknown Project",
+      message: appData.message || "No message provided",
+      appliedDate: appData.fechaaplicacion || "Unknown Date",
+      status: appData.estatus || "Unknown",
+      avatar: null, //not available
+    };
+  }, []);
+  // Handle closing view application modal
+  const handleCloseViewApplication = useCallback(() => {
+    closeModal("viewApplication");
+    setSelectedApplication(null);
+  }, [closeModal]);
   return {
     ...listPage,
     ...dashboardData,
@@ -310,8 +355,12 @@ export const useManagerDashboardPage = () => {
     isLoading,
     //expose my projects data for debugging
     myProjectsData,
-    myProjectsError,
     currentUserId,
+    //view application modal
+    selectedApplication,
+    transformApplicationData,
+    handleViewApplication,
+    handleCloseViewApplication,
   };
 };
 

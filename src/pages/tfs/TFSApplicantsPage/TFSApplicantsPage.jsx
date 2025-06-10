@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 // Custom Hooks
 import useTFSApplicantsPage from '../../../hooks/applicants/useTFSApplicantsPage';
@@ -13,6 +13,7 @@ import { ProjectFilterModal } from "../../../components/Modals/ProjectFilterModa
 import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
+import Alert from "react-bootstrap/Alert";
 
 // CSS
 import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
@@ -22,6 +23,8 @@ import styles from "src/styles/Pages/GridList/GridListDashboard.module.css";
  * Shows applications for TFS to manage assignment process
  */
 export const TFSApplicantsPage = () => {
+  const [loadingError, setLoadingError] = useState(true);
+  const [dataError, setDataError] = useState("Error fetching your data. Please try again later.");
   // Use the custom hook to handle all logic
   const applicantsPage = useTFSApplicantsPage();
   
@@ -45,7 +48,7 @@ export const TFSApplicantsPage = () => {
         
         {/* Search header with filters */}
         <SearchHeader {...headerProps} />
-        
+
         {/* Tabs for different application statuses */}
         <Tabs 
           tabs={applicantsPage.tabNames.map(tab => ({
@@ -58,7 +61,12 @@ export const TFSApplicantsPage = () => {
 
         {/* Main content area with applicants list */}
         <div className={styles.cardsContainer}>
-          <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
+          {applicantsPage.apiError && <div className="login-error-container" style={{ width: "100%" }}>
+            <Alert className="login-error-alert" variant="danger">
+              {applicantsPage.apiError}
+            </Alert>
+          </div >}
+          {!applicantsPage.apiError && <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
             <ApplicantsList 
               applicants={applicantsPage.visibleItems}
               viewMode={applicantsPage.viewMode}
@@ -71,7 +79,7 @@ export const TFSApplicantsPage = () => {
               onViewAssign={applicantsPage.handleViewApplicant}
               onClearFilters={applicantsPage.handleClearFilters}
             />
-          </CustomScrollbar>
+          </CustomScrollbar>}
         </div>
       </div>
       

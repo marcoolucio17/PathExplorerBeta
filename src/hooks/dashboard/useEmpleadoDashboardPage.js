@@ -7,7 +7,7 @@ import useToggleState from '../useToggleState';
 
 /**
  * Employee-specific Dashboard hook
- * Tabs: "All" (no notification badge), "Applied to"
+ * Tabs: "All" (no notification badge), "Applied To"
  * 
  * @returns {Object} Complete state and functions for the Employee Dashboard page
  */
@@ -18,7 +18,7 @@ export const useEmpleadoDashboardPage = () => {
   const dashboardData = useDashboardData();
 
   // Employee-specific tab names
-  const tabNames = ["All", "Applied to"];
+  const tabNames = ["All", "Applied To"];
 
   // Get current user ID from localStorage or sessionStorage
   const currentUserId = useMemo(
@@ -127,23 +127,24 @@ export const useEmpleadoDashboardPage = () => {
         // Projects with roles available for the user
         filteredProjects = dashboardData.projects ? dashboardData.projects : [];
         break;
-      case "Applied to":
-        // Projects where the user has applied to a role
+      case "Applied To":
+        // Projects where the user has Applied To a role
         // Filter out applications where role has been assigned (RolAsignado)
-        return (filteredProjects = dashboardData.projectsApp
-          ? dashboardData.projectsApp.filter(
-              (app) => app.estatus !== "RolAsignado"
-            )
-          : []);
+        filteredProjects = dashboardData.projectsApp
+          ? dashboardData.projectsApp
+          : [];
         break;
       default:
         filteredProjects = dashboardData.projects;
     }
 
-    return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
+    return dashboardData.sortProjects(
+      filteredProjects,
+      listPage.sortOption,
+      listPage.activeTab
+    );
   }, [
     dashboardData.projects,
-    dashboardData.projectsApp,
     listPage.activeTab,
     listPage.sortOption,
     dashboardData.sortProjects,
@@ -212,21 +213,16 @@ export const useEmpleadoDashboardPage = () => {
   // Compute flattened projects for display
   const displayProjects = useMemo(() => {
     const tabProjects = getTabProjects();
-    
 
     if (listPage.activeTab === "All") {
-
-     tabProjects.map((project) => ({
-        project: project,
-        proyecto_rol: null,
-      }));
-
-    } else if (listPage.activeTab === "Applied to") {
-      //for applied to tab, flatten roles but keep project structure
       tabProjects.map((project) => ({
         project: project,
-        proyecto_rol: null, //indicate this is a role card
-        isApplyCard: true, //indicate this is an applied to card
+      }));
+    } else if (listPage.activeTab === "Applied To") {
+      //for Applied To tab, flatten roles but keep project structure
+      return tabProjects.map((project) => ({
+        project: project,
+        isApplyCard: true, //indicate this is an Applied To card
       }));
     }
 
@@ -237,7 +233,7 @@ export const useEmpleadoDashboardPage = () => {
   const isLoading = useMemo(() => {
     if (listPage.activeTab === "All") {
       return dashboardData.projectsLoading;
-    } else if (listPage.activeTab === "Applied to") {
+    } else if (listPage.activeTab === "Applied To") {
       return dashboardData.applyLoading;
     }
     return false;
@@ -265,27 +261,21 @@ export const useEmpleadoDashboardPage = () => {
 
   // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
-    if (!dashboardData.projects || dashboardData.projects.length === 0) {
-      return { All: 0, "Applied to": 0 };
-    }
-
     // Initial counts
     const counts = {
       All: 0, // Will be calculated using filtered results
-      "Applied to": 0,
+      "Applied To": 0,
     };
 
     // Calculate flattened projects (roles) for each tab
     // All projects - use same filtering logic as display
-    const filteredAllProjects = dashboardData.flattenProjectsForList(
-      dashboardData.projects
-    );
-    counts["All"] = filteredAllProjects.length;
+    if (listPage.activeTab === "All") {
+      counts["All"] = displayProjects.length || 0;
+    } else {
+      counts["All"] = dashboardData.projects.length || 0;
+    }
 
-    // Applied to projects - exclude RolAsignado status
-    counts["Applied to"] = dashboardData.projectsApp.filter(
-      (app) => app.estatus !== "RolAsignado"
-    ).length;
+    counts["Applied To"] = dashboardData.projectsApp.length || 0;
 
     return counts;
   }, [

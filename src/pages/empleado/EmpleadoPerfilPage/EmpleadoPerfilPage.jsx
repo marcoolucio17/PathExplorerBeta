@@ -15,7 +15,7 @@ import {
   ProfileCertificates,
   ProfileHeaderCard
 } from "../../../components/Profile";
-
+import Alert from "react-bootstrap/Alert";
 // Modals
 import { CertificateModal } from "../../../components/Modals/CertificateModal";
 import { CVModal } from "../../../components/Modals/CVModal";
@@ -39,6 +39,8 @@ export const EmpleadoPerfilPage = () => {
   // this is for triggering reloads from modals
   const [load, setLoad] = useState(false);
 
+  const [loadingError, setLoadingError] = useState(true);
+  const [dataError, setDataError] = useState("Error fetching your data. Please try again later.");
   // Use the custom hook to handle all logic
   const profilePage = useProfilePage(load, setLoad);
 
@@ -141,7 +143,10 @@ export const EmpleadoPerfilPage = () => {
   };
 
   return (
+    <>
+
     <div className={styles.profileContainer}>
+
       <div className={styles.profileContent}>
         {/* Left Column - Profile info and tabs */}
         <div className={styles.profileColumnLeft}>
@@ -266,8 +271,15 @@ export const EmpleadoPerfilPage = () => {
         profileData={profilePage.userProfile}
         onSave={handleSaveProfileDetails}
         setLoad={setLoad}
-      />
-    </div>
+        />
+
+      </div>
+      {profilePage.error && profilePage.error.split('\n').map((line, index) => (<div className="login-error-container" style={{ width: "65%", marginLeft: "17.5%", marginRight: "17.5%" }}>
+        <Alert key={index} className="login-error-alert" variant="danger">
+          {line}
+        </Alert>
+      </div >))}
+    </>
   );
 };
 
