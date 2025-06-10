@@ -127,7 +127,6 @@ const ProjectList = ({
                     userSkills={userSkills}
                     index={index}
                     isProjectCard={isProjectCard}
-                    onViewApplication={onViewApplication}
                   />
                 </div>
               );
@@ -171,9 +170,7 @@ const ProjectList = ({
                   selectedSkillFilters={selectedSkillFilters}
                   userSkills={userSkills}
                   index={index}
-                  isProjectCard={isProjectCard}
                   tabActive={tabSelected}
-                  onViewApplication={onViewApplication}
                 />
               </div>
             );
@@ -193,7 +190,6 @@ const ProjectList = ({
                 userSkills={userSkills}
                 isProjectCard={true} // Indicate this is a project-level card
                 tabActive={tabSelected}
-                onViewApplication={onViewApplication}
               />
             </div>
           );
@@ -211,6 +207,7 @@ const ProjectList = ({
                 userSkills={userSkills}
                 isApplyCard={true} // Indicate this is an applied to card
                 tabActive={tabSelected}
+                onViewApplication={onViewApplication}
               />
             </div>
           );

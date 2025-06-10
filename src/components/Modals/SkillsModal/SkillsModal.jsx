@@ -78,8 +78,8 @@ export const SkillsModal = ({
   const [expandedCategories, setExpandedCategories] = useState(new Set());
   const disabledSkillsSet = new Set(disabledSkills.map((skill) => skill.idhabilidad));
   const [SKILLS_DATA, setSkillsData] = useState([]);
-  const [loadingError, setLoadingError] = useState(true);
-  const [dataError, setDataError] = useState("Error fetching your data. Please try again later.");
+
+  const [dataError, setDataError] = useState("");
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -94,8 +94,19 @@ export const SkillsModal = ({
     };
 
     const fetchSkills = async () => {
-      const res = await axios.get(DB_URL + "api/habilidades", config);
-      setSkillsData(groupSkillsByCategory(res.data));
+      try {
+        const res = await axios.get(DB_URL + "api/habilidades", config);
+        setSkillsData(groupSkillsByCategory(res.data));
+        setDataError("");
+      } catch (error) {
+        setDataError(
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.response?.data
+        )
+      }
+
+
     };
     fetchSkills();
   }, [isOpen]);
@@ -214,21 +225,20 @@ export const SkillsModal = ({
             </button>
           </div>
         </div>
-        {loadingError && <div className="login-error-container" style={{ width: "90%", marginLeft: "5%", marginRight: "5%" }}>
+        {dataError && <div className="login-error-container" style={{ width: "90%", marginLeft: "5%", marginRight: "5%" }}>
           <Alert className="login-error-alert" variant="danger">
             {dataError}
           </Alert>
         </div >}
-        <div
+        {!dataError && <div
           className={modalStyles.modalBody}
           style={{ height: "calc(100% - 200px)" }}
         >
           {Object.entries(filteredCategories).map(([category, skills]) => (
             <div key={category} className={styles.categorySection}>
               <button
-                className={`${styles.categoryHeader} ${
-                  expandedCategories.has(category) ? styles.expanded : ""
-                }`}
+                className={`${styles.categoryHeader} ${expandedCategories.has(category) ? styles.expanded : ""
+                  }`}
                 onClick={() => toggleCategory(category)}
               >
                 <span>{category}</span>
@@ -255,7 +265,7 @@ export const SkillsModal = ({
               )}
             </div>
           ))}
-        </div>
+        </div>}
 
         <div className={modalStyles.buttonGroup}>
           <button onClick={handleClose} className={modalStyles.cancelButton}>

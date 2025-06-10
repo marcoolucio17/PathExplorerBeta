@@ -40,9 +40,13 @@ export const EmpleadoDashboardPage = () => {
         
         {/* Search header with filters */}
         <SearchHeader {...headerProps} />
-
+          {dashboardPage.errorUserSkills && <div className="login-error-container" style={{ width: "100%" }}>
+            <Alert className="login-error-alert" variant="danger">
+              {dashboardPage.errorUserSkills}
+            </Alert>
+          </div >}
         {/* Tabs for different project statuses */}
-        <Tabs 
+          {!dashboardPage.errorUserSkills && <><Tabs 
           tabs={dashboardPage.tabNames.map(tab => ({
             name: tab,
             notificationCount: dashboardPage.tabCounts[tab] || 0
@@ -51,8 +55,9 @@ export const EmpleadoDashboardPage = () => {
           onTabClick={dashboardPage.setActiveTab}
         />
 
-        {/* Main content area with projects list */}
-        <div className={styles.cardsContainer}>
+            {/* Main content area with projects list */}
+
+            <div className={styles.cardsContainer}>
             <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
               {dashboardPage.allErrorProjectsDashboard[dashboardPage.activeTab] && <div className="login-error-container" style={{ width: "100%" }}>
                 <Alert className="login-error-alert" variant="danger">
@@ -70,8 +75,8 @@ export const EmpleadoDashboardPage = () => {
                 isLoading={dashboardPage.isLoading}
                 onViewApplication={dashboardPage.handleViewApplication}
               />}
-          </CustomScrollbar>
-        </div>
+              </CustomScrollbar>
+            </div></>}
       </div>
 
       {/* Modals */}
@@ -88,7 +93,8 @@ export const EmpleadoDashboardPage = () => {
         clientIdStatus={dashboardPage.clientId}
         selectedClients={dashboardPage.selectedClientFilters}
         onClientSelected={dashboardPage.handleApplyClientFilters}
-        clients={dashboardPage.clients}
+          clients={dashboardPage.clients}
+          error={dashboardPage.errorClients}
       />
       <RolesModal
         isOpen={dashboardPage.modals.rolesFilter}
@@ -96,7 +102,8 @@ export const EmpleadoDashboardPage = () => {
         roleNameStatus={dashboardPage.roleNameSelected}
         roleIdStatus={dashboardPage.roleId}
         onRoleSelected={dashboardPage.handleApplyRoleFilters}
-        roles={dashboardPage.roles}
+          roles={dashboardPage.roles}
+          error={dashboardPage.errorRoles}
       />
       <ViewApplicationModal
         isOpen={dashboardPage.modals.viewApplication}

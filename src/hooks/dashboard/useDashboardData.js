@@ -64,7 +64,6 @@ export const useDashboardData = () => {
     "Applied To": null,
     "My Projects": null,
   });
-  console.log(allErrorProjectsDashboard);
   useEffect(() => {
     if (searchTerm) {
       const params = new URLSearchParams(location.search);
@@ -106,7 +105,7 @@ export const useDashboardData = () => {
 
   // Url for the backend API in render
   let url = "https://pathexplorer-backend.onrender.com/api";
-  let url2 = "http://localhost:8080/api";
+
   // Configuration for axios requests
   const config = {
     headers: {
@@ -119,7 +118,7 @@ export const useDashboardData = () => {
     const fetchProjects = async () => {
       setProjectsLoading(true);
       try {
-        const { data } = await axios.get(`${url2}/projects/`, config);
+        const { data } = await axios.get(`${url}/projects/`, config);
 
         setProjectsData(data);
         setAllErrorProjectsDashboard((prev) => ({
@@ -152,7 +151,11 @@ export const useDashboardData = () => {
       .then((res) => setRolesData(res.data))
       .catch((err) => {
         console.error("Error fetching roles", err);
-        setRolesError(err.response?.data?.message || err.response?.data?.error);
+        setRolesError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.response?.data
+        );
       });
 
     //get user top 3 projects compability
@@ -164,7 +167,6 @@ export const useDashboardData = () => {
           setTopData(res.data);
         })
         .catch((err) => {
-          console.error("Error fetching top projects", err);
           setTopError(err.response?.data?.message || err.response?.data?.error);
         });
     }
@@ -174,15 +176,16 @@ export const useDashboardData = () => {
       .get(`${url}/clientes`, config)
       .then((res) => setClientsData(res.data))
       .catch((err) => {
-        console.error("Error fetching clients", err);
         setClientsError(
-          err.response?.data?.message || err.response?.data?.error
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.response?.data
         );
       });
 
     //fetch user applications
     axios
-      .get(`${url2}/apps/usuario/${localStorage.getItem("id")}`, config)
+      .get(`${url}/apps/usuario/${localStorage.getItem("id")}`, config)
       .then((res) => {
         setMyApplicationsData(res.data);
         setApplyLoading(false);
@@ -212,7 +215,9 @@ export const useDashboardData = () => {
       .catch((err) => {
         console.error("Error fetching user skills", err);
         setUserSkillsError(
-          err.response?.data?.message || err.response?.data?.error
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.response?.data
         );
       });
   }, []);
@@ -416,6 +421,7 @@ export const useDashboardData = () => {
     setFilterOptionsMyProjects,
     projectsLoading,
     applyLoading,
+    errorUserSkills,
   };
 };
 

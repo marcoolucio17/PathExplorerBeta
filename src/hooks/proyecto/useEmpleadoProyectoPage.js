@@ -6,27 +6,32 @@ import { useFetch } from 'src/hooks/useFetch';
 
 function isNonTechnicalSkill(skillName) {
   const nonTechnicalSkills = [
-    'responsabilidad', 'comunicación', 'liderazgo', 'teamwork', 
-    'leadership', 'communication', 'responsibility', 'agile',
-    'scrum', 'project management', 'time management'
+    "responsabilidad",
+    "comunicación",
+    "liderazgo",
+    "teamwork",
+    "leadership",
+    "communication",
+    "responsibility",
+    "agile",
+    "scrum",
+    "project management",
+    "time management",
   ];
-  return nonTechnicalSkills.some(skill => 
+  return nonTechnicalSkills.some((skill) =>
     skillName.toLowerCase().includes(skill.toLowerCase())
   );
 }
 
 function transformBackendProject(projectData, roleId = null) {
-  
-  
   if (!projectData) {
-    console.log('projectData is not being sent or has nothing');
+    console.log("projectData is not being sent or has nothing");
     return null;
   }
 
   let project;
   if (Array.isArray(projectData)) {
     if (projectData.length === 0) {
-
       return null;
     }
     project = projectData[0];
@@ -38,8 +43,9 @@ function transformBackendProject(projectData, roleId = null) {
   const availableRoles = [];
   let primaryRole = null;
 
-  const isSpecificRole = roleId && project.proyecto_roles?.find(r => r.idrol == roleId);
-  
+  const isSpecificRole =
+    roleId && project.proyecto_roles?.find((r) => r.idrol == roleId);
+
   if (project.proyecto_roles && Array.isArray(project.proyecto_roles)) {
     project.proyecto_roles.forEach((proyectoRole, index) => {
       const roleObj = {
@@ -61,8 +67,7 @@ function transformBackendProject(projectData, roleId = null) {
         availableRoles.push(roleObj);
       }
     });
-  }
-  else if (project.roles) {
+  } else if (project.roles) {
     if (Array.isArray(project.roles)) {
       project.roles.forEach((role, index) => {
         const roleObj = {
@@ -82,15 +87,14 @@ function transformBackendProject(projectData, roleId = null) {
           availableRoles.push(roleObj);
         }
       });
-    }
-    else if (project.roles.nombrerol && project.roles.idrol) {
+    } else if (project.roles.nombrerol && project.roles.idrol) {
       const roleObj = {
         id: project.roles.idrol,
         name: project.roles.nombrerol,
         level: "",
         available: true,
       };
-      
+
       primaryRole = roleObj;
       availableRoles.push(roleObj);
     }
@@ -100,7 +104,9 @@ function transformBackendProject(projectData, roleId = null) {
   if (project.proyecto_roles && Array.isArray(project.proyecto_roles)) {
     //if we have a specific role, get skills from that role only
     if (isSpecificRole) {
-      const specificRole = project.proyecto_roles.find(r => r.idrol == roleId);
+      const specificRole = project.proyecto_roles.find(
+        (r) => r.idrol == roleId
+      );
       if (specificRole?.roles?.requerimientos_roles) {
         specificRole.roles.requerimientos_roles.forEach((reqRole) => {
           if (reqRole.requerimientos?.habilidades) {
@@ -133,10 +139,10 @@ function transformBackendProject(projectData, roleId = null) {
       });
     }
   }
-  
+
   //fallback skills if no skills found
   if (requiredSkills.length === 0) {
-    const fallbackSkills = ['JavaScript', 'React', 'Node.js', 'SQL', 'Git'];
+    const fallbackSkills = ["JavaScript", "React", "Node.js", "SQL", "Git"];
     fallbackSkills.forEach((skillName) => {
       requiredSkills.push({
         name: skillName,
@@ -150,30 +156,33 @@ function transformBackendProject(projectData, roleId = null) {
 
   //create people array (client + project manager) separate from team members
   const people = [];
-  
+
   //add project creator/manager to people
   if (project.usuario) {
     people.push({
       id: project.usuario.idusuario,
-      name: project.usuario.nombre || 'Project Manager',
-      avatar: project.usuario.fotodeperfil_url || '/img/fotogabo.jpg',
-      role: 'Project Manager',
+      name: project.usuario.nombre || "Project Manager",
+      avatar: project.usuario.fotodeperfil_url || "/img/fotogabo.jpg",
+      role: "Project Manager",
     });
   }
-  
+
   //transform team members array from utp field (excluding project manager)
   const members = [];
-  
+
   //add team members from utp field (excluding the project manager)
   if (project.utp && Array.isArray(project.utp)) {
     project.utp.forEach((utpEntry, index) => {
       //check if utpEntry has user info and is not the project manager
-      if (utpEntry.usuario && utpEntry.usuario.idusuario !== project.idusuario) {
+      if (
+        utpEntry.usuario &&
+        utpEntry.usuario.idusuario !== project.idusuario
+      ) {
         members.push({
           id: utpEntry.usuario.idusuario || index + 100,
           name: utpEntry.usuario.nombre || `Member ${index + 1}`,
-          avatar: utpEntry.usuario.fotodeperfil_url || '/img/fotogabo.jpg',
-          role: utpEntry.rol?.nombrerol || 'Team Member',
+          avatar: utpEntry.usuario.fotodeperfil_url || "/img/fotogabo.jpg",
+          role: utpEntry.rol?.nombrerol || "Team Member",
         });
       }
     });
@@ -188,7 +197,7 @@ function transformBackendProject(projectData, roleId = null) {
     progress: calculateProgress(project.fechainicio, project.fechafin),
     goal: project.descripcion || "Project goal not specified",
     deliverables: project.projectdeliverables
-      ? project.projectdeliverables.split(',').map((d) => d.trim())
+      ? project.projectdeliverables.split(",").map((d) => d.trim())
       : extractDeliverables(project.descripcion),
     client: {
       name: project.cliente?.clnombre || "Unknown Client",
@@ -206,12 +215,11 @@ function transformBackendProject(projectData, roleId = null) {
   };
 }
 
-
 //format date for viewing
 function formatDate(dateString) {
   if (!dateString) return "";
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) return dateString; 
+  if (isNaN(date.getTime())) return dateString;
   return date.toLocaleDateString();
 }
 //calculate progress
@@ -222,40 +230,40 @@ function calculateProgress(startDate, endDate) {
   const end = new Date(endDate);
   const now = new Date();
 
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0; 
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
 
   if (now < start) return 0;
   if (now > end) return 100;
 
   const total = end.getTime() - start.getTime();
-  if (total <= 0) return 100; 
+  if (total <= 0) return 100;
   const elapsed = now.getTime() - start.getTime();
 
   return Math.round((elapsed / total) * 100);
 }
 
-
 function extractDeliverables(description) {
-  if (!description) return [
-    "Project documentation",
-    "Development deliverables",
-    "Testing and validation",
-    "Final deployment"
-  ];
+  if (!description)
+    return [
+      "Project documentation",
+      "Development deliverables",
+      "Testing and validation",
+      "Final deployment",
+    ];
 
   return [
     "Android & iOS mobile app",
     "Backend to manage user data & posts",
     "Secure database",
-    "Admin web portal"
+    "Admin web portal",
   ];
 }
 
 //remove duplicate skills
 function removeDuplicateSkills(skills) {
   const seen = new Set();
-  return skills.filter(skill => {
-    const skillName = skill.name; 
+  return skills.filter((skill) => {
+    const skillName = skill.name;
     if (seen.has(skillName)) {
       return false;
     }
@@ -266,78 +274,58 @@ function removeDuplicateSkills(skills) {
 
 //check if user has specific skills
 function checkUserSkills(requiredSkills, userSkills) {
-  const userSkillsSet = new Set(userSkills); 
-  return requiredSkills.map(skill => ({
+  const userSkillsSet = new Set(userSkills);
+  return requiredSkills.map((skill) => ({
     ...skill,
-    isUserSkill: userSkillsSet.has(skill.name)
+    isUserSkill: userSkillsSet.has(skill.name),
   }));
 }
 
 //custom hook for empleadoproyectopage
 const useEmpleadoProyectoPage = () => {
-
   const { projectId: urlProjectId, roleId: urlRoleId } = useParams();
   const navigate = useNavigate();
 
   //get ids from url params or fallback to localStorage
-  const projectId = urlProjectId || localStorage.getItem('projectid');
-  const roleId = urlRoleId || localStorage.getItem('idrol');
-
-  console.log('=== API DEBUG INFO ===');
-  console.log('URL Project ID:', urlProjectId);
-  console.log('URL Role ID:', urlRoleId);
-  console.log('Final Project ID:', projectId);
-  console.log('Final Role ID:', roleId);
-  console.log('API endpoint:', `${projectId || '87'}/completo`);
-  console.log('Full API URL:', `https://pathexplorer-backend.onrender.com/api/${projectId || '87'}/completo`);
-  console.log('Token:', localStorage.getItem('token') ? 'Present' : 'Missing');
-  console.log('======================');
+  const projectId = urlProjectId || localStorage.getItem("projectid");
+  const roleId = urlRoleId || localStorage.getItem("idrol");
 
   //always use /completo to get all project data (better than por-rol)
-  const { data, error, loading } = useFetch(`${projectId || '87'}/completo`);
+  const { data, error, loading } = useFetch(`${projectId || "87"}/completo`);
 
   // Modal control
   const { modals, openModal, closeModal } = useModalControl([
-    'skills',
-    'compatibility',
-    'application',
-    'allSkills',
-    'rfp'
+    "skills",
+    "compatibility",
+    "application",
+    "allSkills",
+    "rfp",
   ]);
 
   // Refs
   const peopleSectionRef = useRef(null);
 
   //get actual user ID from localStorage
-  const userId = localStorage.getItem('user_id') || localStorage.getItem('userId') || localStorage.getItem('id') || '1'; 
-  
-  console.log('User Authentication');
-  console.log('User ID from localStorage:', userId);
-  console.log('Available localStorage keys:', Object.keys(localStorage));
+  const userId =
+    localStorage.getItem("user_id") ||
+    localStorage.getItem("userId") ||
+    localStorage.getItem("id") ||
+    "1";
 
   //check if user has already applied to this project
-  const { data: userApplications, loading: applicationsLoading } = useFetch(`apps/usuario/${userId}`);
+  const { data: userApplications, loading: applicationsLoading } = useFetch(
+    `apps/usuario/${userId}`
+  );
 
   //transform backend data to frontend format
   const projectData = useMemo(() => {
     const transformed = transformBackendProject(data, roleId);
-    console.log('DEBUG: Project Data');
-    console.log('Raw backend data:', data);
-    console.log('Data type:', Array.isArray(data) ? 'Array' : typeof data);
-    console.log('Data length:', Array.isArray(data) ? data.length : 'N/A');
-    console.log('Transformed project data:', transformed);
-    console.log('Project ID from params:', projectId);
-    console.log('Role ID from params:', roleId);
-    console.log('---------------------------------');
+
     return transformed;
   }, [data, roleId, projectId]);
 
   //user skills for compatibility calculation temp only
-  const [userSkills] = useState([
-    "Python",
-    "C#",
-    "Figma"
-  ]);
+  const [userSkills] = useState(["Python", "C#", "Figma"]);
 
   //update required skills with user skill status
   const enhancedProjectData = useMemo(() => {
@@ -345,80 +333,86 @@ const useEmpleadoProyectoPage = () => {
 
     return {
       ...projectData,
-      requiredSkills: checkUserSkills(projectData.requiredSkills, userSkills)
+      requiredSkills: checkUserSkills(projectData.requiredSkills, userSkills),
     };
   }, [projectData, userSkills]);
 
   //check if user has applied to current project (must be after enhancedProjectData)
   const hasAppliedToProject = useMemo(() => {
-    if (!userApplications || !Array.isArray(userApplications) || !enhancedProjectData?.availableRoles) {
+    if (
+      !userApplications ||
+      !Array.isArray(userApplications) ||
+      !enhancedProjectData?.availableRoles
+    ) {
       return false;
     }
 
     //get all role IDs from current project
-    const projectRoleIds = enhancedProjectData.availableRoles.map(role => role.id);
-    
-    //check if user has applied to any role in this project
-    const hasApplied = userApplications.some(application => 
-      projectRoleIds.includes(application.idrol)
+    const projectRoleIds = enhancedProjectData.availableRoles.map(
+      (role) => role.id
     );
 
-    console.log('=== APPLICATION CHECK ===');
-    console.log('Project role IDs:', projectRoleIds);
-    console.log('User applications:', userApplications);
-    console.log('Has applied to project:', hasApplied);
-    console.log('========================');
+    //check if user has applied to any role in this project
+    const hasApplied = userApplications.some((application) =>
+      projectRoleIds.includes(application.idrol)
+    );
 
     return hasApplied;
   }, [userApplications, enhancedProjectData?.availableRoles]);
 
   //actions
   const handleShowApplication = useCallback(() => {
-    openModal('application');
+    openModal("application");
   }, [openModal]);
 
   const handleSubmitApplication = useCallback(async (applicationData) => {
-    console.log('Application submitted:', applicationData);
+    console.log("Application submitted:", applicationData);
     //refresh applications after successful submission
     //note: in a real app you might want to invalidate the cache or refetch
   }, []);
 
   const handleShowCompatibility = useCallback(() => {
-    openModal('compatibility');
+    openModal("compatibility");
   }, [openModal]);
 
   const handleShowSkills = useCallback(() => {
-    openModal('skills');
+    openModal("skills");
   }, [openModal]);
 
   const handleShowAllSkills = useCallback(() => {
-    openModal('allSkills');
+    openModal("allSkills");
   }, [openModal]);
 
   const handleShowRFP = useCallback(() => {
-    openModal('rfp');
+    openModal("rfp");
   }, [openModal]);
 
   const handleMemberSelect = useCallback((member) => {
-    console.log('Selected member:', member);
+    console.log("Selected member:", member);
   }, []);
 
-  const handleRoleSelect = useCallback((roleItem) => {
-    const roleId = roleItem.roleId;
-    if (roleId) {
-      navigate(`/empleado/proyecto/${projectId}/${roleId}`);
-    }
-  }, [navigate, projectId]);
-  
+  const handleRoleSelect = useCallback(
+    (roleItem) => {
+      const roleId = roleItem.roleId;
+      if (roleId) {
+        navigate(`/empleado/proyecto/${projectId}/${roleId}`);
+      }
+    },
+    [navigate, projectId]
+  );
+
   //calculate compatibility percentage
   const calculateCompatibilityPercentage = useCallback(() => {
-    if (!enhancedProjectData?.requiredSkills || enhancedProjectData.requiredSkills.length === 0) {
+    if (
+      !enhancedProjectData?.requiredSkills ||
+      enhancedProjectData.requiredSkills.length === 0
+    ) {
       return 0;
     }
 
     const totalSkills = enhancedProjectData.requiredSkills.length;
     const userSkillsSet = new Set(userSkills);
-    const matchingSkills = enhancedProjectData.requiredSkills.filter(skill =>
+    const matchingSkills = enhancedProjectData.requiredSkills.filter((skill) =>
       userSkillsSet.has(skill.name)
     ).length;
 
@@ -430,11 +424,11 @@ const useEmpleadoProyectoPage = () => {
     if (enhancedProjectData?.title && enhancedProjectData?.primaryRole?.name) {
       document.title = `${enhancedProjectData.title} - ${enhancedProjectData.primaryRole.name}`;
     } else {
-      document.title = 'Project Details';
+      document.title = "Project Details";
     }
-    
+
     return () => {
-      document.title = 'PathExplorer';
+      document.title = "PathExplorer";
     };
   }, [enhancedProjectData?.title, enhancedProjectData?.primaryRole?.name]);
 
@@ -444,8 +438,8 @@ const useEmpleadoProyectoPage = () => {
     userSkills,
 
     // API state
-    loading: loading || applicationsLoading, 
-    error,  
+    loading: loading || applicationsLoading,
+    error,
 
     // State
     isApplied: hasAppliedToProject,

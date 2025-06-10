@@ -31,34 +31,38 @@ export const useTFSApplicantsHeaderConfig = (props) => {
       hasDropdown: true,
       isFilterButton: true,
       dropdownItems: [
-        { 
-          label: 'Projects', 
-          icon: 'bi-folder',
+        {
+          label: "Projects",
+          icon: "bi-folder",
           subMenu: true,
           options: [
-            { label: 'All Projects', value: 'All Projects' },
-            ...(projectOptions.slice(0, 4).map(project => ({ 
-              label: project, 
-              value: project 
-            }))),
-            { label: 'More Options...', action: 'modal', icon: 'bi-three-dots' }
-          ]
+            { label: "All Projects", value: "All Projects" },
+            ...projectOptions.slice(0, 4).map((project) => ({
+              label: project,
+              value: project,
+            })),
+            {
+              label: "More Options...",
+              action: "modal",
+              icon: "bi-three-dots",
+            },
+          ],
         },
-        { 
-          label: 'Skills', 
-          action: 'skills', 
-          icon: 'bi-tools'
-        }
+        {
+          label: "Skills",
+          action: "skills",
+          icon: "bi-tools",
+        },
       ],
       onDropdownItemClick: (item) => {
-        if (item.action === 'modal') {
-          openModal('projectFilter');
-        } else if (item.action === 'skills') {
-          openModal('skillsFilter');
+        if (item.action === "modal") {
+          openModal("projectFilter");
+        } else if (item.action === "skills") {
+          openModal("skillsFilter");
         } else if (item.value) {
           filterStates.setSelectedProject(item.value);
         }
-      }
+      },
     },
     {
       label: "Sort By",
@@ -67,17 +71,23 @@ export const useTFSApplicantsHeaderConfig = (props) => {
       hasDropdown: true,
       isFilterButton: true,
       dropdownItems: [
-        { label: 'Experience (Low to High)', value: 'exp_asc', icon: 'bi-sort-numeric-down' },
-        { label: 'Experience (High to Low)', value: 'exp_desc', icon: 'bi-sort-numeric-down-alt' },
-        { label: 'Newest First', value: 'date_desc', icon: 'bi-calendar-date' },
-        { label: 'Oldest First', value: 'date_asc', icon: 'bi-calendar2-date' },
-        { label: 'Compatibility (High to Low)', value: 'match_desc', icon: 'bi-star-fill' },
-        { label: 'Compatibility (Low to High)', value: 'match_asc', icon: 'bi-star' }
+        {
+          label: "Experience (Low to High)",
+          value: "exp_asc",
+          icon: "bi-sort-numeric-down",
+        },
+        {
+          label: "Experience (High to Low)",
+          value: "exp_desc",
+          icon: "bi-sort-numeric-down-alt",
+        },
+        { label: "Newest First", value: "date_desc", icon: "bi-calendar-date" },
+        { label: "Oldest First", value: "date_asc", icon: "bi-calendar2-date" },
       ],
       onDropdownItemClick: (item) => {
         setSortOption(item.value);
-      }
-    }
+      },
+    },
   ];
 
   const filterButtons = [

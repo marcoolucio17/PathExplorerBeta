@@ -7,15 +7,14 @@ import { ChipModalSelect } from '../ChipModalSelect';
 import Alert from "react-bootstrap/Alert";
 
 
-export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus, clients = [], onClientSelected }) => {
+export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus, clients = [], onClientSelected, error }) => {
 
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClient, setselectedClient] = useState('');
     const [selectedClientId, setSelectedClientId] = useState(null);
-    const [loadingError, setLoadingError] = useState(true);
-    const [dataError, setDataError] = useState("Error fetching your data. Please try again later.");
+
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
@@ -95,12 +94,12 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
 
 
                 </div>
-                {loadingError && <div className="login-error-container" style={{ width: "90%", marginLeft: "5%", marginRight: "5%" }}>
+                {error && <div className="login-error-container" style={{ width: "90%", marginLeft: "5%", marginRight: "5%" }}>
                     <Alert className="login-error-alert" variant="danger">
-                        {dataError}
+                        {error}
                     </Alert>
                 </div >}
-                <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
+                {!error && <div className={modalStyles.modalBody} style={{ height: 'calc(100% - 200px)' }}>
                     <div className={styles.clientsList}>
 
 
@@ -115,8 +114,12 @@ export const ClientsModal = ({ isOpen, onClose, clientNameStatus, clientIdStatus
 
                         ))
                         }
+                        {clients.length === 0 && <div className={styles.noResults} style={{ textAlign: "center", width: "100%", padding: "2rem" }}>
+                            <i className="bi bi-search" style={{ fontSize: "2rem", marginBottom: "1rem", color: "#fff" }}></i>
+                            <p style={{ color: "#fff" }}>No clients match your search</p>
+                        </div>}
                     </div>
-                </div>
+                </div>}
 
                 <div className={modalStyles.buttonGroup}>
                     <button onClick={handleClose} className={modalStyles.cancelButton}>

@@ -138,10 +138,13 @@ export const useEmpleadoDashboardPage = () => {
         filteredProjects = dashboardData.projects;
     }
 
-    return dashboardData.sortProjects(filteredProjects, listPage.sortOption);
+    return dashboardData.sortProjects(
+      filteredProjects,
+      listPage.sortOption,
+      listPage.activeTab
+    );
   }, [
     dashboardData.projects,
-    dashboardData.projectsApp,
     listPage.activeTab,
     listPage.sortOption,
     dashboardData.sortProjects,
@@ -210,17 +213,14 @@ export const useEmpleadoDashboardPage = () => {
   // Compute flattened projects for display
   const displayProjects = useMemo(() => {
     const tabProjects = getTabProjects();
-    
 
     if (listPage.activeTab === "All") {
-
-     tabProjects.map((project) => ({
+      tabProjects.map((project) => ({
         project: project,
       }));
-
     } else if (listPage.activeTab === "Applied To") {
       //for Applied To tab, flatten roles but keep project structure
-      tabProjects.map((project) => ({
+      return tabProjects.map((project) => ({
         project: project,
         isApplyCard: true, //indicate this is an Applied To card
       }));
@@ -261,10 +261,6 @@ export const useEmpleadoDashboardPage = () => {
 
   // Calculate correct tab counts based on flattened projects
   const correctedTabCounts = useMemo(() => {
-    if (!dashboardData.projects || dashboardData.projects.length === 0) {
-      return { All: 0, "Applied To": 0 };
-    }
-
     // Initial counts
     const counts = {
       All: 0, // Will be calculated using filtered results
@@ -274,12 +270,12 @@ export const useEmpleadoDashboardPage = () => {
     // Calculate flattened projects (roles) for each tab
     // All projects - use same filtering logic as display
     if (listPage.activeTab === "All") {
-      counts["All"] = displayProjects.length;
+      counts["All"] = displayProjects.length || 0;
     } else {
-      counts["All"] = dashboardData.projects.length;
+      counts["All"] = dashboardData.projects.length || 0;
     }
 
-    counts["Applied To"] = dashboardData.projectsApp.length;
+    counts["Applied To"] = dashboardData.projectsApp.length || 0;
 
     return counts;
   }, [

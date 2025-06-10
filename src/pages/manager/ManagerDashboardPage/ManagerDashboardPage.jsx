@@ -8,6 +8,8 @@ import CustomScrollbar from '../../../components/CustomScrollbar';
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
 import { ClientsModal } from "../../../components/Modals/ClientsModal";
 import { RolesModal } from "../../../components/Modals/RolesModal";
+import { ViewApplicationModal } from "../../../components/Modals/ViewApplicationModal";
+
 import { SearchHeader } from "../../../components/SearchHeader";
 import { Tabs } from "../../../components/Tabs";
 import Button from "../../../components/shared/Button";
@@ -42,7 +44,12 @@ export const ManagerDashboardPage = () => {
         {/* Search header with filters */}
         <SearchHeader {...headerProps} />
         {/* Tabs for different project statuses */}
-        <Tabs
+        {dashboardPage.errorUserSkills && <div className="login-error-container" style={{ width: "100%" }}>
+          <Alert className="login-error-alert" variant="danger">
+            {dashboardPage.errorUserSkills}
+          </Alert>
+        </div >}
+        {!dashboardPage.errorUserSkills && <><Tabs
           tabs={dashboardPage.tabNames.map(tab => ({
             name: tab,
             notificationCount: dashboardPage.tabCounts[tab] || 0
@@ -50,8 +57,9 @@ export const ManagerDashboardPage = () => {
           activeTab={dashboardPage.activeTab}
           onTabClick={dashboardPage.setActiveTab}
         />
-
         {/* Main content area with projects list with the create project button */}
+
+
         <div className={styles.cardsContainer}>
           {/* The create project button appears only in the My Projects active tab */}
           {dashboardPage.activeTab === 'My Projects' && (
@@ -87,9 +95,10 @@ export const ManagerDashboardPage = () => {
               userSkills={dashboardPage.userSkills}
               onClearFilters={dashboardPage.handleClearFilters}
               isLoading={dashboardPage.isLoading}
+                onViewApplication={dashboardPage.handleViewApplication}
             />}
           </CustomScrollbar>
-        </div>
+          </div></>}
       </div>
       {/* Modals */}
       <SkillsModal
@@ -106,6 +115,7 @@ export const ManagerDashboardPage = () => {
         selectedClients={dashboardPage.selectedClientFilters}
         onClientSelected={dashboardPage.handleApplyClientFilters}
         clients={dashboardPage.clients}
+        error={dashboardPage.errorClients}
       />
       <RolesModal
         isOpen={dashboardPage.modals.rolesFilter}
@@ -114,6 +124,14 @@ export const ManagerDashboardPage = () => {
         roleIdStatus={dashboardPage.roleId}
         onRoleSelected={dashboardPage.handleApplyRoleFilters}
         roles={dashboardPage.roles}
+        error={dashboardPage.errorRoles}
+      />
+      <ViewApplicationModal
+        isOpen={dashboardPage.modals.viewApplication}
+        onClose={dashboardPage.handleCloseViewApplication}
+        applicant={dashboardPage.transformApplicationData(dashboardPage.selectedApplication)}
+        readOnly={true}
+        messageOnly={true}
       />
     </div>
   );

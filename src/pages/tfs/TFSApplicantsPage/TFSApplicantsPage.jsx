@@ -48,11 +48,7 @@ export const TFSApplicantsPage = () => {
         
         {/* Search header with filters */}
         <SearchHeader {...headerProps} />
-        {loadingError && <div className="login-error-container" style={{ width: "100%" }}>
-          <Alert className="login-error-alert" variant="danger">
-            {dataError}
-          </Alert>
-        </div >}
+
         {/* Tabs for different application statuses */}
         <Tabs 
           tabs={applicantsPage.tabNames.map(tab => ({
@@ -65,7 +61,12 @@ export const TFSApplicantsPage = () => {
 
         {/* Main content area with applicants list */}
         <div className={styles.cardsContainer}>
-          <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
+          {applicantsPage.apiError && <div className="login-error-container" style={{ width: "100%" }}>
+            <Alert className="login-error-alert" variant="danger">
+              {applicantsPage.apiError}
+            </Alert>
+          </div >}
+          {!applicantsPage.apiError && <CustomScrollbar fadeBackground="transparent" fadeHeight={40} showHorizontalScroll={false}>
             <ApplicantsList 
               applicants={applicantsPage.visibleItems}
               viewMode={applicantsPage.viewMode}
@@ -78,7 +79,7 @@ export const TFSApplicantsPage = () => {
               onViewAssign={applicantsPage.handleViewApplicant}
               onClearFilters={applicantsPage.handleClearFilters}
             />
-          </CustomScrollbar>
+          </CustomScrollbar>}
         </div>
       </div>
       
