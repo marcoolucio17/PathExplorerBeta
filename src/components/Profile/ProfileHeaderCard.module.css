@@ -26,11 +26,11 @@
 }
 
 .avatarXl {
-  width: 80px; /* Reduced from 90px */
-  height: 80px; /* Reduced from 90px */
+  width: 80px; 
+  height: 80px; 
   border-radius: 50%;
   object-fit: cover;
-  border: none; /* Removed purple border */
+  border: none; 
   flex-shrink: 0;
 }
 
@@ -39,18 +39,18 @@
 }
 
 .employeeMeta h1 {
-  font-size: 1.6rem; /* Slightly reduced from 1.75rem */
+  font-size: 1.6rem; 
   color: var(--text-light);
   margin: 0;
-  font-family: 'Graphik Semibold', sans-serif;
-  text-align: left; /* Explicitly left-aligned */
+  font-family: 'Graphik Regular', sans-serif;
+  text-align: left; 
 }
 
 .employeeMeta h2 {
-  font-size: 1rem; /* Reduced from 1.1rem */
+  font-size: 1rem; 
   color: var(--text-main);
-  margin: 0.15rem 0; /* Further reduced from 0.2rem */
-  font-family: 'Graphik Medium', sans-serif;
+  margin: 0.15rem 0; 
+  font-family: 'Graphik light', sans-serif;
 }
 
 .location {
@@ -60,11 +60,11 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: 'Graphik Light', sans-serif; /* Changed to Graphik Light */
+  font-family: 'Graphik Regular Italic', sans-serif; /* Changed to Graphik Light */
 }
 
 .location i {
-  color: var(--purple-icon-1);
+  color: white;
   font-size: 0.9rem; /* Slightly smaller icon */
 }
 
@@ -76,21 +76,21 @@
   font-size: 1.4rem; /* Reduced from 1.5rem */
   color: var(--text-light);
   margin: 0;
-  font-family: 'Graphik Semibold', sans-serif;
+  font-family: 'Graphik Regular', sans-serif;
 }
 
 .projectDuration {
   font-size: 0.9rem; /* Reduced from 0.95rem */
   color: var(--text-main);
   margin: 0.15rem 0; /* Further reduced from 0.2rem */
-  font-family: 'Graphik Regular', sans-serif;
+  font-family: 'Graphik Light', sans-serif;
 }
 
 .projectRole {
   font-size: 0.95rem; /* Reduced from 1rem */
   color: var(--text-muted);
   margin: 0;
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Regular Italic', sans-serif;
 }
 
 .profileActions {

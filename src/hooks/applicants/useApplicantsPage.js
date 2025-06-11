@@ -8,8 +8,11 @@ export const useApplicantsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const matchPercentagesRef = useRef({});
   
-  //get actual manager id from storage instead of hardcoded value
-  const managerId = localStorage.getItem("id") || sessionStorage.getItem("id") || 4;
+  //stabilize manager id to prevent re-renders and multiple fetches
+  const managerId = useMemo(() => {
+    return localStorage.getItem("id") || sessionStorage.getItem("id") || 4;
+  }, []);
+  
   console.log("Using manager ID:", managerId); //debug log
   
   const {
@@ -19,6 +22,7 @@ export const useApplicantsPage = () => {
   } = useFetch(`creador/${managerId}/aplicaciones`);
   
   console.log("API Data:", apiData);
+  
   const mapStatusToTab = (estatus) => {
     console.log('mapping status:', estatus);
     const statusMap = {
@@ -102,48 +106,6 @@ export const useApplicantsPage = () => {
     return transformed;
   };
   
-  useEffect(() => {
-    console.log('debug Information for manager:', managerId);
-    console.log('Loading:', apiLoading);
-    console.log('Error:', apiError);
-    console.log('Raw API Data:', apiData);
-    console.log('API Data Type:', typeof apiData);
-    console.log('Is Array:', Array.isArray(apiData));
-    if (apiData) {
-      console.log('Data Length:', apiData.length);
-      console.log('First Item:', apiData[0]);
-      console.log('Data Structure:', Object.keys(apiData[0] || {}));
-      
-      const transformedData = transformApiData(apiData);
-      console.log('=== Transformed Data ===');
-      console.log('Transformed Data:', transformedData);
-      console.log('First Transformed Item:', transformedData[0]);
-      
-      if (transformedData[0]) {
-        console.log('=== Field Mapping Check ===');
-        console.log('Profile Image URL:', transformedData[0].profileImage);
-        console.log('Applied Date:', transformedData[0].appliedDate);
-        console.log('Project Name:', transformedData[0].project);
-        console.log('Role Name:', transformedData[0].role);
-        console.log('User Name:', transformedData[0].name);
-      }
-      
-      const statusCounts = transformedData.reduce((acc, item) => {
-        acc[item.status] = (acc[item.status] || 0) + 1;
-        return acc;
-      }, {});
-      console.log('Status Distribution:', statusCounts);
-      
-      const projectCounts = transformedData.reduce((acc, item) => {
-        acc[item.project] = (acc[item.project] || 0) + 1;
-        return acc;
-      }, {});
-      console.log('Project Distribution:', projectCounts);
-      console.log('Final Applicants being used:', transformedData);
-    }
-    console.log('=== End API Debug ===');
-  }, [apiData, apiLoading, apiError, managerId]);
-  
   const finalApplicants = useMemo(() => {
     if (apiLoading) {
       console.log('API still loading...');
@@ -162,6 +124,20 @@ export const useApplicantsPage = () => {
     return [];
   }, [apiData, apiLoading, apiError]);
 
+  //calculate tab counts from finalApplicants data like TFS does
+  const tabCounts = useMemo(() => {
+    const counts = { 'Pending': 0, 'In Review': 0, 'Accepted': 0, 'Denied': 0 };
+    
+    finalApplicants.forEach(applicant => {
+      if (counts.hasOwnProperty(applicant.status)) {
+        counts[applicant.status]++;
+      }
+    });
+    
+    console.log('Manager Tab counts:', counts);
+    return counts;
+  }, [finalApplicants]);
+
   const projectOptions = useMemo(() => {
     const projects = finalApplicants.map(app => app.project).filter(Boolean);
     const uniqueProjects = [...new Set(projects)];
@@ -172,6 +148,30 @@ export const useApplicantsPage = () => {
     const allSkills = finalApplicants.flatMap(app => app.skills || []);
     return [...new Set(allSkills)];
   }, [finalApplicants]);
+
+  //only log debug info once when data changes, not on every render
+  useEffect(() => {
+    if (!apiLoading && finalApplicants.length > 0) {
+      console.log('debug Information for manager:', managerId);
+      console.log('Loading:', apiLoading);
+      console.log('Error:', apiError);
+      console.log('Raw API Data:', apiData);
+      console.log('Final Applicants being used:', finalApplicants);
+      
+      const statusCounts = finalApplicants.reduce((acc, item) => {
+        acc[item.status] = (acc[item.status] || 0) + 1;
+        return acc;
+      }, {});
+      console.log('Status Distribution:', statusCounts);
+      
+      const projectCounts = finalApplicants.reduce((acc, item) => {
+        acc[item.project] = (acc[item.project] || 0) + 1;
+        return acc;
+      }, {});
+      console.log('Project Distribution:', projectCounts);
+      console.log('=== End API Debug ===');
+    }
+  }, [finalApplicants, apiLoading, apiError, managerId, apiData]);
 
   const calculateMatchPercentage = (applicant, showCompatibility = true) => {
     if (!applicant || !showCompatibility) return 0;
@@ -240,31 +240,37 @@ export const useApplicantsPage = () => {
     sortFunction: sortApplicants,
     baseUrl: '/manager/dashboard'
   });
+
+  //create custom listPage with tab counts
+  const customListPage = {
+    ...listPage,
+    tabCounts, //use our calculated tab counts
+  };
   
   useEffect(() => {
-    setSearchTerm(listPage.searchTerm);
-  }, [listPage.searchTerm]);
+    setSearchTerm(customListPage.searchTerm);
+  }, [customListPage.searchTerm]);
 
   useEffect(() => {
-    if (listPage.showCompatibility && !listPage.compatibilityLoading) {
+    if (customListPage.showCompatibility && !customListPage.compatibilityLoading) {
       refreshMatchPercentages();
     }
-  }, [listPage.showCompatibility, listPage.compatibilityLoading]);
+  }, [customListPage.showCompatibility, customListPage.compatibilityLoading]);
 
   const handleAcceptDeniedApplicant = (applicant) => {
     console.log('handleAcceptDeniedApplicant called for:', applicant);
-    listPage.closeModal('denialReason');
+    customListPage.closeModal('denialReason');
   };
   
   const handleAppealDeniedApplicant = (applicant, appealReason) => {
     console.log(`Appeal submitted for ${applicant.name}: ${appealReason}`);
-    listPage.closeModal('denialReason');
+    customListPage.closeModal('denialReason');
   };
 
   const getActiveFilters = () => {
     const filters = {};
     
-    const { selectedProject, selectedSkills } = listPage.filterStates;
+    const { selectedProject, selectedSkills } = customListPage.filterStates;
     
     if (selectedProject && selectedProject !== 'All Projects') {
       filters.projects = {
@@ -292,21 +298,21 @@ export const useApplicantsPage = () => {
     const applicant = finalApplicants.find(app => app.id === applicantId);
     console.log('found applicant:', applicant);
     console.log('applicant status:', applicant?.status);
-    console.log('modals object:', listPage.modals);
+    console.log('modals object:', customListPage.modals);
     
     if (applicant && applicant.status === 'Denied') {
       console.log('opening denialReason modal');
-      listPage.setSelectedItem(applicant);
-      listPage.openModal('denialReason');
+      customListPage.setSelectedItem(applicant);
+      customListPage.openModal('denialReason');
     }
     else if (applicant && applicant.status === 'Accepted') {
       console.log('opening assignEmployee modal');
-      listPage.setSelectedItem(applicant);
-      listPage.openModal('assignEmployee');
+      customListPage.setSelectedItem(applicant);
+      customListPage.openModal('assignEmployee');
     } else {
       console.log('opening viewRequest modal');
-      listPage.setSelectedItem(applicant);
-      listPage.openModal('viewRequest');
+      customListPage.setSelectedItem(applicant);
+      customListPage.openModal('viewRequest');
     }
   };
 
@@ -314,8 +320,8 @@ export const useApplicantsPage = () => {
     console.log('handleViewRequest called with:', applicantId);
     const applicant = finalApplicants.find(app => app.id === applicantId);
     console.log('found applicant:', applicant);
-    listPage.setSelectedItem(applicant);
-    listPage.openModal('viewRequest');
+    customListPage.setSelectedItem(applicant);
+    customListPage.openModal('viewRequest');
   };
 
   //override handleViewItem to prevent unwanted navigation
@@ -339,7 +345,7 @@ export const useApplicantsPage = () => {
       console.error('Error accepting application:', error);
     }
     
-    listPage.closeModal('viewRequest');
+    customListPage.closeModal('viewRequest');
   };
 
   const handleDenyApplicant = async (applicant) => {
@@ -357,7 +363,7 @@ export const useApplicantsPage = () => {
       console.error('Error denying application:', error);
     }
     
-    listPage.closeModal('viewRequest');
+    customListPage.closeModal('viewRequest');
   };
 
   const handleViewProfile = (applicant) => {
@@ -379,7 +385,7 @@ export const useApplicantsPage = () => {
       console.error('Error assigning application:', error);
     }
     
-    listPage.closeModal('assignEmployee');
+    customListPage.closeModal('assignEmployee');
   };
 
   const handleAssignSuccess = () => {
@@ -387,7 +393,7 @@ export const useApplicantsPage = () => {
     console.log('assignment completed successfully');
     
     //now update the application status to RolAsignado
-    const applicant = listPage.selectedItem;
+    const applicant = customListPage.selectedItem;
     if (applicant) {
       console.log('updating application status for:', applicant);
       patchApplicationStatus(applicant.userId, applicant.id, 'RolAsignado')
@@ -404,16 +410,16 @@ export const useApplicantsPage = () => {
         });
     }
     
-    listPage.closeModal('assignEmployee');
+    customListPage.closeModal('assignEmployee');
     console.log('=== HANDLE ASSIGN SUCCESS END ===');
   };
 
   const calculateApplicantMatchPercentage = (applicant) => {
-    return calculateMatchPercentage(applicant, listPage.showCompatibility);
+    return calculateMatchPercentage(applicant, customListPage.showCompatibility);
   };
 
   return {
-    ...listPage,
+    ...customListPage,
     projectOptions,
     skillOptions,
     calculateMatchPercentage: calculateApplicantMatchPercentage,

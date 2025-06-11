@@ -16,6 +16,7 @@ import Button from 'src/components/shared/Button';
  * @param {Function} props.onViewRequest - Function called when View Request button is clicked
  * @param {Function} props.onViewReason - Function called when View Reason button is clicked
  * @param {Function} props.onViewAssign - Function called when View Appeal button is clicked
+ * @param {Function} props.onClick - Function called when the card is clicked
  */
 const ApplicantCard = ({
   applicant,
@@ -25,7 +26,8 @@ const ApplicantCard = ({
   activeTab,
   onViewRequest,
   onViewReason,
-  onViewAssign
+  onViewAssign,
+  onClick
 }) => {
   // Determine the class based on view mode
   const cardClass = viewMode === 'grid' 
@@ -128,7 +130,12 @@ const ApplicantCard = ({
   // Grid view - wrap the content in a GlassCard
   if (viewMode === 'grid') {
     return (
-      <GlassCard className={cardClass} disableNavigation={true}>
+      <GlassCard 
+        className={cardClass} 
+        disableNavigation={true}
+        onClick={onClick}
+        style={{ cursor: onClick ? 'pointer' : 'default' }}
+      >
         {applicantContent}
       </GlassCard>
     );
@@ -136,7 +143,12 @@ const ApplicantCard = ({
   
   // List view - custom layout for horizontal display
   return (
-    <GlassCard className={cardClass} disableNavigation={true}>
+    <GlassCard 
+      className={cardClass} 
+      disableNavigation={true}
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
       <div className={styles.cardHeader}>
         <img 
           className={styles.cardAvatar} 

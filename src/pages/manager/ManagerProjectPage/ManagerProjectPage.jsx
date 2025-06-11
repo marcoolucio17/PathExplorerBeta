@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Custom Hooks
 import useManagerProjectPage from '../../../hooks/proyecto/useManagerProjectPage.js';
@@ -19,7 +20,27 @@ import styles from "../../../styles/Pages/Proyecto/ManagerProjectPage.module.css
 import peopleStyles from "../../../styles/Pages/Proyecto/PeopleSection.module.css";
 
 export const ManagerProjectPage = () => {
-  console.log("ManagerProjectPage component loaded");
+  const navigate = useNavigate();
+  
+  //handle back navigation based on user role in localStorage
+  const handleBackToDashboard = () => {
+    const userRole = localStorage.getItem('role');
+    
+    switch(userRole) {
+      case 'empleado':
+        navigate('/empleado/dashboard');
+        break;
+      case 'manager':
+        navigate('/manager/dashboard');
+        break;
+      case 'admin':
+        navigate('/TFS/dashboard');
+        break;
+      default:
+        navigate('/dashboard');
+        break;
+    }
+  };
   
   const projectPage = useManagerProjectPage();
   const { projectData, projectUsers, isLoading, error } = projectPage;
@@ -65,14 +86,21 @@ export const ManagerProjectPage = () => {
 
   return (
     <div className={styles.projectContainer}>
+      
       <div className={styles.projectContent}>
         <div className={styles.projectDetails}>
           <div className={styles.pageHeader}>
-            <div className={styles.titleContainer}>
-              <h1 className={styles.pageTitle}>
-                {projectData.pnombre || 'Project Management'}
-              </h1>
-            </div>
+            <Button 
+              type="secondary"
+              variant="back"
+              icon="bi bi-arrow-left"
+              onClick={handleBackToDashboard}
+            >
+              Back to Dashboard
+            </Button>
+            <h1 className={styles.pageTitle}>
+              {projectData.pnombre || 'Project Management'}
+            </h1>
           </div>
           
           <div className={styles.projectDates}>

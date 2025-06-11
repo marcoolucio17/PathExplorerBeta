@@ -40,10 +40,10 @@ overflow: visible; /* Allow button hover effects */
 
 .pageTitle {
 font-size: 1.8rem;
-font-weight: 600;
+font-weight: 100;
 margin: 0;
 color: var(--text-light);
-font-family: 'Graphik Medium', sans-serif;
+font-family: 'Graphik Regular', sans-serif;
 }
 
 /* Search and Filters Row */

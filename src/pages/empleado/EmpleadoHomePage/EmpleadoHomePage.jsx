@@ -87,27 +87,20 @@ export const EmpleadoHomePage = () => {
         return [
           {
             id: 1,
-            icon: "bi-gear-fill",
-            title: "System Admin",
-            path: "/tfs/admin"
+            icon: "bi-person-fill",
+            title: "My Profile",
+            path: "/tfs/perfil"
           },
           {
-            id: 2,
-            icon: "bi-database",
-            title: "Data Management",
-            path: "/tfs/data"
+            icon: "bi-folder-fill",
+            title: "Applicants",
+            path: "/tfs/applicants"
           },
           {
             id: 3,
-            icon: "bi-shield-check",
-            title: "Security Settings",
-            path: "/tfs/security"
-          },
-          {
-            id: 4,
-            icon: "bi-bar-chart",
-            title: "System Reports",
-            path: "/tfs/reports"
+            icon: "bi-people-fill",
+            title: "Employees Dashboard",
+            path: "/tfs/employee-dashboard"
           }
         ];
       
@@ -171,6 +164,12 @@ export const EmpleadoHomePage = () => {
           font-size: 0.7rem !important;
           padding: 0.2rem 0.4rem !important;
         }
+        .empleado-home-cards [class*="skeletonCard"] {
+          height: 245px !important;
+          min-height: 245px !important;
+          width: 400px !important;
+          min-width: 400px !important;
+        }
       `}</style>
 
       {error && <div className="login-error-container" style={{ width: "65%", marginLeft: "17.5%", marginRight: "17.5%" }}>
@@ -214,6 +213,7 @@ export const EmpleadoHomePage = () => {
                     calculateMatchPercentage={dashboardPage.calculateMatchPercentage}
                     onClearFilters={dashboardPage.handleClearFilters}
                     isLoading={dashboardPage.isLoading}
+                    skeletonCount={2}
                   />
                 </div>}
               </div>
