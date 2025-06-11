@@ -41,7 +41,7 @@
 }
 
 .notifications-panel {
-  background: var(--glass-bg);
+  background: rgba(0, 0, 0, 0.805);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
