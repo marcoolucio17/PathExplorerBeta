@@ -312,6 +312,19 @@ export const useManagerDashboardPage = () => {
   const transformApplicationData = useCallback((appData) => {
     if (!appData) return null;
 
+    //convert spanish status to english for consistency
+    const convertStatusToEnglish = (status) => {
+      const statusMap = {
+        'Pendiente': 'Pending',
+        'RolAsignado': 'Assigned',
+        'Rechazado': 'Rejected',
+        'Asignado': 'Approved',
+        'En Revision': 'Under Review',
+        'Cancelado': 'Cancelled'
+      };
+      return statusMap[status] || status;
+    };
+
     return {
       id: appData.idaplicacion,
       userId: null, //no user data available in this structure
@@ -321,7 +334,7 @@ export const useManagerDashboardPage = () => {
       project: appData.proyecto?.pnombre || "Unknown Project",
       message: appData.message || "No message provided",
       appliedDate: appData.fechaaplicacion || "Unknown Date",
-      status: appData.estatus || "Unknown",
+      status: convertStatusToEnglish(appData.estatus) || "Unknown",
       avatar: null, //not available
     };
   }, []);

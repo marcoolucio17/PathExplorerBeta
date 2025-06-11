@@ -74,6 +74,7 @@ const ApplicantCard = ({
             <i className="bi bi-clock"></i> {activeTab === 'Pending' ? 'Applied:' : 
                                            activeTab === 'In Review' ? 'Requested:' :
                                            activeTab === 'Accepted' ? 'Accepted:' :
+                                           activeTab === 'Pending Assignment' ? 'Approved:' :
                                            'Denied On:'}
           </span>
           <span className={styles.detailValue}>
@@ -174,6 +175,7 @@ const ApplicantCard = ({
             <i className="bi bi-clock"></i> {activeTab === 'Pending' ? 'Applied' : 
                                             activeTab === 'In Review' ? 'Requested' :
                                             activeTab === 'Accepted' ? 'Accepted' :
+                                            activeTab === 'Pending Assignment' ? 'Approved' :
                                             'Denied On'}
           </span>
           <span className={styles.detailValue}>
