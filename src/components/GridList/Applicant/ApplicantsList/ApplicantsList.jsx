@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import ApplicantCard from 'src/components/GridList/Applicant/ApplicantCard';
 import styles from 'src/styles/GridList/GridListContainer.module.css';
 
@@ -28,6 +29,16 @@ const ApplicantsList = ({
   onViewAssign,
   onClearFilters
 }) => {
+  const navigate = useNavigate();
+
+  //handle applicant card click to navigate to employee profile
+  const handleApplicantClick = (applicant) => {
+    if (applicant && applicant.userId) {
+      const userRole = localStorage.getItem("role") || "empleado";
+      navigate(`/${userRole}/employee/${applicant.userId}`);
+    }
+  };
+
   // If loading, show loader
   if (isLoading) {
     return (
@@ -84,6 +95,7 @@ const ApplicantsList = ({
               onViewRequest={onViewRequest}
               onViewReason={onViewReason}
               onViewAssign={onViewAssign}
+              onClick={() => handleApplicantClick(applicant)}
               index={index}
             />
           </div>

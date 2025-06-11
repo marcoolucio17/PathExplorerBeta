@@ -234,9 +234,7 @@ export const useManagerDashboardPage = () => {
     const tabProjects = getTabProjects();
 
     if (listPage.activeTab === "All") {
-      tabProjects.map((project) => ({
-        project: project,
-      }));
+      return dashboardData.flattenProjectsForList(tabProjects);
     }
     //for my projects tab, don't flatten - show each project as one card
     else if (listPage.activeTab === "My Projects") {

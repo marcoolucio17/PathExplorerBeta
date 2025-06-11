@@ -289,6 +289,10 @@ const useEmpleadoProyectoPage = () => {
   const navigate = useNavigate();
   // State for user skills
   const [userSkillsNames, setUserSkillsNames] = useState([]);
+  // State for application success
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [hasAppliedLocally, setHasAppliedLocally] = useState(false);
+  
   // Parameters for All projects
   const [filterOptions, setFilterOptions] = useState({
     idCompatible: localStorage.getItem("id"),
@@ -395,8 +399,8 @@ const useEmpleadoProyectoPage = () => {
       projectRoleIds.includes(application.idrol)
     );
 
-    return hasApplied;
-  }, [userApplications, enhancedProjectData?.availableRoles]);
+    return hasApplied || hasAppliedLocally;
+  }, [userApplications, enhancedProjectData?.availableRoles, hasAppliedLocally]);
 
   //actions
   const handleShowApplication = useCallback(() => {
@@ -405,6 +409,18 @@ const useEmpleadoProyectoPage = () => {
 
   const handleSubmitApplication = useCallback(async (applicationData) => {
     console.log("Application submitted:", applicationData);
+    
+    //set local applied state to immediately update UI
+    setHasAppliedLocally(true);
+    
+    //show success notification
+    setShowSuccessNotification(true);
+    
+    //hide notification after 3 seconds
+    setTimeout(() => {
+      setShowSuccessNotification(false);
+    }, 3000);
+    
     //refresh applications after successful submission
     //note: in a real app you might want to invalidate the cache or refetch
   }, []);
@@ -484,6 +500,7 @@ const useEmpleadoProyectoPage = () => {
     // State
     isApplied: hasAppliedToProject,
     isLoading: false,
+    showSuccessNotification,
 
     // Refs
     peopleSectionRef,

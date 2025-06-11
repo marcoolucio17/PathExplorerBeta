@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 import useFetch from '../../../hooks/useFetch';
 import modalStyles from 'src/styles/Modals/Modal.module.css';
 
-const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, onViewProfile, readOnly = false, messageOnly = false }) => {
-  //fetch feedback data using user id - only when userId is properly defined and not in messageOnly mode
+const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, onViewProfile, readOnly = false, messageOnly = false, hideFeedback = false }) => {
+  //fetch feedback data using user id - only when userId is properly defined and not in messageOnly mode and not hiding feedback
   const { data: feedbackData, loading: feedbackLoading, error: feedbackError } = useFetch(
-    (!messageOnly && applicant && applicant.userId) ? `feedback/${applicant.userId}` : null
+    (!messageOnly && !hideFeedback && applicant && applicant.userId) ? `feedback/${applicant.userId}` : null
   );
 
-  //debug feedback fetching - only if not messageOnly
+  //debug feedback fetching - only if not messageOnly and not hideFeedback
   useEffect(() => {
-    if (messageOnly) return; //skip debug for messageOnly mode
+    if (messageOnly || hideFeedback) return; //skip debug for messageOnly mode or when hiding feedback
     
     console.log('=== Fdebug ===');
     console.log('Modal isOpen:', isOpen);
@@ -42,7 +42,7 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
       console.log('Error URL from config:', feedbackError.config?.url);
     }
     console.log('====================');
-  }, [isOpen, applicant, feedbackLoading, feedbackError, feedbackData, messageOnly]);
+  }, [isOpen, applicant, feedbackLoading, feedbackError, feedbackData, messageOnly, hideFeedback]);
 
   if (!isOpen || !applicant) return null;
 
@@ -189,8 +189,8 @@ const ViewApplicationModal = ({ isOpen, onClose, applicant, onAccept, onDeny, on
             </div>
           </div>
 
-          {/*feedback section - only show if not messageOnly*/}
-          {!messageOnly && (
+          {/*feedback section - only show if not messageOnly and not hideFeedback*/}
+          {!messageOnly && !hideFeedback && (
             <div style={{ marginBottom: '1rem' }}>
               <h3 style={{ 
                 color: 'var(--text-light)', 

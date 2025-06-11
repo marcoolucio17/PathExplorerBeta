@@ -25,10 +25,6 @@ const ProjectCard = ({
 }) => {
 
   const navigate = useNavigate();
-  
-  const cardClass = viewMode === 'grid'
-    ? styles.cardGrid
-    : `${styles.cardList} ${customStyles.cardList}`;
 
   //custom navigation for project cards
   const handleProjectCardClick = (e) => {
@@ -43,30 +39,153 @@ const ProjectCard = ({
   //stable duration calculation based on project id to prevent fluctuation
   const ensureRoleData = () => {
     if (isProjectCard && !isApplyCard) {
+      //debug data structure for project cards
+      console.log("Project Card - Full project data:", project);
+      console.log("Project Card - Available keys:", Object.keys(project));
+      
+      //comprehensive mapping for client logo for project cards
+      const clientLogo = project.cliente?.fotodecliente_url || 
+                        project.client?.fotodecliente_url ||
+                        project.fotodecliente_url ||
+                        project.clientLogo ||
+                        project.cliente?.logo ||
+                        project.client?.logo ||
+                        project.logo ||
+                        "/images/ImagenProyectoDefault.png";
+      
+      console.log("Project Card - Client logo check:", {
+        "project.cliente?.fotodecliente_url": project.cliente?.fotodecliente_url,
+        "project.client?.fotodecliente_url": project.client?.fotodecliente_url,
+        "project.fotodecliente_url": project.fotodecliente_url,
+        "project.clientLogo": project.clientLogo,
+        "final clientLogo": clientLogo
+      });
+      
       //for project cards, show project name as title
-
       return {
         roleName: project.pnombre || 'Project',
         projectName: '', //no subtitle for project cards
         duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD",
-        roleCount: project.proyecto_roles ? project.proyecto_roles.length : 0
+        roleCount: project.proyecto_roles ? project.proyecto_roles.length : 0,
+        clientLogo: clientLogo
       };
     } else if (isApplyCard && !isProjectCard) {
-      return {
-        roleName: project.roles.nombrerol,
-        projectName: project.proyecto.pnombre || 'Project',
+      //debug data structure for applied to cards
+      console.log("Applied To Card - Full project data:", project);
+      console.log("Applied To Card - Available keys:", Object.keys(project));
+      
+      //comprehensive mapping for role name
+      const roleName = project.roles?.nombrerol || 
+                      project.rol?.nombrerol || 
+                      project.role?.nombrerol ||
+                      project.nombrerol || 
+                      project.roleName ||
+                      'Unknown Role';
+      
+      //comprehensive mapping for project name - try all possible paths
+      const projectName = project.proyecto?.pnombre || 
+                         project.proyectos?.pnombre || 
+                         project.project?.pnombre ||
+                         project.project?.name ||
+                         project.pnombre || 
+                         project.projectName ||
+                         project.name ||
+                         project.proyecto?.nombre ||
+                         project.proyectos?.nombre ||
+                         project.nombre ||
+                         'Unknown Project';
+      
+      //comprehensive mapping for client logo
+      const clientLogo = project.proyecto?.cliente?.fotodecliente_url || 
+                        project.proyectos?.cliente?.fotodecliente_url ||
+                        project.project?.cliente?.fotodecliente_url ||
+                        project.cliente?.fotodecliente_url ||
+                        project.proyecto?.fotodecliente_url ||
+                        project.proyectos?.fotodecliente_url ||
+                        project.project?.fotodecliente_url ||
+                        project.fotodecliente_url ||
+                        project.clientLogo ||
+                        "/images/ImagenProyectoDefault.png";
+      
+      //comprehensive mapping for description
+      const description = project.proyecto?.descripcion || 
+                         project.proyectos?.descripcion || 
+                         project.project?.descripcion ||
+                         project.descripcion || 
+                         project.description ||
+                         project.proyecto?.description ||
+                         project.proyectos?.description ||
+                         'No description available';
+      
+      //comprehensive mapping for duration
+      const duration = project.proyecto?.duracionMes || 
+                      project.proyectos?.duracionMes || 
+                      project.project?.duracionMes ||
+                      project.duracionMes || 
+                      project.duration ||
+                      project.proyecto?.duration ||
+                      project.proyectos?.duration ||
+                      "TBD";
+      
+      //convert spanish status to english
+      const convertStatusToEnglish = (status) => {
+        const statusMap = {
+          'Pendiente': 'Pending',
+          'RolAsignado': 'Assigned',
+          'Rechazado': 'Rejected',
+          'Aprobado': 'Approved',
+          'En Revision': 'Under Review',
+          'Cancelado': 'Cancelled'
+        };
+        return statusMap[status] || status;
+      };
+      
+      console.log("Applied To Card - Extracted data:", {
+        roleName,
+        projectName, 
+        clientLogo,
+        description,
+        duration,
         status: project.estatus,
-        date: project.fechaaplicacion,
-
+        statusEnglish: convertStatusToEnglish(project.estatus),
+        date: project.fechaaplicacion
+      });
+      
+      console.log("Applied To Card - Project name check:", {
+        "project.proyecto?.pnombre": project.proyecto?.pnombre,
+        "project.proyectos?.pnombre": project.proyectos?.pnombre,
+        "project.pnombre": project.pnombre,
+        "project.name": project.name,
+        "final projectName": projectName
+      });
+      
+      return {
+        roleName,
+        projectName,
+        status: convertStatusToEnglish(project.estatus) || 'Unknown Status',
+        date: project.fechaaplicacion || 'Unknown Date',
+        description,
+        duration: duration ? (duration === 0 ? "< 1" : duration) : "TBD",
+        clientLogo
       }
     }
 
-    //proyecto_rol.nombrerol ||
+    //regular role cards for All tab
+    const clientLogo = project.cliente?.fotodecliente_url || 
+                      project.client?.fotodecliente_url ||
+                      project.fotodecliente_url || 
+                      project.clientLogo ||
+                      project.cliente?.logo ||
+                      project.client?.logo ||
+                      project.logo ||
+                      "/images/ImagenProyectoDefault.png";
+    
     return {
       roleName: project.nombrerol || 'Developer',
-
       projectName: project.pnombre || 'Project',
-      duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD"
+      duration: project.duracionMes ? project.duracionMes : project.duracionMes === 0 ? "< 1" : "TBD",
+      description: project.descripcion || 'No description available',
+      clientLogo: clientLogo
     };
   };
 
@@ -99,6 +218,31 @@ const ProjectCard = ({
   };
   const roleData = ensureRoleData();
   const skillsData = ensureSkillsData();
+
+  //check if this is an assigned role card
+  const isAssignedRole = isApplyCard && roleData.status === "Assigned";
+
+  //determine card styling based on assignment status
+  const getCardClass = () => {
+    let baseClass = viewMode === 'grid'
+      ? styles.cardGrid
+      : `${styles.cardList} ${customStyles.cardList}`;
+    
+    if (isAssignedRole) {
+      baseClass += ` ${styles.assignedCard}`;
+    }
+    
+    return baseClass;
+  };
+
+  //get card props for data attributes
+  const getCardProps = () => {
+    const props = {};
+    if (viewMode === 'list' && isApplyCard) {
+      props['data-card-type'] = 'apply';
+    }
+    return props;
+  };
 
   const renderSkills = () => {
     //don't render skills for project cards
@@ -133,23 +277,13 @@ const ProjectCard = ({
 
   const gridContent = (
     <>
-      {showCompatibility && !isProjectCard && !isApplyCard && (
-        <div className={styles.statusCircle}>
-          <ProgressCircle
-            value={compatibilityValue}
-            size={60}
-            fontSize="1.1rem"
-            strokeWidth={6}
-            fontWeight="light"
-          />
-        </div>
-      )}
-
+      
+      
       <div className={styles.cardHeader}>
         <img
           className={styles.cardAvatar}
-          src={project.cliente?.fotodecliente_url || project.fotodecliente_url || "/images/ImagenProyectoDefault.png"}
-          alt={`${project.pnombre} logo`}
+          src={roleData.clientLogo || "/images/ImagenProyectoDefault.png"}
+          alt={`${roleData.projectName || 'Project'} logo`}
         />
         {!isApplyCard && (<>
         <div className={styles.cardInfo}>
@@ -162,13 +296,16 @@ const ProjectCard = ({
         {isApplyCard && (
           <div className={styles.cardInfo}>
             <h3 className={styles.cardTitle}>{roleData.roleName}</h3>
+            {isAssignedRole && (
+              <p className={styles.congratsMessage}>Congratulations! You've been assigned to this role!</p>
+            )}
           </div>
         )}
       </div>
 
       {!isApplyCard && <div className={`${styles.cardDescription} ${styles.reducedMargin}`}>
         <p className={styles.descriptionText}>
-          {project.descripcion || 'This project aims to develop a comprehensive solution that meets client requirements while leveraging modern technologies...'}
+          {roleData.description || 'This project aims to develop a comprehensive solution that meets client requirements while leveraging modern technologies...'}
         </p>
       </div>}
 
@@ -177,12 +314,24 @@ const ProjectCard = ({
           <span className={styles.detailLabel}>
             <i className="bi bi-clock"></i> Duration:
           </span>
-          {(roleData.duration !== "< 1") && <span className={styles.detailValue}>
-            {roleData.duration} months
-          </span>}
-          {(roleData.duration === "< 1") && <span className={styles.detailValue}>
-            {roleData.duration} month
-          </span>}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {(roleData.duration !== "< 1") && <span className={styles.detailValue}>
+              {roleData.duration} months
+            </span>}
+            {(roleData.duration === "< 1") && <span className={styles.detailValue}>
+              {roleData.duration} month
+            </span>}
+            
+            {showCompatibility && !isProjectCard && !isApplyCard && (
+              <ProgressCircle
+                value={compatibilityValue}
+                size={40}
+                fontSize="0.7rem"
+                strokeWidth={5}
+                fontWeight="light"
+              />
+            )}
+          </div>
         </div>}
 
         {isApplyCard && (
@@ -199,8 +348,8 @@ const ProjectCard = ({
             <span className={styles.detailLabel}>
               <i className="bi bi-clock"></i> Status:
             </span>
-            <span className={styles.detailValue}>
-              {roleData.status}
+            <span className={`${styles.detailValue} ${isAssignedRole ? styles.assignedStatus : ''}`}>
+              {isAssignedRole ? "Assigned" : roleData.status}
             </span>
           </div>)
         }
@@ -208,21 +357,36 @@ const ProjectCard = ({
 
       {isApplyCard && (
         <div className={styles.cardFooter}>
-          <Button
-            type="secondary"
-            variant="view"
-            icon="bi-file-earmark-text"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              //open modal with application data
-              if (onViewApplication) {
-                onViewApplication(project);
-              }
-            }}
-          >
-            View Request
-          </Button>
+          {isAssignedRole ? (
+            <Button
+              type="primary"
+              variant="success"
+              icon="bi-rocket-takeoff"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                //navigate to project details or team dashboard
+              }}
+            >
+              View Project
+            </Button>
+          ) : (
+            <Button
+              type="secondary"
+              variant="view"
+              icon="bi-file-earmark-text"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                //open modal with application data
+                if (onViewApplication) {
+                  onViewApplication(project);
+                }
+              }}
+            >
+              View Request
+            </Button>
+          )}
         </div>
       )}
       {!isProjectCard && !isApplyCard && (
@@ -238,8 +402,8 @@ const ProjectCard = ({
       <div className={styles.cardHeader}>
         <img
           className={styles.cardAvatar}
-          src={project.cliente?.fotodecliente_url || "/images/ImagenProyectoDefault.png"}
-          alt={`${project.pnombre} logo`}
+          src={roleData.clientLogo || "/images/ImagenProyectoDefault.png"}
+          alt={`${roleData.projectName || 'Project'} logo`}
         />
       </div>
 
@@ -249,42 +413,80 @@ const ProjectCard = ({
         {isProjectCard && !isApplyCard && roleData.roleCount > 0 && (
           <p className={styles.cardSubtitle}>{roleData.roleCount} roles available</p>
         )}
+        {isApplyCard && (
+          <p className={styles.cardSubtitle}>Applied on {new Date(roleData.date).toLocaleDateString()}</p>
+        )}
       </div>
 
       <div className={customStyles.floatingDescription}>
         <p className={styles.descriptionText}>
-          {isProjectCard ? project.descripcion : `Description for Project ${project.pnombre || '5'}`}
+          {roleData.description || `Description for Project ${roleData.projectName || 'Unknown'}`}
         </p>
       </div>
 
-      {isProjectCard && (
+      {!isApplyCard && (
         <div className={customStyles.skillsCircleContainer}>
           <div className={`${styles.cardSkills} ${customStyles.cardSkills}`}>
             {renderSkills()}
           </div>
-
-          {!showCompatibility && (
-            <div className={`${styles.statusCircle} ${customStyles.statusCircle}`}>
-              <ProgressCircle
-                value={compatibilityValue}
-                size={60}
-                strokeWidth={6}
-                fontSize="1rem"
-                fontWeight="light"
-              />
-            </div>
-          )}
         </div>
       )}
 
       <div className={customStyles.durationColumn}>
         <span className={styles.detailLabel}>
-          <i className="bi bi-clock"></i> Duration
+          <i className="bi bi-clock"></i> {isApplyCard ? 'Duration' : 'Duration'}
         </span>
-        <span className={customStyles.durationValue}>
-          {roleData.duration} months
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span className={customStyles.durationValue}>
+            {roleData.duration === "< 1" ? "< 1 month" : `${roleData.duration} months`}
+          </span>
+          
+          {showCompatibility && !isApplyCard && (
+            <ProgressCircle
+              value={compatibilityValue}
+              size={40}
+              strokeWidth={4}
+              fontSize="0.8rem"
+              fontWeight="light"
+            />
+          )}
+        </div>
       </div>
+
+      {isApplyCard && (
+        <div className={styles.cardFooter}>
+          {isAssignedRole ? (
+            <Button
+              type="primary"
+              variant="success"
+              icon="bi-rocket-takeoff"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                //navigate to project details or team dashboard
+              }}
+            >
+              View Project
+            </Button>
+          ) : (
+            <Button
+              type="secondary"
+              variant="view"
+              icon="bi-file-earmark-text"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                //open modal with application data
+                if (onViewApplication) {
+                  onViewApplication(project);
+                }
+              }}
+            >
+              View Request
+            </Button>
+          )}
+        </div>
+      )}
     </>
   );
 
@@ -298,7 +500,7 @@ const ProjectCard = ({
             pointerEvents: 'auto'
           }}
         >
-          <GlassCard className={cardClass}>
+          <GlassCard className={getCardClass()}>
             {gridContent}
           </GlassCard>
         </div>
@@ -306,13 +508,13 @@ const ProjectCard = ({
     }
     if (isApplyCard) {
       return (
-        <GlassCard className={cardClass} tabActive={"Applied To"}>
+        <GlassCard className={getCardClass()} tabActive={"Applied To"} {...getCardProps()}>
           {gridContent}
         </GlassCard>
       );
     }
     return (
-      <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
+      <GlassCardNavigation id={id} idrol={idrol} className={getCardClass()} onClick={onClick}>
         {gridContent}
       </GlassCardNavigation>
     );
@@ -327,7 +529,7 @@ const ProjectCard = ({
           pointerEvents: 'auto'
         }}
       >
-        <GlassCard className={cardClass}>
+        <GlassCard className={getCardClass()}>
           {listContent}
         </GlassCard>
       </div>
@@ -335,14 +537,14 @@ const ProjectCard = ({
   }
   if (isApplyCard) {
     return (
-      <GlassCard className={cardClass} tabActive={"Applied To"}>
+      <GlassCard className={getCardClass()} tabActive={"Applied To"} {...getCardProps()}>
         {listContent}
       </GlassCard>
     );
   }
 
   return (
-    <GlassCardNavigation id={id} idrol={idrol} className={cardClass} onClick={onClick}>
+    <GlassCardNavigation id={id} idrol={idrol} className={getCardClass()} onClick={onClick}>
       {listContent}
     </GlassCardNavigation>
   );

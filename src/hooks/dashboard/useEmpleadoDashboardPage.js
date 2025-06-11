@@ -215,14 +215,13 @@ export const useEmpleadoDashboardPage = () => {
     const tabProjects = getTabProjects();
 
     if (listPage.activeTab === "All") {
-      tabProjects.map((project) => ({
-        project: project,
-      }));
+      return dashboardData.flattenProjectsForList(tabProjects);
     } else if (listPage.activeTab === "Applied To") {
       //for Applied To tab, flatten roles but keep project structure
       return tabProjects.map((project) => ({
         project: project,
         isApplyCard: true, //indicate this is an Applied To card
+        idaplicacion: project.idaplicacion,
       }));
     }
 
