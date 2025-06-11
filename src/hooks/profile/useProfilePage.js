@@ -76,7 +76,7 @@ function transformBackendExperience(projects) {
       id: project.idproyecto,
       dateStart: formatDateToMonthYear(project.fechainicio),
       dateEnd: formatDateToMonthYear(project.fechafin),
-      logo: "/imagesUser/trump.png", // no tenemos fotos aún lolls
+      logo: project.rol.fotoURL || "/images/pageiconsmall.png", 
       alt: project.rol.nombrerol,
       title: project.rol.nombrerol,
       description: project.rol.descripcionrol,
