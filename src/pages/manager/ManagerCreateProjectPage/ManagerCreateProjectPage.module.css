@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--container-padding);
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* content container */
@@ -59,10 +59,11 @@
 
 .pageTitle {
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 100;
+  text-align: left;
   margin: 0;
   color: var(--text-light);
-  font-family: var(--font-semibold);
+  font-family: "Graphik Regular";
 }
 
 .pageSubtitle {
@@ -230,6 +231,27 @@
   font-size: 0.8rem;
   cursor: pointer;
   font-family: var(--font-primary);
+}
+
+/* voy a intentar el botonsito con ai */
+.generateButton {
+  text-align: center !important;
+  font-size: var(--btn-font-size);
+  font-weight: 600;
+  font-family: var(--btn-font-family);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #9772fd, #8f1ef9);
+  border: none;
+  border-radius: var(--btn-border-radius);
+  padding: 1rem 2rem;
+  color: white;
+  box-shadow: 0 0 3px rgba(193, 127, 255, 0.6),
+    0 0 0px rgba(193, 127, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  backdrop-filter: blur(3px);
 }
 
 .enhanceButton {

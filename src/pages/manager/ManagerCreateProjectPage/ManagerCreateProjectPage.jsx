@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import styles from './ManagerCreateProjectPage.module.css';
 import { usePost } from 'src/hooks/usePost';
 import axios from 'axios';
@@ -13,6 +14,25 @@ export const ManagerCreateProjectPage = () => {
   const [clientImageUrl, setClientImageUrl] = useState(null);
   const { data: habilidades } = useFetch("habilidades");
   const navigate = useNavigate();
+
+  const handleBackToDashboard = () => {
+    const userRole = localStorage.getItem('role');
+    
+    switch(userRole) {
+      case 'empleado':
+        navigate('/empleado/dashboard');
+        break;
+      case 'manager':
+        navigate('/manager/dashboard');
+        break;
+      case 'admin':
+        navigate('/TFS/dashboard');
+        break;
+      default:
+        navigate('/dashboard');
+        break;
+    }
+  };
 
   useEffect(() => {
     if (clientes) {
@@ -311,6 +331,14 @@ export const ManagerCreateProjectPage = () => {
       <div className={styles.createProjectContent}>
         <div className={styles.formDetails}>
           <div className={styles.pageHeader}>
+          <Button 
+              type="secondary"
+              variant="back"
+              icon="bi bi-arrow-left"
+              onClick={handleBackToDashboard}
+            >
+              Back to Dashboard
+            </Button>
             <div>
               <h1 className={styles.pageTitle}>Create Project</h1>
               <p className={styles.pageSubtitle}>Upload and add details for your project</p>
@@ -365,10 +393,27 @@ export const ManagerCreateProjectPage = () => {
                     rows="3"
                     required
                   />
+                  {/* <button
+                    className={styles.generateButton}
+                    disabled={isLoading2}
+                  >
+                    <i className="bi bi-upload"></i>
+                    Upload New With AI ✨
+                    {isLoading2 && (
+                    <Spinner
+                      animation="border"
+                      role="status"
+                      size="sm"
+                      className="ms-2"
+                    >
+                      <span className="visually-hidden">Enhancing</span>
+                    </Spinner>
+                    )}
+                  </button> */}
                   <button
                     type="button"
                     onClick={handleEnhance}
-                    className={styles.enhanceButton}
+                    className={styles.generateButton}
                   >
                     Enhance Description
                   </button>

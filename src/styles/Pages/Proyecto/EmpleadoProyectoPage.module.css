@@ -65,10 +65,10 @@
 
 .pageTitle {
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 100;
   margin: 0;
   color: var(--text-light);
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Regular', sans-serif;
 }
 
 .userRole {
@@ -136,10 +136,10 @@
 
 .sectionTitle {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 100;
   margin: 0;
   color: var(--text-light);
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Regular', sans-serif;
 }
 
 .sectionText {

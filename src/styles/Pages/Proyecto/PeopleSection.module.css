@@ -9,11 +9,11 @@
 
 .peopleTitle {
   font-size: 1.35rem;
-  font-weight: 600;
+  font-weight: 100;
   margin: 0 0 0.5rem 0;
   color: var(--text-light);
   flex-shrink: 0;
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Regular', sans-serif;
 }
 
 .peopleContent {
@@ -73,13 +73,13 @@
 
 .personName {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 100;
   color: var(--text-light);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: 'Graphik Medium', sans-serif;
+  font-family: 'Graphik Regular', sans-serif;
 }
 
 .personRole {

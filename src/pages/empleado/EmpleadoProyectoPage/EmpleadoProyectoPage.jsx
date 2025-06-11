@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Custom Hooks
 import useEmpleadoProyectoPage from '../../../hooks/proyecto/useEmpleadoProyectoPage.js';
@@ -9,7 +10,7 @@ import { ProgressBar } from '../../../components/ProgressBar';
 import SkillChip from '../../../components/SkillChip/SkillChip';
 import Button from '../../../components/shared/Button';
 import CustomScrollbar from '../../../components/CustomScrollbar';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner, { SuccessNotification } from '../../../components/LoadingSpinner';
 
 //modals
 import { SkillsModal } from "../../../components/Modals/SkillsModal";
@@ -25,8 +26,28 @@ import skillsStyles from "src/styles/Pages/Proyecto/SkillsSection.module.css";
 import Alert from "react-bootstrap/Alert";
 //project details page for empleado role
 export const EmpleadoProyectoPage = () => {
+  const navigate = useNavigate();
   const proyectoPage = useEmpleadoProyectoPage();
-  const { projectData, userSkills, isApplied, isLoading, loading, error } = proyectoPage;
+  const { projectData, userSkills, isApplied, isLoading, loading, error, showSuccessNotification } = proyectoPage;
+
+  const handleBackToDashboard = () => {
+    const userRole = localStorage.getItem('role');
+    
+    switch(userRole) {
+      case 'empleado':
+        navigate('/empleado/dashboard');
+        break;
+      case 'manager':
+        navigate('/manager/dashboard');
+        break;
+      case 'admin':
+        navigate('/TFS/dashboard');
+        break;
+      default:
+        navigate('/dashboard');
+        break;
+    }
+  };
 
   //loading state
   if (loading) {
@@ -78,13 +99,19 @@ export const EmpleadoProyectoPage = () => {
         {/* Left Column - Project Details */}
         <div className={styles.proyectoDetails}>
           <div className={styles.pageHeader}>
-            <div className={styles.titleContainer}>
-              <h1 className={styles.pageTitle}>
-                {projectData.title} - <span className={styles.userRole}>
-                  {projectData.primaryRole ? projectData.primaryRole.name : 'Role Not Specified'}
-                </span>
-              </h1>
-            </div>
+            <Button 
+              type="secondary"
+              variant="back"
+              icon="bi bi-arrow-left"
+              onClick={handleBackToDashboard}
+            >
+              Back to Dashboard
+            </Button>
+            <h1 className={styles.pageTitle}>
+              {projectData.title} - <span className={styles.userRole}>
+                {projectData.primaryRole ? projectData.primaryRole.name : 'Role Not Specified'}
+              </span>
+            </h1>
           </div>
           
           <div className={styles.proyectoDates}>
@@ -303,6 +330,12 @@ export const EmpleadoProyectoPage = () => {
         isOpen={proyectoPage.modals.rfp}
         onClose={() => proyectoPage.closeModal('rfp')}
         projectData={projectData}
+      />
+
+      {/* Success Notification */}
+      <SuccessNotification 
+        isVisible={showSuccessNotification}
+        message="Successfully applied to project!"
       />
     </div>
   );

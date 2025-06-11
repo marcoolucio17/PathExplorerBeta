@@ -41,7 +41,7 @@ export const TFSApplicantsPage = () => {
             icon="bi bi-arrow-left"
             onClick={applicantsPage.handleBack}
           >
-            Back to Dashboard
+            Back to Home
           </Button>
           <h1 className={styles.pageTitle}>Application Management</h1>
         </div>
@@ -114,6 +114,7 @@ export const TFSApplicantsPage = () => {
         onDeny={applicantsPage.handleDenyApplicant}
         onViewProfile={applicantsPage.handleViewProfile}
         readOnly={applicantsPage.activeTab === 'Pending Assignment'}
+        hideFeedback={true}
       />
     </div>
   );

@@ -226,7 +226,7 @@ export const useTFSApplicantsPage = () => {
       projectField: 'project' 
     },
     sortFunction: sortApplicants,
-    baseUrl: '/tfs/dashboard'
+    baseUrl: '/tfs'
   });
 
   useEffect(() => {
