@@ -115,7 +115,7 @@
   left: 0;
   width: 64px;
   height: calc(110vh - 103px);
-  background-color: #15151576;
+  background-color: rgba(255, 255, 255, 0.103);
   box-shadow: var(--shadow-dropdown);
   padding-top: 10px;
   overflow-x: hidden;

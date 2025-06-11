@@ -75,8 +75,6 @@ export const FeedbackModal = ({
       feedback: feedback.trim(),
       rating: rating
     };
-
-    console.log('Submitting feedback:', feedbackData);
     
     try {
       await onSubmitFeedback(feedbackData);
@@ -123,14 +121,9 @@ export const FeedbackModal = ({
                 <div className={styles.userDetails}>
                   <h3>{selectedUser?.nombre}</h3>
                   <p>{selectedUser?.correoelectronico}</p>
-                  <span className={styles.userType}>{selectedUser?.tipo}</span>
                 </div>
               </div>
 
-              {/* Project Info */}
-              <div className={styles.projectInfo}>
-                <h4>Project: {projectData?.pnombre || 'Unknown Project'}</h4>
-              </div>
 
               {/* Rating */}
               <div className={styles.formSection}>
